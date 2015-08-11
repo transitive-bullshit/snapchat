@@ -4,6 +4,8 @@ var debug = require('debug')('snapchat')
 var EventEmitter = require('events').EventEmitter
 var inherits = require('inherits')
 
+var constants = require('./lib/constants')
+
 inherits(Snapchat, EventEmitter)
 
 /**

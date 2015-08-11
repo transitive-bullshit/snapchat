@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "debug": "^2.1.0",
+    "enum": "^2.1.0",
     "inherits": "^2.0.1",
     "xtend": "^4.0.0"
   },
