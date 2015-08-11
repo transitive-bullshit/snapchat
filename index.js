@@ -178,7 +178,15 @@ Snapchat.prototype.signIn = function (username, password, gmailEmail, gmailPassw
         return cb(err)
       }
 
-      self._getGoogleCloudMessagingIdentifier(
+      self._getGoogleCloudMessagingIdentifier(function (err, ptoken) {
+        if (err) {
+          debug('could not google cloud messaging identifier')
+          return cb(err)
+        }
+
+
+        throw new Error("TODO")
+      })
     })
   })
                     [self getGoogleCloudMessagingIdentifier: ^(NSString *ptoken, NSError *error3) {
@@ -490,6 +498,7 @@ Snapchat.prototype._getGoogleCloudMessagingIdentifier = function (cb) {
     if (err) {
       cb(err)
     } else if (body) {
+      // TODO: parse token=
     }
   })
 
