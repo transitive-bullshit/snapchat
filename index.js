@@ -239,7 +239,7 @@ Snapchat.prototype.registerUsername = function (username, registeredEmail, gmail
 /**
  * The third and final step in registration.
  * If you don't want to verify your humanity a phone number,
- * you can verify it by with a "captcha" image of sorts.
+ * you can verify it by with a 'captcha' image of sorts.
  *
  * @param {string} mobile A 10-digit (+ optional country code, defaults to 1) mobile phone number to be associated with the account, in any format. i.e. +11234567890, (123) 456-7890, 1-1234567890
  * @param {boolean} sms YES if you want a code sent via SMS, NO if you want to be called for verification.
@@ -275,11 +275,11 @@ Snapchat.prototype.getCaptcha = function (cb) {
 }
 
 /**
- * Use this to "solve" a captcha.
+ * Use this to 'solve' a captcha.
  * @warning Seems to not be working.
  * @todo: document response
  *
- * @param {string} solution The solution to the captcha as a binary string. If the first, second, and last images contain ghosts, the solution would be \c "110000001".
+ * @param {string} solution The solution to the captcha as a binary string. If the first, second, and last images contain ghosts, the solution would be \c '110000001'.
  * @param {function} cb
  */
 Snapchat.prototype.solveCaptcha = function (solution, cb) {
@@ -311,21 +311,21 @@ Snapchat.prototype._sendEvents = function (events, snapInfo, cb) {
 Snapchat.prototype._getAuthToken = function (gmailEmail, gmailPassword, cb) {
   var self = this
   var params = {
-    "google_play_services_version": "7097038",
-    "device_country": "us",
-    "operatorCountry": "us",
-    "lang": "en_US",
-    "sdk_version": "19",
-    "accountType": "HOSTED_OR_GOOGLE",
-    "Email": gmailEmail,
-    "Passwd": gmailPassword,
-    "service": "audience: server: client_id: 694893979329-l59f3phl42et9clpoo296d8raqoljl6p.apps.googleusercontent.com",
-    "source": "android",
-    "androidId": "378c184c6070c26c",
-    "app": "com.snapchat.android",
-    "client_sig": "49f6badb81d89a9e38d65de76f09355071bd67e7",
-    "callerPkg": "com.snapchat.android",
-    "callerSig": "49f6badb81d89a9e38d65de76f09355071bd67e7"
+    'google_play_services_version': '7097038',
+    'device_country': 'us',
+    'operatorCountry': 'us',
+    'lang': 'en_US',
+    'sdk_version': '19',
+    'accountType': 'HOSTED_OR_GOOGLE',
+    'Email': gmailEmail,
+    'Passwd': gmailPassword,
+    'service': 'audience: server: client_id: 694893979329-l59f3phl42et9clpoo296d8raqoljl6p.apps.googleusercontent.com',
+    'source': 'android',
+    'androidId': '378c184c6070c26c',
+    'app': 'com.snapchat.android',
+    'client_sig': '49f6badb81d89a9e38d65de76f09355071bd67e7',
+    'callerPkg': 'com.snapchat.android',
+    'callerSig': '49f6badb81d89a9e38d65de76f09355071bd67e7'
   }
 
   var headers = {
@@ -337,7 +337,7 @@ Snapchat.prototype._getAuthToken = function (gmailEmail, gmailPassword, cb) {
   headers[constants.headers.userAgent] = 'GoogleAuth/1.4 (mako JDQ39)'
 
   request.post({
-    url: "https://android.clients.google.com/auth",
+    url: 'https://android.clients.google.com/auth',
     form: params,
     headers: headers
   }, function (err, httpResponse, body) {
@@ -376,7 +376,7 @@ Snapchat.prototype._getDeviceToken = function (cb) {
     // TODO
 
     Request.postTo(constants.endpoints.device.identifier, { }, headers, null, function (err, response, body) {
-      cb("TODO")
+      cb('TODO')
     })
   }
 }
