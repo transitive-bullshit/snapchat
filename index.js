@@ -1,10 +1,13 @@
 module.exports = Snapchat
 
 var debug = require('debug')('snapchat')
+var request = require('request')
 var EventEmitter = require('events').EventEmitter
 var inherits = require('inherits')
 
 var constants = require('./lib/constants')
+var Session = require('./lib/session')
+var Request = require('./lib/request')
 
 inherits(Snapchat, EventEmitter)
 
@@ -19,8 +22,64 @@ function Snapchat (opts) {
   if (!opts) opts = {}
   EventEmitter.call(self)
 
-  debug('new snapchat client (username %s)', self.username)
+  debug('new snapchat client')
 }
+
+/**
+ * The username of the currently signed in (or not yet singed in) user.
+ * @note Always lowercase.
+ *
+ * @type {string}
+ */
+Object.defineProperty(Snapchat.prototype, 'username', {
+  get: function () {
+    var self = this
+    return self._username
+  }
+})
+
+/**
+ * The username of the currently signed in (or not yet singed in) user.
+ * @note Always lowercase.
+ *
+ * @type {Session}
+ */
+Object.defineProperty(Snapchat.prototype, 'currentSession', {
+  get: function () {
+    var self = this
+    return self._currentSession
+  },
+
+  set: function (currentSession) {
+    var self = this
+    self._currentSession = currentSession
+    self._username = currentSession.username
+  }
+})
+
+/**
+ * The size of your device's screen.
+ *
+ * @type {Object}
+ */
+Object.defineProperty(Snapchat.prototype, 'screenSize', {
+  get: function () {
+    var self = this
+    return self._screenSize
+  }
+})
+
+/**
+ * The maximum size to load videos in
+ *
+ * @type {Object}
+ */
+Object.defineProperty(Snapchat.prototype, 'maxVideoSize', {
+  get: function () {
+    var self = this
+    return self._maxVideoSize
+  }
+})
 
 /**
  * Whether or not this client is signed in.
@@ -28,6 +87,70 @@ function Snapchat (opts) {
  * @type {boolean}
  */
 Object.defineProperty(Snapchat.prototype, 'isSignedIn', {
+  get: function () {
+    var self = this
+    return self.googleAuthToken && self.authToken && self.username
+  }
+})
+
+/**
+ * Used internally to sign in.
+ *
+ * @type {string}
+ */
+Object.defineProperty(Snapchat.prototype, 'authToken', {
+  get: function () {
+    var self = this
+    return self._authToken
+  }
+})
+
+/**
+ * Used internally to sign in.
+ *
+ * @type {string}
+ */
+Object.defineProperty(Snapchat.prototype, 'googleAuthToken', {
+  get: function () {
+    var self = this
+    return self._googleAuthToken
+  }
+})
+
+/**
+ * Used internally.
+ *
+ * @type {string}
+ */
+Object.defineProperty(Snapchat.prototype, 'deviceToken1i', {
+  get: function () {
+    var self = this
+    return self._deviceToken1i
+  }
+})
+
+/**
+ * Used internally.
+ *
+ * @type {string}
+ */
+Object.defineProperty(Snapchat.prototype, 'deviceToken1v', {
+  get: function () {
+    var self = this
+    return self._deviceToken1v
+  }
+})
+
+/**
+ * Used internally to sign in and trick Snapchat into thinking we're using the first party client.
+ *
+ * @type {string}
+ */
+Object.defineProperty(Snapchat.prototype, 'googleAttestation', {
+  get: function () {
+    var self = this
+    return self._googleAttestation
+  }
 })
 
 /**
@@ -83,9 +206,9 @@ Snapchat.prototype.updateSession = function (cb) {
  * The first step in creating a new Snapchat account. Registers an email, password, and birthday in preparation for creating a new account.
  *
  * The result passed to cb has the following keys:
- *  - \c email:                 the email you registered with.
+ *  - \c email: the email you registered with.
  *  - \c snapchat_phone_number: a number you can use to verify your phone number later.
- *  - \c username_suggestions:  an array of available usernames for the next step.
+ *  - \c username_suggestions: an array of available usernames for the next step.
  *
  * @param {string} email The email address to be associated with the account.
  * @param {string} password The password of the account to be created.
@@ -162,4 +285,104 @@ Snapchat.prototype.getCaptcha = function (cb) {
 Snapchat.prototype.solveCaptcha = function (solution, cb) {
   var self = this
   debug('Snapchat.solveCaptcha')
+}
+
+/**
+ * internal
+ */
+Snapchat.prototype._post = function (endpoint, params, cb) {
+}
+
+/**
+ * internal
+ */
+Snapchat.prototype._get = function (endpoint, cb) {
+}
+
+/**
+ * internal
+ */
+Snapchat.prototype._sendEvents = function (events, snapInfo, cb) {
+}
+
+/**
+ * internal
+ */
+Snapchat.prototype._getAuthToken = function (gmailEmail, gmailPassword, cb) {
+  var self = this
+  var params = {
+    "google_play_services_version": "7097038",
+    "device_country": "us",
+    "operatorCountry": "us",
+    "lang": "en_US",
+    "sdk_version": "19",
+    "accountType": "HOSTED_OR_GOOGLE",
+    "Email": gmailEmail,
+    "Passwd": gmailPassword,
+    "service": "audience: server: client_id: 694893979329-l59f3phl42et9clpoo296d8raqoljl6p.apps.googleusercontent.com",
+    "source": "android",
+    "androidId": "378c184c6070c26c",
+    "app": "com.snapchat.android",
+    "client_sig": "49f6badb81d89a9e38d65de76f09355071bd67e7",
+    "callerPkg": "com.snapchat.android",
+    "callerSig": "49f6badb81d89a9e38d65de76f09355071bd67e7"
+  }
+
+  var headers = {
+    'device': '378c184c6070c26c',
+    'app': 'com.snapchat.android',
+    'Accept-Encoding': 'gzip'
+  }
+
+  headers[constants.headers.userAgent] = 'GoogleAuth/1.4 (mako JDQ39)'
+
+  request.post({
+    url: "https://android.clients.google.com/auth",
+    form: params,
+    headers: headers
+  }, function (err, httpResponse, body) {
+    // TODO
+    console.error(err, httpResponse, body)
+    process.exit(1)
+
+    if (err) {
+      cb(err)
+    } else {
+      cb(err, body)
+    }
+  })
+}
+
+/**
+ * internal
+ */
+Snapchat.prototype._getDeviceToken = function (cb) {
+  // TODO
+  var dt1i = null
+  var dt1v = null
+
+  function completion () {
+    var result = { }
+    result[constants.core.deviceToken1i] = dt1i
+    result[constants.core.deviceToken1v] = dt1v
+
+    cb(null, result)
+  }
+
+  if (dt1i && dt1v) {
+    completion()
+  } else {
+    var headers = {}
+    // TODO
+
+    Request.postTo(constants.endpoints.device.identifier, { }, headers, null, function (err, response, body) {
+      cb("TODO")
+    })
+  }
+}
+/**
+/* Attestation, courtesy of \c casper.io
+ * internal
+ */
+Snapchat.prototype._getGoogleCloudMessagingIdentifier = function (username, password, ts, cb) {
 }
