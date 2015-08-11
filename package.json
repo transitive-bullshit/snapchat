@@ -1,6 +1,6 @@
 {
   "name": "snapchat",
-  "description": "Client for the unofficial Snapchat API",
+  "description": "Nodejs client for the unofficial Snapchat API",
   "version": "0.0.1",
   "author": {
     "name": "Travis Fischer",
