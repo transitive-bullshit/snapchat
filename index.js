@@ -49,7 +49,14 @@ Object.defineProperty(Snapchat.prototype, 'currentSession', {
   set: function (currentSession) {
     var self = this
     self._currentSession = currentSession
-    self._username = currentSession.username
+
+    if (currentSession) {
+      self._username = currentSession.username
+      self._authToken = currentSession.authToken
+    } else {
+      self._username = null
+      self._authToken = null
+    }
   }
 })
 
@@ -222,9 +229,13 @@ Snapchat.prototype.signIn = function (username, password, gmailEmail, gmailPassw
               return cb(err)
             }
 
-            self.currentSession = new Session(StringUtils.tryParseJSON(body))
-            self._authToken = self.currentSession.authToken
-            cb(null, self._currentSession)
+            var result = StringUtils.tryParseJSON(body)
+            if (result) {
+              self.currentSession = new Session(result)
+              cb(null, self.currentSession)
+            } else {
+              cb('signIn parse error')
+            }
           })
         })
       })
@@ -243,7 +254,12 @@ Snapchat.prototype.signIn = function (username, password, gmailEmail, gmailPassw
 Snapchat.prototype.restoreSession = function (username, authToken, googleAuthToken, cb) {
   var self = this
   debug('Snapchat.restoreSession (username %s)', username)
-  throw new Error("TODO")
+
+  self._username = username
+  self._authToken = authToken
+  self._googleAuthToken = googleAuthToken
+
+  self.updateSession(cb)
 }
 
 /**
@@ -254,7 +270,32 @@ Snapchat.prototype.restoreSession = function (username, authToken, googleAuthTok
 Snapchat.prototype.signOut = function (cb) {
   var self = this
   debug('Snapchat.signOut')
-  throw new Error("TODO")
+
+  var params = {
+    'username': self._username
+  }
+
+  Request.postTo(constants.endpoints.account.login, params, self._googleAuthToken, self._authToken, function (err, response, body) {
+    if (err) {
+      debug('signOut error %s %s', err, response)
+      return cb(err)
+    } else {
+      var result = StringUtils.tryParseJSON(body)
+      if (result && result.length === 0) {
+        self._currentSession = null
+        self._username = null
+        self._authToken = null
+        self._googleAuthToken = null
+        self._googleAttestation = null
+        self._deviceToken1i = null
+        self._deviceToken1v = null
+        cb(null)
+      } else {
+        debug('signOut parse error %s', body)
+        cb('signOut parse error')
+      }
+    }
+  })
 }
 
 /**
@@ -265,7 +306,26 @@ Snapchat.prototype.signOut = function (cb) {
 Snapchat.prototype.updateSession = function (cb) {
   var self = this
   debug('Snapchat.updateSession')
-  throw new Error("TODO")
+
+  self._post(constants.endpoints.update.all, {
+    'username': self._username,
+    'width': constants.screen.width,
+    'height': constants.screen.height,
+    'max_video_width': constants.screen.maxVideoWidth,
+    'max_video_height': constants.screen.maxVideoHeight,
+    'include_client_settings': 'true'
+  }, function (err, response, body) {
+    if (err) {
+      debug('updateSession error %s %s', err, response)
+      cb(err)
+    } else if (body) {
+      var result = StringUtils.tryParseJSON(body)
+
+      if (result) {
+        self.currentSession = new Session(result)
+      }
+    }
+  })
 }
 
 /**
