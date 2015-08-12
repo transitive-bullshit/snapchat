@@ -184,71 +184,54 @@ Snapchat.prototype.signIn = function (username, password, gmailEmail, gmailPassw
           return cb(err)
         }
 
+        self._getDeviceTokens(function (err, deviceTokens) {
+          if (err) {
+            debug('error getting device token')
+            return cb(err)
+          }
 
-        throw new Error("TODO")
+          self._googleAuthToken = gauth
+          self._googleAttestation = attestation
+          self._deviceToken1i = deviceTokens[constants.core.deviceToken1i]
+          self._deviceToken1v = deviceTokens[constants.core.deviceToken1v]
+
+          var reqToken = StringUtils.hashSCString(constants.core.staticToken, timestamp)
+          var preHash = StringUtils.getSCHashString(username, password, timestamp, reqToken)
+          var deviceHash = StringUtils.hashHMac(preHash, self._deviceToken1i).substr(0, 20)
+
+          var params = {
+            'username': username,
+            'password': password,
+            'width': constants.screen.width,
+            'height': constants.screen.height,
+            'max_video_width': constants.screen.maxVideoWidth,
+            'max_video_height': constants.screen.maxVideoHeight,
+            'application_id': 'com.snapchat.android',
+            'is_two_fa': 'false',
+            'ptoken': ptoken || 'ie',
+            'pre_auth': '',
+            'sflag': 1,
+            'dtoken1i': self._deviceToken1i,
+            'attestation': self._googleAttestation,
+            'timestamp': timestamp
+          }
+
+          var headers = { }
+          headers[constants.headers.clientAuthToken] = 'Bearer ' + self._googleAuthToken
+
+          Request.postTo(constants.endpoints.account.login, params, self._googleAuthToken, null, function (err, response, body) {
+            if (err) {
+              debug('error logging in %s', response)
+              return cb(err)
+            }
+
+            self.currentSession = new Session(StringUtils.tryParseJSON(body))
+            self._authToken = self.currentSession.authToken
+          })
+        })
       })
     })
   })
-                    [self getGoogleCloudMessagingIdentifier: ^(NSString *ptoken, NSError *error3) {
-                        if (!error3) {
-                            [self getDeviceToken: ^(NSDictionary *dict, NSError *error4) {
-                                if (error4 || !dict) {
-                                    completion(nil, [SKRequest errorWithMessage: "Could not retrieve Snapchat device token." code: error4.code?: 1])
-                                } else {
-
-                                    _googleAuthToken   = gauth
-                                    _googleAttestation = attestation
-                                    _deviceToken1i     = dict[SKConsts.deviceToken1i]
-                                    _deviceToken1v     = dict[SKConsts.deviceToken1v]
-
-                                    NSString *req_token = [NSString hashSCString: SKConsts.staticToken and: timestamp]
-                                    NSString *string    = [NSString stringWithFormat: "%@|%@|%@|%", username, password, timestamp, req_token]
-                                    NSString *deviceSig = [[NSString hashHMac: string key: self.deviceToken1v] substringWithRange: NSMakeRange(0, 20)]
-
-                                    NSDictionary *post = @{"username": username,
-                                                           "password": password,
-                                                           "height": @(kScreenHeight),
-                                                           "width": @(kScreenWidth),
-                                                           "max_video_width": @480,
-                                                           "max_video_height": @640,
-                                                           "application_id": "com.snapchat.android",
-                                                           "is_two_fa": "false",
-                                                           "ptoken": ptoken ?: "ie",
-                                                           "pre_auth": "",
-                                                           "sflag": @1,
-                                                           "dsig": deviceSig,
-                                                           "dtoken1i": self.deviceToken1i,
-                                                           "attestation": self.googleAttestation,
-                                                           "timestamp": timestamp}
-
-                                    NSDictionary *headers = @{SKHeaders.clientAuthToken: [NSString stringWithFormat: "Bearer %", self.googleAuthToken]}
-                                    SKRequest *request    = [[SKRequest alloc] initWithPOSTEndpoint: SKEPAccount.login token: nil query: post headers: headers ts: timestamp]
-                                    NSURLSession *session = [NSURLSession sessionWithConfiguration: [NSURLSessionConfiguration defaultSessionConfiguration]]
-
-                                    NSURLSessionDataTask *dataTask = [session dataTaskWithRequest: request completionHandler: ^(NSData *data, NSURLResponse *response, NSError *error5) {
-                                        [self handleError: error5 data: data response: response completion: ^(NSDictionary *json, NSError *jsonerror) {
-                                            dispatch_async(dispatch_get_main_queue(), ^{
-                                                if (!jsonerror) {
-                                                    self.currentSession = [SKSession sessionWithJSONResponse: json]
-                                                    _authToken = self.currentSession.authToken
-                                                    completion(json, nil)
-                                                } else {
-                                                    completion(nil, jsonerror)
-                                                }
-                                            })
-                                        }]
-                                    }]
-                                    [dataTask resume]
-                                }
-                            }]
-                        } else {
-                            completion(nil, [SKRequest errorWithMessage: "Could not retrieve Snapchat push token." code: error3.code?: 1])
-                        }
-                    }]
-                }
-            }]
-        }
-    }]
 }
 
 /**
@@ -262,6 +245,7 @@ Snapchat.prototype.signIn = function (username, password, gmailEmail, gmailPassw
 Snapchat.prototype.restoreSession = function (username, authToken, googleAuthToken, cb) {
   var self = this
   debug('Snapchat.restoreSession (username %s)', username)
+  throw new Error("TODO")
 }
 
 /**
@@ -272,6 +256,7 @@ Snapchat.prototype.restoreSession = function (username, authToken, googleAuthTok
 Snapchat.prototype.signOut = function (cb) {
   var self = this
   debug('Snapchat.signOut')
+  throw new Error("TODO")
 }
 
 /**
@@ -282,6 +267,7 @@ Snapchat.prototype.signOut = function (cb) {
 Snapchat.prototype.updateSession = function (cb) {
   var self = this
   debug('Snapchat.updateSession')
+  throw new Error("TODO")
 }
 
 /**
@@ -422,26 +408,27 @@ Snapchat.prototype._getAuthToken = function (gmailEmail, gmailPassword, cb) {
     url: 'https://android.clients.google.com/auth',
     form: params,
     headers: headers
-  }, function (err, httpResponse, body) {
-    // TODO
-    console.error(err, httpResponse, body)
-    process.exit(1)
-
+  }, function (err, response, body) {
     if (err) {
+      debug('_getAuthToken error %s', response)
       cb(err)
     } else {
-      cb(err, body)
+      cb(null, StringUtils.matchGroup(body, /Auth=([\w\.-]+)/i, 1))
     }
   })
 }
 
+// static cache of device tokens
+var sDeviceToken1i = null
+var sDeviceToken1v = null
+
 /**
  * internal
  */
-Snapchat.prototype._getDeviceToken = function (cb) {
-  // TODO
-  var dt1i = null
-  var dt1v = null
+Snapchat.prototype._getDeviceTokens = function (cb) {
+  // cache device tokens
+  var dt1i = sDeviceToken1i
+  var dt1v = sDeviceToken1v
 
   function completion () {
     var result = { }
@@ -454,11 +441,28 @@ Snapchat.prototype._getDeviceToken = function (cb) {
   if (dt1i && dt1v) {
     completion()
   } else {
-    var headers = {}
-    // TODO
+    Request.postTo(constants.endpoints.device.identifier, { }, null, null, function (err, response, body) {
+      if (err) {
+        debug('_getDeviceTokens error %s', response)
+        return cb(err)
+      } else if (body) {
+        var result = StringUtils.tryParseJSON(body)
 
-    Request.postTo(constants.endpoints.device.identifier, { }, headers, null, function (err, response, body) {
-      cb('TODO')
+        if (result) {
+          dt1i = result[constants.core.deviceToken1i]
+          dt1v = result[constants.core.deviceToken1v]
+
+          if (dt1i && dt1v) {
+            sDeviceToken1i = dt1i
+            sDeviceToken1v = dt1v
+
+            completion()
+          }
+        }
+      }
+
+      debug('_getDeviceTokens parse error %s', body)
+      cb('_getDeviceTokens parse error')
     })
   }
 }
@@ -498,21 +502,12 @@ Snapchat.prototype._getGoogleCloudMessagingIdentifier = function (cb) {
     if (err) {
       cb(err)
     } else if (body) {
-      // TODO: parse token=
+      // parse token
+      cb(null, StringUtils.matchGroup(body, /token=([\w\.-]+)/, 1))
+    } else {
+      cb('unknown error')
     }
   })
-
-      if (error) {
-          callback(nil, error)
-      } else if (data) {
-          NSString *string = [[NSString alloc] initWithData: data encoding: NSUTF8StringEncoding]
-          string = [string matchGroupAtIndex: 1 forRegex: "token=([\\w\\.-]+)"]
-          callback(string, nil)
-      } else {
-          callback(nil, [SKRequest errorWithMessage: "Unknown error" code: [(NSHTTPURLResponse *)response statusCode]])
-      }
-  }]
-  [dataTask resume]
 }
 
 /**
@@ -520,8 +515,8 @@ Snapchat.prototype._getGoogleCloudMessagingIdentifier = function (cb) {
  * internal
  */
 Snapchat.prototype._getAttestation = function (username, password, ts, cb) {
-  var hashString = uesrname + "|" + password + "|" + ts + "|" + constants.endpoints.account.login
-  var nonce = StringUtils.sha256Hash(hashString)
+  var preHash = StringUtils.getSCHashString(username, password, ts, constants.endpoints.account.login)
+  var nonce = StringUtils.sha256Hash(preHash)
 
   var params = {
     'nonce': nonce,
@@ -537,9 +532,9 @@ Snapchat.prototype._getAttestation = function (username, password, ts, cb) {
     if (err) {
       return cb(err)
     } else {
-      var result = JSON.parse(body)
+      var result = StringUtils.tryParseJSON(body)
 
-      if (+result.code === 200) {
+      if (result && +result.code === 200) {
         return cb(null, result.signedAttestation)
       } else {
         return cb("unknown error")
