@@ -205,7 +205,7 @@ Snapchat.prototype.signIn = function (username, password, gmailEmail, gmailPassw
           self._deviceToken1v = deviceTokens[constants.core.deviceToken1v]
 
           var reqToken = StringUtils.hashSCString(constants.core.staticToken, timestamp)
-          var preHash = StringUtils.getSCHashString(username, password, timestamp, reqToken)
+          var preHash = StringUtils.getSCPreHashString(username, password, timestamp, reqToken)
           var deviceHash = StringUtils.hashHMacToBase64(preHash, self._deviceToken1i).substr(0, 20)
 
           var params = {
@@ -728,7 +728,7 @@ Snapchat.prototype._getGoogleCloudMessagingIdentifier = function (cb) {
  * internal
  */
 Snapchat.prototype._getAttestation = function (username, password, ts, cb) {
-  var preHash = StringUtils.getSCHashString(username, password, ts, constants.endpoints.account.login)
+  var preHash = StringUtils.getSCPreHashString(username, password, ts, constants.endpoints.account.login)
   var nonce = new Buffer(StringUtils.sha256HashToBase64(preHash))
 
   var params = {
