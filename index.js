@@ -519,5 +519,40 @@ Snapchat.prototype._getGoogleCloudMessagingIdentifier = function (cb) {
  * Attestation, courtesy of \c casper.io
  * internal
  */
-Snapchat.prototype._getGoogleCloudMessagingIdentifier = function (username, password, ts, cb) {
+Snapchat.prototype._getAttestation = function (username, password, ts, cb) {
+  var hashString = uesrname + "|" + password + "|" + ts + "|" + constants.endpoints.account.login
+  NSString *nonce          = [hashString.sha256HashRaw base64EncodedStringWithOptions: 0];
+
+  NSDictionary *query = @{@"nonce": nonce,
+                          @"authentication": SKAttestation.auth,
+                          @"apk_digest": SKAttestation.digest9_12_2,
+                          @"timestamp": ts};
+  NSData *queryData  = [[NSString queryStringWithParams: query] dataUsingEncoding: NSUTF8StringEncoding];
+
+  NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL: [NSURL URLWithString: SKAttestation.URLCasper]];
+  request.HTTPMethod  = @"POST";
+  request.HTTPBody    = queryData;
+  [request setValue: @"application/x-www-form-urlencoded" forHTTPHeaderField: @"Content-type"];
+
+  NSURLSession *session = [NSURLSession sessionWithConfiguration: [NSURLSessionConfiguration defaultSessionConfiguration]];
+  NSURLSessionDataTask *dataTask = [session dataTaskWithRequest: request completionHandler: ^(NSData *data, NSURLResponse *response, NSError *error) {
+      if (error) {
+          completion(nil, error);
+      } else if (data) {
+          NSError *jsonError;
+          NSDictionary *json = [NSJSONSerialization JSONObjectWithData: data options: 0 error: &jsonError];
+
+          if (jsonError)
+              completion(nil, jsonError);
+          else if ([json[@"code"] integerValue] == 200)
+              completion(json[@"signedAttestation"], nil);
+          else
+              completion(nil, [SKRequest unknownError]);
+      } else {
+          completion(nil, [SKRequest unknownError]);
+      }
+  }];
+
+  [dataTask resume];
+
 }
