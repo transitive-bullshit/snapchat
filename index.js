@@ -220,6 +220,7 @@ Snapchat.prototype.signIn = function (username, password, gmailEmail, gmailPassw
             'ptoken': ptoken || 'ie',
             'pre_auth': '',
             'sflag': 1,
+            'dsig': deviceHash,
             'dtoken1i': self._deviceToken1i,
             'attestation': self._googleAttestation,
             'timestamp': timestamp
@@ -277,7 +278,7 @@ Snapchat.prototype.signOut = function (cb) {
     'username': self._username
   }
 
-  self._post(constants.endpoints.account.login, params, function (err, response, body) {
+  self.post(constants.endpoints.account.login, params, function (err, response, body) {
     if (err) {
       debug('signOut error %s %s', err, response)
       return cb(err)
@@ -309,7 +310,7 @@ Snapchat.prototype.updateSession = function (cb) {
   var self = this
   debug('Snapchat.updateSession')
 
-  self._post(constants.endpoints.update.all, {
+  self.post(constants.endpoints.update.all, {
     'username': self._username,
     'width': constants.screen.width,
     'height': constants.screen.height,
@@ -351,7 +352,7 @@ Snapchat.prototype.registerEmail = function (email, password, birthday, cb) {
   var self = this
   debug('Snapchat.registerEmail (email %s)', email)
 
-  self._post(constants.endpoints.registration.start, {
+  self.post(constants.endpoints.registration.start, {
     'email': email,
     'password': password,
     'birthday': birthday,
@@ -397,7 +398,7 @@ Snapchat.prototype.registerUsername = function (username, registeredEmail, gmail
       return cb(err)
     }
 
-    self._post(constants.endpoints.registration.username, {
+    self.post(constants.endpoints.registration.username, {
       'username': registeredEmail,
       'selected_username': username
     }, function (err, response, body) {
@@ -435,7 +436,7 @@ Snapchat.prototype.sendPhoneVerification = function (mobile, sms, cb) {
   var countryCode = +mobile[1]
   mobile = mobile.substr(2)
 
-  self._post(constants.endpoints.registration.verifyPhone, {
+  self.post(constants.endpoints.registration.verifyPhone, {
     'username': self._username,
     'phoneNumber': mobile,
     'countryCode': countryCode,
@@ -489,7 +490,7 @@ Snapchat.prototype.getCaptcha = function (cb) {
   var self = this
   debug('Snapchat.getCaptcha')
 
-  self._post(constants.endpoints.registration.getCaptcha, {
+  self.post(constants.endpoints.registration.getCaptcha, {
     'username': self._username
   }, function (err, response, body) {
     if (err) {
@@ -525,11 +526,15 @@ Snapchat.prototype.solveCaptcha = function (solution, cb) {
 }
 
 /**
- * internal
+ * Initializes a POST request to the Snapchat API.
+ *
+ * @param {string} endpoint Snapchat API endpoint
+ * @param {Object} params Form data (will be augmented with required snapchat API params)
+ * @param {function} cb
  */
-Snapchat.prototype._post = function (endpoint, params, cb) {
+Snapchat.prototype.post = function (endpoint, params, cb) {
   var self = this
-  debug('Snapchat._post (%s)', endpoint)
+  debug('Snapchat.post (%s)', endpoint)
 
   Request.post(endpoint, params, self._googleAuthToken, self._authToken, cb)
 }
@@ -537,9 +542,9 @@ Snapchat.prototype._post = function (endpoint, params, cb) {
 /**
  * internal
  */
-Snapchat.prototype._sendEvents = function (events, snapInfo, cb) {
+Snapchat.prototype.sendEvents = function (events, snapInfo, cb) {
   var self = this
-  debug('Snapchat._sendEvents')
+  debug('Snapchat.sendEvents')
 
   cb = cb || function () { }
   events = events || { }
@@ -551,10 +556,10 @@ Snapchat.prototype._sendEvents = function (events, snapInfo, cb) {
     'username': self._username
   }, function (err, response, body) {
     if (err) {
-      debug('_sendEvents error %s %s', err, response)
+      debug('sendEvents error %s %s', err, response)
       return cb(err)
     } else {
-      debug('_sendEvents post body %s', body)
+      debug('sendEvents post body %s', body)
       cb(null)
     }
   })
