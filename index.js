@@ -206,7 +206,7 @@ Snapchat.prototype.signIn = function (username, password, gmailEmail, gmailPassw
 
           var reqToken = StringUtils.hashSCString(constants.core.staticToken, timestamp)
           var preHash = StringUtils.getSCHashString(username, password, timestamp, reqToken)
-          var deviceHash = StringUtils.hashHMac(preHash, self._deviceToken1i).substr(0, 20)
+          var deviceHash = StringUtils.hashHMacToBase64(preHash, self._deviceToken1i).substr(0, 20)
 
           var params = {
             'username': username,
@@ -367,18 +367,14 @@ Snapchat.prototype.registerEmail = function (email, password, birthday, cb) {
       debug('registerEmail error %s', err)
       return cb(err)
     } else {
-      console.log('body', body)
       var result = StringUtils.tryParseJSON(body)
 
       if (result && !!result.logged) {
-        return cb(null, {
-          'email': result['email'],
-          'snapchat_phone_number': result['snapchat_phone_number'],
-          'username_suggestions': result['username_suggestions']
-        })
+        return cb(null, result)
       }
     }
 
+    debug('registerEmail parse error %s', body)
     cb('registerEmail error')
   })
 }
@@ -733,7 +729,7 @@ Snapchat.prototype._getGoogleCloudMessagingIdentifier = function (cb) {
  */
 Snapchat.prototype._getAttestation = function (username, password, ts, cb) {
   var preHash = StringUtils.getSCHashString(username, password, ts, constants.endpoints.account.login)
-  var nonce = StringUtils.sha256Hash(preHash)
+  var nonce = new Buffer(StringUtils.sha256HashToBase64(preHash))
 
   var params = {
     'nonce': nonce,
