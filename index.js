@@ -652,13 +652,13 @@ Snapchat.prototype._getDeviceTokens = function (cb) {
   }
 
   if (dt1i && dt1v) {
-    completion()
+    return completion()
   } else {
     Request.post(constants.endpoints.device.identifier, { }, null, null, function (err, response, body) {
       if (err) {
         debug('_getDeviceTokens error %s', response)
         return cb(err)
-      } else if (body) {
+      } else {
         var result = StringUtils.tryParseJSON(body)
 
         if (result) {
@@ -669,7 +669,7 @@ Snapchat.prototype._getDeviceTokens = function (cb) {
             sDeviceToken1i = dt1i
             sDeviceToken1v = dt1v
 
-            completion()
+            return completion()
           }
         }
       }

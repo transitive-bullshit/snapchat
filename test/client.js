@@ -14,7 +14,20 @@ test('Snapchat.registerEmail', function (t) {
   })
 })
 
-test('Snapchat._getGoogleCloudMessagingIdentifier', function (t) {
+test('Snapchat._getDeviceTokens', function (t) {
+  var client = new Snapchat()
+
+  client._getDeviceTokens(function (err, result) {
+    console.log(result)
+    t.notOk(err)
+    t.ok(result)
+    t.ok(result.dtoken1i)
+    t.ok(result.dtoken1v)
+    t.end()
+  })
+})
+
+/*test('Snapchat._getGoogleCloudMessagingIdentifier', function (t) {
   var client = new Snapchat()
 
   client._getGoogleCloudMessagingIdentifier(function (err, result) {
@@ -24,4 +37,4 @@ test('Snapchat._getGoogleCloudMessagingIdentifier', function (t) {
     console.log(result)
     t.end()
   })
-})
+})*/
