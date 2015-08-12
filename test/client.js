@@ -4,7 +4,7 @@ var Snapchat = require('../')
 test('Snapchat.registerEmail', function (t) {
   var client = new Snapchat()
 
-  client.registerEmail('test@textblast.io', 'Burnfisch2', '1994-03-20', function (err, result) {
+  client.registerEmail('test@textblast.io', 'Testpassword7', '1994-03-20', function (err, result) {
     t.notOk(err)
     t.ok(result)
     t.ok(result['email'])
