@@ -10,5 +10,5 @@ function Transaction (params) {
   var self = this
   if (!(self instanceof Transaction)) return new Transaction(params)
 
-  throw new Error("TODO")
+  throw new Error('TODO')
 }

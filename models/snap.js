@@ -10,5 +10,5 @@ function Snap (params) {
   var self = this
   if (!(self instanceof Snap)) return new Snap(params)
 
-  throw new Error("TODO")
+  throw new Error('TODO')
 }

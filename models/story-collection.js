@@ -10,5 +10,5 @@ function StoryCollection (params) {
   var self = this
   if (!(self instanceof StoryCollection)) return new StoryCollection(params)
 
-  throw new Error("TODO")
+  throw new Error('TODO')
 }

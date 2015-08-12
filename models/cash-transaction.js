@@ -10,5 +10,5 @@ function CashTransaction (params) {
   var self = this
   if (!(self instanceof CashTransaction)) return new CashTransaction(params)
 
-  throw new Error("TODO")
+  throw new Error('TODO')
 }

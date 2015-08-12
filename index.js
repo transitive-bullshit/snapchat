@@ -361,7 +361,7 @@ Snapchat.prototype.registerEmail = function (email, password, birthday, cb) {
   self.post(constants.endpoints.account.registration.start, {
     'email': email,
     'password': password,
-    'birthday': birthday,
+    'birthday': birthday
   }, function (err, response, body) {
     if (err) {
       debug('registerEmail error %s', err)
@@ -523,7 +523,7 @@ Snapchat.prototype.getCaptcha = function (cb) {
       }
 
       // TODO
-      cb(new Error("TODO"))
+      cb(new Error('TODO'))
     })
   })
 }
@@ -544,7 +544,7 @@ Snapchat.prototype.solveCaptcha = function (solution, cb) {
     return cb(new Error('signin required'))
   }
 
-  throw new Error("TODO")
+  throw new Error('TODO')
 }
 
 /**
@@ -595,7 +595,6 @@ Snapchat.prototype.sendEvents = function (events, snapInfo, cb) {
  * internal
  */
 Snapchat.prototype._getGoogleAuthToken = function (gmailEmail, gmailPassword, cb) {
-  var self = this
   var params = {
     'google_play_services_version': '7097038',
     'device_country': 'us',
@@ -691,14 +690,14 @@ Snapchat.prototype._getDeviceTokens = function (cb) {
  */
 Snapchat.prototype._getGoogleCloudMessagingIdentifier = function (cb) {
   var params = {
-    "X-google.message_id": "google.rpc1",
-    "device": 4343470343591528399,
-    "sender": 191410808405,
-    "app_ver": 706,
-    "gcm_ver": 7097038,
-    "app": "com.snapchat.android",
-    "iat": (new Date()).value,
-    "cert": "49f6badb81d89a9e38d65de76f09355071bd67e7"
+    'X-google.message_id': 'google.rpc1',
+    'device': 4343470343591528399,
+    'sender': 191410808405,
+    'app_ver': 706,
+    'gcm_ver': 7097038,
+    'app': 'com.snapchat.android',
+    'iat': (new Date()).value,
+    'cert': '49f6badb81d89a9e38d65de76f09355071bd67e7'
   }
 
   var headers = {
@@ -710,10 +709,10 @@ Snapchat.prototype._getGoogleCloudMessagingIdentifier = function (cb) {
     'Accept-Encoding': 'gzip'
   }
 
-  headers[constants.headers.userAgent] = "Android-GCM/1.5 (A116 _Quad KOT49H)"
+  headers[constants.headers.userAgent] = 'Android-GCM/1.5 (A116 _Quad KOT49H)'
 
   request.post({
-    url: "https://android.clients.google.com/c2dm/register3",
+    url: 'https://android.clients.google.com/c2dm/register3',
     form: params,
     headers: headers
   }, function (err, httpResponse, body) {
@@ -755,7 +754,7 @@ Snapchat.prototype._getAttestation = function (username, password, ts, cb) {
       if (result && +result.code === 200) {
         return cb(null, result.signedAttestation)
       } else {
-        return cb("unknown error")
+        return cb('unknown error')
       }
     }
   })
