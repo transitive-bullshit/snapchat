@@ -4,11 +4,11 @@ var constants = require('../lib/constants')
 var Request = require('../lib/request')
 
 test('request ping', function (t) {
-  var request = Request.post(constants.endpoints.misc.ping, { }, null, constants.core.staticToken, function (err, response, body) {
-    console.log(request)
-    console.log(err)
-    console.log(response)
-    console.log(body)
+  Request.post(constants.endpoints.misc.ping, function (err, response, body) {
+    t.notOk(err)
+    t.equal(response.statusCode, 200)
+    t.ok(body)
+    t.equal(body.length, 0)
     t.end()
   })
 })
