@@ -22,9 +22,3 @@ There are a few basic ground-rules for contributors:
 ## Releases
 
 Declaring formal releases remains the prerogative of the project maintainer.
-
-## Changes to this arrangement
-
-This is an experiment and feedback is welcome! This document is subject to pull requests or changes by contributors where you believe you have something valuable to add or change.
-
-*Thanks to [Rod Vagg](https://github.com/rvagg) and the [LevelUP](https://github.com/rvagg/node-levelup) project for coming up with this model of open source contribution.*
