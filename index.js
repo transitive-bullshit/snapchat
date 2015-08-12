@@ -2,6 +2,8 @@ module.exports = Snapchat
 
 var debug = require('debug')('snapchat')
 var request = require('request')
+var phone = require('phone')
+var zlib = require('zlib')
 
 var constants = require('./lib/constants')
 var Request = require('./lib/request')
@@ -223,7 +225,7 @@ Snapchat.prototype.signIn = function (username, password, gmailEmail, gmailPassw
             'timestamp': timestamp
           }
 
-          Request.postTo(constants.endpoints.account.login, params, self._googleAuthToken, null, function (err, response, body) {
+          Request.post(constants.endpoints.account.login, params, self._googleAuthToken, null, function (err, response, body) {
             if (err) {
               debug('error logging in %s', response)
               return cb(err)
@@ -275,7 +277,7 @@ Snapchat.prototype.signOut = function (cb) {
     'username': self._username
   }
 
-  Request.postTo(constants.endpoints.account.login, params, self._googleAuthToken, self._authToken, function (err, response, body) {
+  self._post(constants.endpoints.account.login, params, function (err, response, body) {
     if (err) {
       debug('signOut error %s %s', err, response)
       return cb(err)
@@ -317,19 +319,23 @@ Snapchat.prototype.updateSession = function (cb) {
   }, function (err, response, body) {
     if (err) {
       debug('updateSession error %s %s', err, response)
-      cb(err)
-    } else if (body) {
+      return cb(err)
+    } else {
       var result = StringUtils.tryParseJSON(body)
 
       if (result) {
         self.currentSession = new Session(result)
+        return cb(null, self.currentSession)
       }
     }
+
+    cb('updateSession error')
   })
 }
 
 /**
- * The first step in creating a new Snapchat account. Registers an email, password, and birthday in preparation for creating a new account.
+ * The first step in creating a new Snapchat account.
+ * Registers an email, password, and birthday in preparation for creating a new account.
  *
  * The result passed to cb has the following keys:
  *  - \c email: the email you registered with.
@@ -344,6 +350,30 @@ Snapchat.prototype.updateSession = function (cb) {
 Snapchat.prototype.registerEmail = function (email, password, birthday, cb) {
   var self = this
   debug('Snapchat.registerEmail (email %s)', email)
+
+  self._post(constants.endpoints.registration.start, {
+    'email': email,
+    'password': password,
+    'birthday': birthday,
+  }, function (err, response, body) {
+    if (err) {
+      debug('registerEmail error %s %s', err, response)
+      return cb(err)
+    } else {
+      var result = StringUtils.tryParseJSON(body)
+
+      if (result && !!result.logged) {
+        return cb(null, {
+          'email': result['email'],
+          'snapchat_phone_number': result['snapchat_phone_number'],
+          'username_suggestions': result['username_suggestions']
+        })
+      }
+    }
+
+    cb('registerEmail error')
+  })
+
 }
 
 /**
@@ -352,7 +382,7 @@ Snapchat.prototype.registerEmail = function (email, password, birthday, cb) {
  * You must call this method after successfully completing the first step in registration.
  *
  * @param {string} username The username of the account to be created, trimmed to the first 15 characters.
- * @param {string} registeredEmail The email address to be associated with the account, used in the first step of registration.
+ * @param {string} registeredEmail The previously registered email address associated with the account (from the first step of registration).
  * @param {string} gmailEmail A valid GMail address. Required to make Snapchat think this is an official client.
  * @param {string} gmailPassword The password to the Google account associated with gmailEmail.
  * @param {function} cb
@@ -360,6 +390,32 @@ Snapchat.prototype.registerEmail = function (email, password, birthday, cb) {
 Snapchat.prototype.registerUsername = function (username, registeredEmail, gmailEmail, gmailPassword, cb) {
   var self = this
   debug('Snapchat.registerUsername (username %s, email %s)', username, registeredEmail)
+
+  self._getAuthToken(gmailEmail, gmailPassword, function (err, gauth) {
+    if (err) {
+      debug('could not retrieve google auth token')
+      return cb(err)
+    }
+
+    self._post(constants.endpoints.registration.username, {
+      'username': registeredEmail,
+      'selected_username': username
+    }, function (err, response, body) {
+      if (err) {
+        debug('registerUsername error %s %s', err, response)
+        return cb(err)
+      } else {
+        var result = StringUtils.tryParseJSON(body)
+
+        if (result) {
+          self.currentSession = new Session(result)
+          return cb(null)
+        }
+      }
+
+      cb('registerUsername error')
+    })
+  })
 }
 
 /**
@@ -374,6 +430,26 @@ Snapchat.prototype.registerUsername = function (username, registeredEmail, gmail
 Snapchat.prototype.sendPhoneVerification = function (mobile, sms, cb) {
   var self = this
   debug('Snapchat.sendPhoneVerification (mobile %s, sms %d)', mobile, sms)
+
+  mobile = phone(mobile)
+  var countryCode = +mobile[1]
+  mobile = mobile.substr(2)
+
+  self._post(constants.endpoints.registration.verifyPhone, {
+    'username': self._username,
+    'phoneNumber': mobile,
+    'countryCode': countryCode,
+    'action': 'updatePhoneNumber',
+    'skipConfirmation': true
+  }, function (err, response, body) {
+    if (err) {
+      debug('sendPhoneVerification error %s %s', err, response)
+      return cb(err)
+    } else {
+      debug('sendPhoneVerification post body %s', body)
+      cb(null)
+    }
+  })
 }
 
 /**
@@ -387,6 +463,20 @@ Snapchat.prototype.sendPhoneVerification = function (mobile, sms, cb) {
 Snapchat.prototype.verifyPhoneNumber = function (code, cb) {
   var self = this
   debug('Snapchat.verifyPhoneNumber (code %s)', code)
+
+  Request.post(constants.endpoints.registration.verifyPhone, {
+    'action': 'verifyPhoneNumber',
+    'username': self._username,
+    'code': code
+  }, self._googleAuthToken, constants.core.staticToken, function (err, response, body) {
+    if (err) {
+      debug('verifyPhoneNumber error %s %s', err, response)
+      return cb(err)
+    }
+
+    debug('verifyPhoneNumber post body %s', body)
+    cb(null)
+  })
 }
 
 /**
@@ -398,6 +488,25 @@ Snapchat.prototype.verifyPhoneNumber = function (code, cb) {
 Snapchat.prototype.getCaptcha = function (cb) {
   var self = this
   debug('Snapchat.getCaptcha')
+
+  self._post(constants.endpoints.registration.getCaptcha, {
+    'username': self._username
+  }, function (err, response, body) {
+    if (err) {
+      debug('getCaptcha error %s %s', err, response)
+      return cb(err)
+    }
+
+    zlib.gunzip(new Buffer(body), function (err, data) {
+      if (err) {
+        debug('getCaptcha gunzip error %s', err)
+        return cb(err)
+      }
+
+      // TODO
+      cb(new Error("TODO"))
+    })
+  })
 }
 
 /**
@@ -411,24 +520,44 @@ Snapchat.prototype.getCaptcha = function (cb) {
 Snapchat.prototype.solveCaptcha = function (solution, cb) {
   var self = this
   debug('Snapchat.solveCaptcha')
+
+  throw new Error("TODO")
 }
 
 /**
  * internal
  */
 Snapchat.prototype._post = function (endpoint, params, cb) {
-}
+  var self = this
+  debug('Snapchat._post (%s)', endpoint)
 
-/**
- * internal
- */
-Snapchat.prototype._get = function (endpoint, cb) {
+  Request.post(endpoint, params, self._googleAuthToken, self._authToken, cb)
 }
 
 /**
  * internal
  */
 Snapchat.prototype._sendEvents = function (events, snapInfo, cb) {
+  var self = this
+  debug('Snapchat._sendEvents')
+
+  cb = cb || function () { }
+  events = events || { }
+  snapInfo = snapInfo || { }
+
+  self._post(constants.endpoints.update.snaps, {
+    'events': JSON.stringify(events),
+    'json': JSON.stringify(snapInfo),
+    'username': self._username
+  }, function (err, response, body) {
+    if (err) {
+      debug('_sendEvents error %s %s', err, response)
+      return cb(err)
+    } else {
+      debug('_sendEvents post body %s', body)
+      cb(null)
+    }
+  })
 }
 
 /**
@@ -499,7 +628,7 @@ Snapchat.prototype._getDeviceTokens = function (cb) {
   if (dt1i && dt1v) {
     completion()
   } else {
-    Request.postTo(constants.endpoints.device.identifier, { }, null, null, function (err, response, body) {
+    Request.post(constants.endpoints.device.identifier, { }, null, null, function (err, response, body) {
       if (err) {
         debug('_getDeviceTokens error %s', response)
         return cb(err)
