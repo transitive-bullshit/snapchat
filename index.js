@@ -13,7 +13,7 @@ var Session = require('./models/session')
 /**
  * Snapchat Client
  *
- * @param {Object} opts
+ * @param {Object} opts (currently unused)
  */
 function Snapchat (opts) {
   var self = this
@@ -381,7 +381,6 @@ Snapchat.prototype.registerEmail = function (email, password, birthday, cb) {
 
     cb('registerEmail error')
   })
-
 }
 
 /**
