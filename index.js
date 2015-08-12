@@ -94,7 +94,7 @@ Object.defineProperty(Snapchat.prototype, 'maxVideoSize', {
 Object.defineProperty(Snapchat.prototype, 'isSignedIn', {
   get: function () {
     var self = this
-    return self.googleAuthToken && self.authToken && self.username
+    return self._googleAuthToken && self._authToken && self._username
   }
 })
 
@@ -173,7 +173,7 @@ Snapchat.prototype.signIn = function (username, password, gmailEmail, gmailPassw
   var self = this
   debug('Snapchat.signIn (username %s)', username)
 
-  self._getAuthToken(gmailEmail, gmailPassword, function (err, gauth) {
+  self._getGoogleAuthToken(gmailEmail, gmailPassword, function (err, gauth) {
     if (err) {
       debug('could not retrieve google auth token')
       return cb(err)
@@ -274,11 +274,13 @@ Snapchat.prototype.signOut = function (cb) {
   var self = this
   debug('Snapchat.signOut')
 
-  var params = {
-    'username': self._username
+  if (!self.isSignedIn) {
+    return cb(new Error('signin required'))
   }
 
-  self.post(constants.endpoints.account.login, params, function (err, response, body) {
+  self.post(constants.endpoints.account.login, {
+    'username': self._username
+  }, function (err, response, body) {
     if (err) {
       debug('signOut error %s %s', err, response)
       return cb(err)
@@ -309,6 +311,10 @@ Snapchat.prototype.signOut = function (cb) {
 Snapchat.prototype.updateSession = function (cb) {
   var self = this
   debug('Snapchat.updateSession')
+
+  if (!self.isSignedIn) {
+    return cb(new Error('signin required'))
+  }
 
   self.post(constants.endpoints.update.all, {
     'username': self._username,
@@ -392,7 +398,7 @@ Snapchat.prototype.registerUsername = function (username, registeredEmail, gmail
   var self = this
   debug('Snapchat.registerUsername (username %s, email %s)', username, registeredEmail)
 
-  self._getAuthToken(gmailEmail, gmailPassword, function (err, gauth) {
+  self._getGoogleAuthToken(gmailEmail, gmailPassword, function (err, gauth) {
     if (err) {
       debug('could not retrieve google auth token')
       return cb(err)
@@ -432,6 +438,10 @@ Snapchat.prototype.sendPhoneVerification = function (mobile, sms, cb) {
   var self = this
   debug('Snapchat.sendPhoneVerification (mobile %s, sms %d)', mobile, sms)
 
+  if (!self.isSignedIn) {
+    return cb(new Error('signin required'))
+  }
+
   mobile = phone(mobile)
   var countryCode = +mobile[1]
   mobile = mobile.substr(2)
@@ -465,6 +475,10 @@ Snapchat.prototype.verifyPhoneNumber = function (code, cb) {
   var self = this
   debug('Snapchat.verifyPhoneNumber (code %s)', code)
 
+  if (!self.isSignedIn) {
+    return cb(new Error('signin required'))
+  }
+
   Request.post(constants.endpoints.registration.verifyPhone, {
     'action': 'verifyPhoneNumber',
     'username': self._username,
@@ -489,6 +503,10 @@ Snapchat.prototype.verifyPhoneNumber = function (code, cb) {
 Snapchat.prototype.getCaptcha = function (cb) {
   var self = this
   debug('Snapchat.getCaptcha')
+
+  if (!self.isSignedIn) {
+    return cb(new Error('signin required'))
+  }
 
   self.post(constants.endpoints.registration.getCaptcha, {
     'username': self._username
@@ -522,6 +540,10 @@ Snapchat.prototype.solveCaptcha = function (solution, cb) {
   var self = this
   debug('Snapchat.solveCaptcha')
 
+  if (!self.isSignedIn) {
+    return cb(new Error('signin required'))
+  }
+
   throw new Error("TODO")
 }
 
@@ -546,6 +568,10 @@ Snapchat.prototype.sendEvents = function (events, snapInfo, cb) {
   var self = this
   debug('Snapchat.sendEvents')
 
+  if (!self.isSignedIn) {
+    return cb(new Error('signin required'))
+  }
+
   cb = cb || function () { }
   events = events || { }
   snapInfo = snapInfo || { }
@@ -568,7 +594,7 @@ Snapchat.prototype.sendEvents = function (events, snapInfo, cb) {
 /**
  * internal
  */
-Snapchat.prototype._getAuthToken = function (gmailEmail, gmailPassword, cb) {
+Snapchat.prototype._getGoogleAuthToken = function (gmailEmail, gmailPassword, cb) {
   var self = this
   var params = {
     'google_play_services_version': '7097038',
@@ -602,7 +628,7 @@ Snapchat.prototype._getAuthToken = function (gmailEmail, gmailPassword, cb) {
     headers: headers
   }, function (err, response, body) {
     if (err) {
-      debug('_getAuthToken error %s', response)
+      debug('_getGoogleAuthToken error %s', response)
       cb(err)
     } else {
       cb(null, StringUtils.matchGroup(body, /Auth=([\w\.-]+)/i, 1))
