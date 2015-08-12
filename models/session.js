@@ -1,7 +1,7 @@
 /* jshint -W069 */
 module.exports = Session
 
-var constants = require('./constants')
+var constants = require('../lib/constants')
 var User = require('./user')
 var Conversation = require('./conversation')
 var UserStory = require('./user-story')

@@ -4,9 +4,9 @@ var debug = require('debug')('snapchat')
 var request = require('request')
 
 var constants = require('./lib/constants')
-var Session = require('./lib/session')
 var Request = require('./lib/request')
 var StringUtils = require('./lib/string-utils')
+var Session = require('./models/session')
 
 /**
  * Snapchat Client
@@ -521,38 +521,29 @@ Snapchat.prototype._getGoogleCloudMessagingIdentifier = function (cb) {
  */
 Snapchat.prototype._getAttestation = function (username, password, ts, cb) {
   var hashString = uesrname + "|" + password + "|" + ts + "|" + constants.endpoints.account.login
-  NSString *nonce          = [hashString.sha256HashRaw base64EncodedStringWithOptions: 0];
+  var nonce = StringUtils.sha256Hash(hashString)
 
-  NSDictionary *query = @{@"nonce": nonce,
-                          @"authentication": SKAttestation.auth,
-                          @"apk_digest": SKAttestation.digest9_12_2,
-                          @"timestamp": ts};
-  NSData *queryData  = [[NSString queryStringWithParams: query] dataUsingEncoding: NSUTF8StringEncoding];
+  var params = {
+    'nonce': nonce,
+    'authentication': constants.attestation.auth,
+    'apk_digest': constants.attestation.digest9_12_2,
+    'timestamp': ts
+  }
 
-  NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL: [NSURL URLWithString: SKAttestation.URLCasper]];
-  request.HTTPMethod  = @"POST";
-  request.HTTPBody    = queryData;
-  [request setValue: @"application/x-www-form-urlencoded" forHTTPHeaderField: @"Content-type"];
+  request.post({
+    url: constants.attestation.URLCaspter,
+    form: params
+  }, function (err, response, body) {
+    if (err) {
+      return cb(err)
+    } else {
+      var result = JSON.parse(body)
 
-  NSURLSession *session = [NSURLSession sessionWithConfiguration: [NSURLSessionConfiguration defaultSessionConfiguration]];
-  NSURLSessionDataTask *dataTask = [session dataTaskWithRequest: request completionHandler: ^(NSData *data, NSURLResponse *response, NSError *error) {
-      if (error) {
-          completion(nil, error);
-      } else if (data) {
-          NSError *jsonError;
-          NSDictionary *json = [NSJSONSerialization JSONObjectWithData: data options: 0 error: &jsonError];
-
-          if (jsonError)
-              completion(nil, jsonError);
-          else if ([json[@"code"] integerValue] == 200)
-              completion(json[@"signedAttestation"], nil);
-          else
-              completion(nil, [SKRequest unknownError]);
+      if (+result.code === 200) {
+        return cb(null, result.signedAttestation)
       } else {
-          completion(nil, [SKRequest unknownError]);
+        return cb("unknown error")
       }
-  }];
-
-  [dataTask resume];
-
+    }
+  })
 }
