@@ -152,7 +152,7 @@ Object.defineProperty(Snapchat.prototype, 'googleAttestation', {
 /**
  * Signs into Snapchat.
  *
- * A valid GMail account is necessary to trick Snapchat into thinking we're using the first party client. Your data is only ever sent to Google, Scout's honor.
+ * A valid GMail account is necessary to trick Snapchat into thinking we're using the first party client.
  *
  * @param {string} username The Snapchat username to sign in with.
  * @param {string} password The password to the Snapchat account to sign in with.
@@ -216,9 +216,6 @@ Snapchat.prototype.signIn = function (username, password, gmailEmail, gmailPassw
             'timestamp': timestamp
           }
 
-          var headers = { }
-          headers[constants.headers.clientAuthToken] = 'Bearer ' + self._googleAuthToken
-
           Request.postTo(constants.endpoints.account.login, params, self._googleAuthToken, null, function (err, response, body) {
             if (err) {
               debug('error logging in %s', response)
@@ -227,6 +224,7 @@ Snapchat.prototype.signIn = function (username, password, gmailEmail, gmailPassw
 
             self.currentSession = new Session(StringUtils.tryParseJSON(body))
             self._authToken = self.currentSession.authToken
+            cb(null, self._currentSession)
           })
         })
       })
