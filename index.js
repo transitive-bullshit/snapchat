@@ -278,11 +278,11 @@ Snapchat.prototype.signOut = function (cb) {
     return cb(new Error('signin required'))
   }
 
-  self.post(constants.endpoints.account.login, {
+  self.post(constants.endpoints.account.logout, {
     'username': self._username
   }, function (err, response, body) {
     if (err) {
-      debug('signOut error %s %s', err, response)
+      debug('signOut error %s', err)
       return cb(err)
     } else {
       var result = StringUtils.tryParseJSON(body)
@@ -325,7 +325,7 @@ Snapchat.prototype.updateSession = function (cb) {
     'include_client_settings': 'true'
   }, function (err, response, body) {
     if (err) {
-      debug('updateSession error %s %s', err, response)
+      debug('updateSession error %s', err)
       return cb(err)
     } else {
       var result = StringUtils.tryParseJSON(body)
@@ -358,15 +358,16 @@ Snapchat.prototype.registerEmail = function (email, password, birthday, cb) {
   var self = this
   debug('Snapchat.registerEmail (email %s)', email)
 
-  self.post(constants.endpoints.registration.start, {
+  self.post(constants.endpoints.account.registration.start, {
     'email': email,
     'password': password,
     'birthday': birthday,
   }, function (err, response, body) {
     if (err) {
-      debug('registerEmail error %s %s', err, response)
+      debug('registerEmail error %s', err)
       return cb(err)
     } else {
+      console.log('body', body)
       var result = StringUtils.tryParseJSON(body)
 
       if (result && !!result.logged) {
@@ -404,12 +405,12 @@ Snapchat.prototype.registerUsername = function (username, registeredEmail, gmail
       return cb(err)
     }
 
-    self.post(constants.endpoints.registration.username, {
+    self.post(constants.endpoints.account.registration.username, {
       'username': registeredEmail,
       'selected_username': username
     }, function (err, response, body) {
       if (err) {
-        debug('registerUsername error %s %s', err, response)
+        debug('registerUsername error %s', err)
         return cb(err)
       } else {
         var result = StringUtils.tryParseJSON(body)
@@ -446,7 +447,7 @@ Snapchat.prototype.sendPhoneVerification = function (mobile, sms, cb) {
   var countryCode = +mobile[1]
   mobile = mobile.substr(2)
 
-  self.post(constants.endpoints.registration.verifyPhone, {
+  self.post(constants.endpoints.account.registration.verifyPhone, {
     'username': self._username,
     'phoneNumber': mobile,
     'countryCode': countryCode,
@@ -454,7 +455,7 @@ Snapchat.prototype.sendPhoneVerification = function (mobile, sms, cb) {
     'skipConfirmation': true
   }, function (err, response, body) {
     if (err) {
-      debug('sendPhoneVerification error %s %s', err, response)
+      debug('sendPhoneVerification error %s', err)
       return cb(err)
     } else {
       debug('sendPhoneVerification post body %s', body)
@@ -479,13 +480,13 @@ Snapchat.prototype.verifyPhoneNumber = function (code, cb) {
     return cb(new Error('signin required'))
   }
 
-  Request.post(constants.endpoints.registration.verifyPhone, {
+  Request.post(constants.endpoints.account.registration.verifyPhone, {
     'action': 'verifyPhoneNumber',
     'username': self._username,
     'code': code
   }, self._googleAuthToken, constants.core.staticToken, function (err, response, body) {
     if (err) {
-      debug('verifyPhoneNumber error %s %s', err, response)
+      debug('verifyPhoneNumber error %s', err)
       return cb(err)
     }
 
@@ -508,11 +509,11 @@ Snapchat.prototype.getCaptcha = function (cb) {
     return cb(new Error('signin required'))
   }
 
-  self.post(constants.endpoints.registration.getCaptcha, {
+  self.post(constants.endpoints.account.registration.getCaptcha, {
     'username': self._username
   }, function (err, response, body) {
     if (err) {
-      debug('getCaptcha error %s %s', err, response)
+      debug('getCaptcha error %s', err)
       return cb(err)
     }
 
@@ -582,7 +583,7 @@ Snapchat.prototype.sendEvents = function (events, snapInfo, cb) {
     'username': self._username
   }, function (err, response, body) {
     if (err) {
-      debug('sendEvents error %s %s', err, response)
+      debug('sendEvents error %s', err)
       return cb(err)
     } else {
       debug('sendEvents post body %s', body)
