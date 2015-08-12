@@ -13,3 +13,15 @@ test('Snapchat.registerEmail', function (t) {
     t.end()
   })
 })
+
+test('Snapchat._getGoogleCloudMessagingIdentifier', function (t) {
+  var client = new Snapchat()
+
+  client._getGoogleCloudMessagingIdentifier(function (err, result) {
+    t.notOk(err)
+    t.ok(result)
+    t.equal(typeof result, 'string')
+    console.log(result)
+    t.end()
+  })
+})

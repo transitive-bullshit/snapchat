@@ -692,7 +692,7 @@ Snapchat.prototype._getGoogleCloudMessagingIdentifier = function (cb) {
     'app_ver': 706,
     'gcm_ver': 7097038,
     'app': 'com.snapchat.android',
-    'iat': (new Date()).value,
+    'iat': (new Date()).getTime(),
     'cert': '49f6badb81d89a9e38d65de76f09355071bd67e7'
   }
 
@@ -711,15 +711,20 @@ Snapchat.prototype._getGoogleCloudMessagingIdentifier = function (cb) {
     url: 'https://android.clients.google.com/c2dm/register3',
     form: params,
     headers: headers
-  }, function (err, httpResponse, body) {
+  }, function (err, response, body) {
     if (err) {
-      cb(err)
-    } else if (body) {
-      // parse token
-      cb(null, StringUtils.matchGroup(body, /token=([\w\.-]+)/, 1))
+      return cb(err)
     } else {
-      cb('unknown error')
+      // parse token
+      var token = StringUtils.matchGroup(body, /token=([\w\.-]+)/, 1)
+
+      if (token) {
+        return cb(null, token)
+      }
     }
+
+    debug('_getGoogleCloudMessagingIdentifier parse error %s', body)
+    cb('_getGoogleCloudMessagingIdentifier error')
   })
 }
 
