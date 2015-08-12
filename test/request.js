@@ -8,7 +8,10 @@ test('request ping', function (t) {
     t.notOk(err)
     t.equal(response.statusCode, 200)
     t.ok(body)
-    t.equal(body.length, 0)
+
+    var result = JSON.parse(body)
+    t.ok(result)
+    t.ok(result.timestamp)
     t.end()
   })
 })
