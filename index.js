@@ -8,6 +8,14 @@ var zlib = require('zlib')
 var constants = require('./lib/constants')
 var Request = require('./lib/request')
 var StringUtils = require('./lib/string-utils')
+
+var Account = require('./routes/account')
+var Chat = require('./routes/chat')
+var Device = require('./routes/device')
+var Friends = require('./routes/friends')
+var Snaps = require('./routes/snaps')
+var Stories = require('./routes/stories')
+
 var Session = require('./models/session')
 
 /**
@@ -21,6 +29,13 @@ function Snapchat (opts) {
   if (!opts) opts = {}
 
   debug('new snapchat client')
+
+  self.account = new Account(self, opts)
+  self.chat = new Chat(self, opts)
+  self.device = new Device(self, opts)
+  self.friends = new Friends(self, opts)
+  self.snaps = new Snaps(self, opts)
+  self.stories = new Stories(self, opts)
 }
 
 /**
