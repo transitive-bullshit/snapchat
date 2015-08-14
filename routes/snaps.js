@@ -2,7 +2,7 @@ module.exports = Snaps
 
 var debug = require('debug')('snapchat:snaps')
 
-var constants = require('./constants')
+var StringUtils = require('../lib/string-utils')
 
 /**
  * Snapchat wrapper for friends-related API calls.

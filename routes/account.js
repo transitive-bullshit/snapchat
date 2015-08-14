@@ -2,7 +2,7 @@ module.exports = Account
 
 var debug = require('debug')('snapchat:account')
 
-var constants = require('./constants')
+var StringUtils = require('../lib/string-utils')
 
 /**
  * Snapchat wrapper for account-related API calls.

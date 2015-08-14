@@ -2,7 +2,7 @@ module.exports = Device
 
 var debug = require('debug')('snapchat:device')
 
-var constants = require('./constants')
+var StringUtils = require('../lib/string-utils')
 
 /**
  * Snapchat wrapper for chat-related API calls.

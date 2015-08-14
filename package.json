@@ -14,6 +14,7 @@
     "debug": "^2.1.0",
     "enum": "^2.1.0",
     "inherits": "^2.0.1",
+    "node-uuid": "^1.4.3",
     "phone": "^1.0.4",
     "request": "^2.60.0",
     "url-join": "0.0.1",

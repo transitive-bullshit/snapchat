@@ -2,7 +2,7 @@ module.exports = Stories
 
 var debug = require('debug')('snapchat:stories')
 
-var constants = require('./constants')
+var StringUtils = require('../lib/string-utils')
 
 /**
  * Snapchat wrapper for story-related API calls.
@@ -21,10 +21,11 @@ function Stories (client, opts) {
  * Posts a story with the given options.
  *
  * @param {Blob} blob The Blob object containing the image or video data to send.
- * @param {Object} opts The options for the story to post.
+ * @param {StoryOptions} opts The options for the story to post.
  * @param {function} cb
  */
 Stories.prototype.postStory = function (blob, opts, cb) {
+
 }
 
 /**
@@ -106,4 +107,11 @@ Stories.prototype.provideSharedDescription = function (sharedStory, cb) {
  * @param {function} cb
  */
 Stories.prototype.getSharedDescriptionForStory = function (sharedStory, cb) {
+}
+
+/**
+ * @internal
+ */
+Stories.prototype._uploadStory = function (blob, cb) {
+  var uuid = StringUtils.mediaIdentifer(self.client.username)
 }
