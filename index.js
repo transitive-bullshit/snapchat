@@ -217,7 +217,7 @@ Snapchat.prototype.signIn = function (username, password, gmailEmail, gmailPassw
             'max_video_height': constants.screen.maxVideoHeight,
             'application_id': 'com.snapchat.android',
             'is_two_fa': 'false',
-            'ptoken': ptoken || 'ie',
+            'ptoken': ptoken,
             'pre_auth': '',
             'sflag': 1,
             'dsig': deviceHash,
@@ -412,6 +412,7 @@ Snapchat.prototype.registerUsername = function (username, registeredEmail, gmail
 
         if (result) {
           self.currentSession = new Session(result)
+          self._googleAuthToken = gauth
           return cb(null)
         }
       }
@@ -720,6 +721,11 @@ Snapchat.prototype._getGoogleCloudMessagingIdentifier = function (cb) {
 
       if (token) {
         return cb(null, token)
+      } else {
+        debug('_getGoogleCloudMessagingIdentifier using default token %s', body)
+
+        // default token
+        return cb(null, 'ie')
       }
     }
 
