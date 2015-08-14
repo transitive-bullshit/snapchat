@@ -1,4 +1,3 @@
-/* jshint -W069 */
 module.exports = SKBlob
 
 /**
@@ -11,6 +10,7 @@ function SKBlob (params) {
   if (!(self instanceof SKBlob)) return new SKBlob(params)
 
 
+  throw new Error("TODO")
 }
 
 /**

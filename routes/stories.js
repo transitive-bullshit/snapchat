@@ -1,7 +1,9 @@
 module.exports = Stories
 
-var debug = require('debug')('snapchat:stories')
+var debug = require('debug')('snapchat: stories')
 
+var constants = require('../lib/constants')
+var Request = require('../lib/request')
 var StringUtils = require('../lib/string-utils')
 
 /**
@@ -25,7 +27,41 @@ function Stories (client, opts) {
  * @param {function} cb
  */
 Stories.prototype.postStory = function (blob, opts, cb) {
+  var self = this
 
+  self._uploadStory(blob, function (err, mediaID) {
+    if (err) {
+      debug('Snapchat.Stories.postStory error %s', err)
+      return cb(err)
+    }
+
+    self.client.post(constants.endpoints.stories.post, {
+      "caption_text_display": opts.text,
+      "story_timestamp": StringUtils.timestamp(),
+      'type': blob.isImage ? constants.MediaKind.Image : constants.MediaKind.Video,
+      "media_id": mediaID,
+      "client_id": mediaID,
+      "time": opts.timer | 0,
+      "username": self.client.username,
+      "camera_front_facing": opts.cameraFrontFacing,
+      "my_story": 'true',
+      "zipped": 0,
+      "shared_ids": "{}"
+    }, function (err, response, body) {
+      if (err) {
+        debug('Snapchat.Stories.postStory error %s', err)
+        return cb(err)
+      }
+
+      var result = StringUtils.tryParseJSON(body)
+      if (result) {
+        cb(null, result)
+      } else {
+        debug('Snapchat.Stories.postStory parse error %s', body)
+        cb('Snapchat.Stories.postStory error')
+      }
+    })
+  })
 }
 
 /**
@@ -75,7 +111,7 @@ Stories.prototype.markStoriesViewed = function (stories, cb) {
 /**
  * Marks a single story opened.
  *
- * @discussion To batch mark stories viewed, use \c -markStoriesViewed:completion:.
+ * @discussion To batch mark stories viewed, use \c -markStoriesViewed: completion: .
  * @param story The story to mark as opened.
  * @param sscount The number of times the story was screenshotted.
  * @param {function} cb
@@ -110,8 +146,29 @@ Stories.prototype.getSharedDescriptionForStory = function (sharedStory, cb) {
 }
 
 /**
+ * Uploads a new story associated with the given blob.
+ *
  * @internal
+ * @param {SKBlob} blob
+ * @param {function} cb
  */
 Stories.prototype._uploadStory = function (blob, cb) {
+  var self = this
   var uuid = StringUtils.mediaIdentifer(self.client.username)
+
+  var params = {
+    'media_id': uuid,
+    'type': blob.isImage ? constants.MediaKind.Image : constants.MediaKind.Video,
+    'data': blob.data,
+    'zipped': 0,
+    'features_map': '{}',
+    'username': self.client.username
+  }
+
+  var headers = { }
+
+  headers[constants.headers.clientAuthToken] = 'Bearer ' + self.client.googleAuthToken
+  headers[constants.headers.contentType] = 'multipart/form-data; boundary=' + constants.core.boundary
+
+  return Request.postCustom(constants.endpoints.stories.upload, params, headers, self.client.authToken, cb)
 }
