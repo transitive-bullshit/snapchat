@@ -6,6 +6,8 @@ var constants = require('../lib/constants')
 var Request = require('../lib/request')
 var StringUtils = require('../lib/string-utils')
 
+var SKBlob = require('../models/blob')
+
 /**
  * Snapchat wrapper for story-related API calls.
  *
@@ -67,10 +69,29 @@ Stories.prototype.postStory = function (blob, opts, cb) {
 /**
  * Downloads media for a story.
  *
- * @param story The story to download.
+ * @param {Story} story The story to download.
  * @param {function} cb
  */
 Stories.prototype.loadStoryBlob = function (story, cb) {
+  var self = this
+
+  function blobHandler (err, response, body) {
+    if (err) {
+      debug('Snapchat.Stories.loadStoryBlob error %s', err)
+      return cb(err)
+    } else {
+      SKBlob.initWithStoryData(body, story, cb)
+    }
+  }
+
+  if (story.needsAuth) {
+    Request.post(constants.endpoints.stories.authBlob, {
+      'story_id': story.mediaIdentifier,
+      'username':  self.client.username
+    }, self.client.googleAuthToken, self.client.authToken, blobHandler)
+  } else {
+    self.client.get(story.mediaURL.replace(constants.endpoints.baseURL), blobHandler)
+  }
 }
 
 /**
@@ -80,6 +101,16 @@ Stories.prototype.loadStoryBlob = function (story, cb) {
  * @param {function} cb
  */
 Stories.prototype.loadStoryThumbnailBlob = function (story, cb) {
+  var self = this
+
+  self.client.get(constants.endpoints.stories.thumb + story.mediaIdentifier, function (err, response, body) {
+    if (err) {
+      debug('Snapchat.Stories.loadStoryThumbnailBlob error %s', err)
+      return cb(err)
+    }
+
+    SKBlob.initWithStoryData(body, story, cb)
+  })
 }
 
 /**
@@ -89,6 +120,7 @@ Stories.prototype.loadStoryThumbnailBlob = function (story, cb) {
  * @param {function} cb
  */
 Stories.prototype.loadStories = function (stories, cb) {
+  var self = this
 }
 
 /**
@@ -97,6 +129,7 @@ Stories.prototype.loadStories = function (stories, cb) {
  * @param {function} cb
  */
 Stories.prototype.deleteStory = function (story, cb) {
+  var self = this
 }
 
 /**
@@ -106,6 +139,7 @@ Stories.prototype.deleteStory = function (story, cb) {
  * @param {function} cb
  */
 Stories.prototype.markStoriesViewed = function (stories, cb) {
+  var self = this
 }
 
 /**
@@ -117,6 +151,7 @@ Stories.prototype.markStoriesViewed = function (stories, cb) {
  * @param {function} cb
  */
 Stories.prototype.markStoryViewed = function (story, sscount, cb) {
+  var self = this
 }
 
 /**
@@ -125,6 +160,7 @@ Stories.prototype.markStoryViewed = function (story, sscount, cb) {
  * @param {function} cb
  */
 Stories.prototype.hideSharedStory = function (story, cb) {
+  var self = this
 }
 
 /**
@@ -134,6 +170,7 @@ Stories.prototype.hideSharedStory = function (story, cb) {
  * @param {function} cb
  */
 Stories.prototype.provideSharedDescription = function (sharedStory, cb) {
+  var self = this
 }
 
 /**
@@ -143,6 +180,7 @@ Stories.prototype.provideSharedDescription = function (sharedStory, cb) {
  * @param {function} cb
  */
 Stories.prototype.getSharedDescriptionForStory = function (sharedStory, cb) {
+  var self = this
 }
 
 /**

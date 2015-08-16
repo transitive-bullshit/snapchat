@@ -48,3 +48,14 @@ Object.defineProperty(SKBlob.prototype, 'isImage', {
 Object.defineProperty(SKBlob.prototype, 'isVideo', {
   get: function () { return !this._isImage }
 })
+
+/**
+ * Initializes and returns a new SKBlob from the given story and raw data.
+ *
+ * @static
+ * @param {string} data
+ * @param {Story} story
+ * @param {function} cb
+ */
+SKBlob.initWithStoryData = function (data, story, cb) {
+}
