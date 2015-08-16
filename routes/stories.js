@@ -121,6 +121,8 @@ Stories.prototype.loadStoryThumbnailBlob = function (story, cb) {
  */
 Stories.prototype.loadStories = function (stories, cb) {
   var self = this
+
+
 }
 
 /**

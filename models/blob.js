@@ -1,16 +1,23 @@
 module.exports = SKBlob
 
+var BufferUtils = require('../lib/buffer-utils')
+var zlib = require('zlib')
+
 /**
  * Snapchat Blob wrapper
  *
- * @param {Object} params
+ * @param {Buffer} data
  */
-function SKBlob (params) {
+function SKBlob (data) {
   var self = this
-  if (!(self instanceof SKBlob)) return new SKBlob(params)
+  if (!(self instanceof SKBlob)) return new SKBlob(data)
 
+  self._data = data
+  self._isImage = BufferUtils.isImage(data)
+  self._isVideo = BufferUtils.isMPEG4(data)
 
-  throw new Error("TODO")
+  // TODO
+  self._overlay = null
 }
 
 /**
@@ -46,16 +53,59 @@ Object.defineProperty(SKBlob.prototype, 'isImage', {
  * @type {boolean}
  */
 Object.defineProperty(SKBlob.prototype, 'isVideo', {
-  get: function () { return !this._isImage }
+  get: function () { return this._isVideo }
 })
 
 /**
  * Initializes and returns a new SKBlob from the given story and raw data.
  *
  * @static
- * @param {string} data
+ * @param {Buffer} data
  * @param {Story} story
  * @param {function} cb
  */
 SKBlob.initWithStoryData = function (data, story, cb) {
+  if (BufferUtils.isCompressed(data)) {
+    SKBlob.decompress(data, story, cb)
+  } else {
+    SKBlob.decrypt(data, story, cb)
+  }
+}
+
+/**
+ * Unarchives blobs initialized with anonymous data.
+ *
+ * @static
+ * @param {Buffer} data
+ * @param {Story} story
+ * @param {function} cb
+ */
+SKBlob.decompress = function (data, story, cb) {
+  zlib.gunzip(data, function (err, decompressed) {
+    if (err) {
+      cb(err)
+    } else {
+      cb(null, new SKBlob(decompressed))
+    }
+  })
+}
+
+/**
+ * @static
+ * @param {Buffer} data
+ * @param {Story} story
+ * @param {function} cb
+ */
+SKBlob.decrypt = function (data, story, cb) {
+  if (!BufferUtils.isCompressed(data) && !BufferUtils.isMedia(data)) {
+    data = BufferUtils.decryptStory(data, story.mediaKey, story.mediaIV)
+  }
+
+  if (BufferUtils.isCompressed(data)) {
+    SKBlob.decompress(data, cb)
+  } else {
+    var blob = new SKBlob(data)
+
+    cb(BufferUtils.isMedia(data) ? null : 'unknown blob format', blob)
+  }
 }

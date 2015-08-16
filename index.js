@@ -7,6 +7,7 @@ var zlib = require('zlib')
 
 var constants = require('./lib/constants')
 var Request = require('./lib/request')
+var BufferUtils = require('./lib/buffer-utils')
 var StringUtils = require('./lib/string-utils')
 
 var Account = require('./routes/account')
@@ -755,7 +756,7 @@ Snapchat.prototype._getGoogleCloudMessagingIdentifier = function (cb) {
  */
 Snapchat.prototype._getAttestation = function (username, password, ts, cb) {
   var preHash = StringUtils.getSCPreHashString(username, password, ts, constants.endpoints.account.login)
-  var nonce = new Buffer(StringUtils.sha256HashToBase64(preHash))
+  var nonce = new Buffer(BufferUtils.sha256HashToBase64(preHash))
 
   var params = {
     'nonce': nonce,
