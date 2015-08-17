@@ -128,6 +128,7 @@ Chat.prototype.conversationWithUser = function (username, cb) {
 /**
  * Fetches the conversations for all users in \e usernames
  *
+ * @param {Array[string]} usernames
  * @param {function} cb
  */
 Chat.prototype.conversationsWithUsers = function (usernames, cb) {
@@ -223,7 +224,7 @@ Chat.prototype.conversationsWithUsers = function (usernames, cb) {
 /**
  * Clears the conversation with the given identifier.
  *
- * @param identifier The identifier of the conversation to clear.
+ * @param {string} identifier The identifier of the conversation to clear.
  * @param {function} cb
  */
 Chat.prototype.clearConversationWithIdentifier = function (identifier, cb) {
@@ -253,8 +254,8 @@ Chat.prototype.clearFeed = function (cb) {
 /**
  * Sends a message \e message to \e username.
  *
- * @param message The message to send.
- * @param username The username of the recipient.
+ * @param {string} message The message to send.
+ * @param {Array[string]} username The username of the recipient.
  * @param {function} cb
  */
 Chat.prototype.sendMessage = function (message, username, cb) {
@@ -275,8 +276,8 @@ Chat.prototype.sendMessage = function (message, username, cb) {
 /**
  * Sends a message \e message to each user in \e usernames.
  *
- * @param message The message to send.
- * @param usernames An array of username strings as recipients.
+ * @param {string} message The message to send.
+ * @param {Array[string]} usernames An array of username strings as recipients.
  * @param {function} cb
  */
 Chat.prototype.sendMessages = function (message, usernames, cb) {
@@ -351,31 +352,93 @@ Chat.prototype.sendMessages = function (message, usernames, cb) {
 /**
  * Loads another page of conversations in the feed after the given conversation.
  *
- * @discussion This method will update \c [Client sharedClient],currentSession.conversations accordingly.
- * @param conversation The conversation after which to load more conversations.
+ * @discussion This method will update \c client.currentSession.conversations accordingly.
+ *
+ * @param {Conversation} conversation The conversation after which to load more conversations.
  * @param {function} cb
  */
 Chat.prototype.loadConversationsAfter = function (conversation, cb) {
   var self = this
-  debug('Chat.loadConversationAfter')
+  debug('Chat.loadConversationsAfter')
+
+  if (!conversation.pagination.length) {
+    return cb(null, [ ])
+  }
+
+  self.client.post(constants.endpoints.chat.conversations, {
+    'username': self.client.username,
+    'checksum': StringUtils.md5HashToHex(self.client.username),
+    'offset': conversation.pagination,
+  }, function (err, response, body) {
+    if (err) {
+      return cb(err)
+    } else {
+      var result = StringUtils.tryParseJSON(body)
+
+      if (result) {
+        result = result['conversations_response']
+
+        if (result && result.length) {
+          var conversations = result.map(function (result) {
+            var convo = new Conversation(result)
+
+            self.client.currentSession.conversations.push(convo)
+            return convo
+          })
+
+          cb(null, conversations)
+        }
+      }
+
+      cb('Chat.loadConversationsAfter parse error')
+    }
+  })
 }
 
 /**
  * Loads every conversation.
  *
- * @discussion This method will update \c [Client sharedClient].currentSession.conversations accordingly.
+ * @discussion This method will update \c client.currentSession.conversations accordingly.
  * @param {function} cb
- * @note \e cb will still take an error if it retrieved some conversations, but failed to get the rest after some point.
  */
 Chat.prototype.allConversations = function (cb) {
   var self = this
   debug('Chat.allConversations')
+
+  self.client.updateSession(function (err) {
+    if (err) {
+      return cb(err)
+    }
+
+    var conversations = [ ]
+    var last = self.client.currentSession.conversations[self.client.currentSession.conversations.length - 1]
+
+    function loadPage () {
+      self.loadConversationsAfter(last, function (err, convos) {
+        if (err) {
+          cb(err, conversations)
+        } else if (convos.length > 0) {
+          conversations = conversations.concat(convos)
+          last = convos[convos.length - 1]
+          loadPage()
+        } else {
+          conversations.forEach(function (convo) {
+            self.client.currentSession.conversations.push(convo)
+          })
+
+          cb(null, conversations)
+        }
+      })
+    }
+
+    loadPage()
+  })
 }
 
 /**
  * Loads more messages after the given message or cash transaction.
  *
- * @param messageOrTransaction any object conforming to Pagination \b EXCEPT AN \C Conversation.
+ * @param {Transaction|Message} messageOrTransaction any object conforming to Pagination \b EXCEPT AN \C Conversation.
  * @warning Do not pass an \c Conversation object to messageOrTransaction. Doing so will raise an exception.
  * @param {function} cb
  */
