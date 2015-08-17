@@ -63,3 +63,10 @@ function Conversation (params) {
     return new Snap(snap)
   })
 }
+
+Conversation.prototype.addMessagesFromConversation = function (convo) {
+  var self = this
+  if (!convo.messages.count) return
+
+  self.messages = self.messages.concat(convo.messages)
+}

@@ -210,7 +210,7 @@ Chat.prototype.conversationsWithUsers = function (usernames, cb) {
             return new Conversation(convo)
           })
 
-          cb(null, results)
+          return cb(null, results)
         } else {
           debug('Chat.conversationsWithUsers parse error %s', body)
         }
@@ -338,7 +338,7 @@ Chat.prototype.sendMessages = function (message, usernames, cb) {
             return new Conversation(convo)
           })
 
-          cb(null, results)
+          return cb(null, results)
         } else {
           debug('Chat.sendMessages parse error %s', body)
         }
@@ -386,7 +386,7 @@ Chat.prototype.loadConversationsAfter = function (conversation, cb) {
             return convo
           })
 
-          cb(null, conversations)
+          return cb(null, conversations)
         }
       }
 
@@ -439,23 +439,68 @@ Chat.prototype.allConversations = function (cb) {
  * Loads more messages after the given message or cash transaction.
  *
  * @param {Transaction|Message} messageOrTransaction any object conforming to Pagination \b EXCEPT AN \C Conversation.
- * @warning Do not pass an \c Conversation object to messageOrTransaction. Doing so will raise an exception.
+ * @warning Do not pass an \c Conversation object to messageOrTransaction. Doing so will throw an exception.
  * @param {function} cb
  */
 Chat.prototype.loadMessagesAfterPagination = function (messageOrTransaction, cb) {
   var self = this
   debug('Chat.loadMessagesAfterPagination')
+
+  if (messageOrTransaction instanceof Conversation ||
+     !messageOrTransaction.conversationIdentifier) {
+    throw new Error("Chat.loadMessagesAfterPagination invalid param")
+  }
+
+  if (!messageOrTransaction.pagination.length) {
+    return cb(null, null)
+  }
+
+  self.clients.post(constants.endpoints.chat.conversation, {
+    'username': self.client.username,
+    'conversation_id': messageOrTransaction.conversationIdentifier,
+    'offset': messageOrTransaction.pagination
+  }, function (err, response, body) {
+    if (err) {
+      return cb(err)
+    } else {
+      var result = StringUtils.tryParseJSON(body)
+
+      if (result && result.conversation) {
+        return cb(null, new Conversation(result.conversation))
+      }
+
+      cb('Chat.loadConversationsAfter parse error')
+    }
+  })
 }
 
 /**
  * Loads every message in the given thread and adds them to that Conversation object.
  *
- * @param conversation The conversation to load completely.
+ * @param {Conversation} conversation The conversation to load completely.
  * @param {function} cb
  */
 Chat.prototype.fullConversation = function (conversation, cb) {
   var self = this
   debug('Chat.fullConversation')
+
+  var last = conversation.messages[conversation.messages.length - 1]
+
+  function loadPage () {
+    self.loadMessagesAfterPagination(last, function (err, convo) {
+      if (err) {
+        cb(err)
+      } else if (convo) {
+        last = convo.messages[convo.messages.length - 1]
+        conversation.addMessagesFromConversation(convo)
+        loadPage()
+      } else {
+        cb(null)
+      }
+    })
+  }
+
+  loadPage()
 }
 
 /**
