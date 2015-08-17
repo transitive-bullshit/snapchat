@@ -8,6 +8,8 @@ var Request = require('../lib/request')
 var StringUtils = require('../lib/string-utils')
 
 var SKBlob = require('../models/blob')
+var StoryUpdater = require('../models/story-updater')
+var SharedStoryDescription = require('../models/shared-story-description')
 
 /**
  * Snapchat wrapper for story-related API calls.
@@ -170,23 +172,40 @@ Stories.prototype.deleteStory = function (story, cb) {
 /**
  * Marks a set of stories as opened.
  *
- * @param {array} stories An array of \c StoryUpdater objects.
+ * @param {Array[StoryUpdater]} stories An array of \c StoryUpdater objects.
  * @param {function} cb
  */
 Stories.prototype.markStoriesViewed = function (stories, cb) {
   var self = this
+
+  var friendStories = stories.map(function (update) {
+    return {
+      "id": update.storyID,
+      "screenshot_count": update.screenshotCount,
+      "timestamp": update.timestamp
+    }
+  })
+
+  self.client.post(constants.endpoints.update.stories, {
+    "username": self.client.username,
+    "friend_stories": JSON.stringify(friendStories)
+  }, cb)
 }
 
 /**
  * Marks a single story opened.
+ * To batch mark stories viewed, use \c markStoriesViewed
  *
- * @discussion To batch mark stories viewed, use \c -markStoriesViewed: completion: .
- * @param story The story to mark as opened.
- * @param sscount The number of times the story was screenshotted.
+ * @param {Story} story The story to mark as opened.
+ * @param {number} sscount The number of times the story was screenshotted.
  * @param {function} cb
  */
 Stories.prototype.markStoryViewed = function (story, sscount, cb) {
   var self = this
+
+  self.markStoriesViewed([
+    new StoryUpdater(story.identifier, StringUtils.timestamp(), sscount)
+  ], cb)
 }
 
 /**
@@ -196,16 +215,28 @@ Stories.prototype.markStoryViewed = function (story, sscount, cb) {
  */
 Stories.prototype.hideSharedStory = function (story, cb) {
   var self = this
+
+  self.client.post(constants.endpoints.friends.hide, {
+    'friend': story.username,
+    'hide': 'true',
+    'username': self.client.username
+  }, cb)
 }
 
 /**
  * Does nothing if the story is not a shared story.
  *
- * @param sharedStory A shared story.
+ * @param {Story} sharedStory A shared story.
  * @param {function} cb
  */
 Stories.prototype.provideSharedDescription = function (sharedStory, cb) {
   var self = this
+  if (!sharedStory.shared) return
+
+  self.client.post(constants.endpoints.sharedDescription, {
+    'shared_id': sharedStory.identifier,
+    'username': self.client.username
+  }, cb)
 }
 
 /**
@@ -216,6 +247,26 @@ Stories.prototype.provideSharedDescription = function (sharedStory, cb) {
  */
 Stories.prototype.getSharedDescriptionForStory = function (sharedStory, cb) {
   var self = this
+
+  if (!sharedStory.sharedStoryIdentifier) {
+    throw new Error('Snapchat.Stories.getSharedDescriptionForStory error invalid story')
+  }
+
+  var endpoint = constants.endpoints.sharedDescription + '?ln=en&shared_id=' + sharedStory.sharedStoryIdentifier
+
+  self.client.get(endpoint, function (err, response, body) {
+    if (err) {
+      return cb(err)
+    } else {
+      var result = StringUtils.tryParseJSON(body)
+
+      if (result) {
+        return cb(null, new SharedStoryDescription(result))
+      }
+    }
+
+    cb('Snapchat.Stories.getSharedDescriptionForStory parse error')
+  })
 }
 
 /**
