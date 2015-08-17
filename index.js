@@ -246,19 +246,16 @@ Snapchat.prototype.signIn = function (username, password, gmailEmail, gmailPassw
             'timestamp': timestamp
           }
 
-          Request.post(constants.endpoints.account.login, params, self._googleAuthToken, null, function (err, response, body) {
+          Request.post(constants.endpoints.account.login, params, self._googleAuthToken, null, function (err, result) {
             if (err) {
-              debug('error logging in %s', response)
+              debug('Snapchat.signIn error %s', err)
               return cb(err)
+            } else if (result) {
+              self.currentSession = new Session(result)
+              return cb(null, self.currentSession)
             }
 
-            var result = StringUtils.tryParseJSON(body)
-            if (result) {
-              self.currentSession = new Session(result)
-              cb(null, self.currentSession)
-            } else {
-              cb('signIn parse error')
-            }
+            cb('signIn parse error')
           })
         })
       })
@@ -292,7 +289,7 @@ Snapchat.prototype.restoreSession = function (username, authToken, googleAuthTok
  */
 Snapchat.prototype.signOut = function (cb) {
   var self = this
-  debug('Snapchat.signOut')
+  debug('Snapchat.signOut (%s)', self.username)
 
   if (!self.isSignedIn) {
     return cb(new Error('signin required'))
@@ -300,26 +297,22 @@ Snapchat.prototype.signOut = function (cb) {
 
   self.post(constants.endpoints.account.logout, {
     'username': self._username
-  }, function (err, response, body) {
+  }, function (err, result) {
     if (err) {
-      debug('signOut error %s', err)
+      debug('Snapchat.signOut error %s', err)
       return cb(err)
-    } else {
-      var result = StringUtils.tryParseJSON(body)
-      if (result && result.length === 0) {
-        self._currentSession = null
-        self._username = null
-        self._authToken = null
-        self._googleAuthToken = null
-        self._googleAttestation = null
-        self._deviceToken1i = null
-        self._deviceToken1v = null
-        cb(null)
-      } else {
-        debug('signOut parse error %s', body)
-        cb('signOut parse error')
-      }
+    } else if (result && result.length === 0) {
+      self._currentSession = null
+      self._username = null
+      self._authToken = null
+      self._googleAuthToken = null
+      self._googleAttestation = null
+      self._deviceToken1i = null
+      self._deviceToken1v = null
+      return cb(null)
     }
+
+    cb('Snapchat.signOut parse error')
   })
 }
 
@@ -343,17 +336,13 @@ Snapchat.prototype.updateSession = function (cb) {
     'max_video_width': constants.screen.maxVideoWidth,
     'max_video_height': constants.screen.maxVideoHeight,
     'include_client_settings': 'true'
-  }, function (err, response, body) {
+  }, function (err, result) {
     if (err) {
       debug('updateSession error %s', err)
       return cb(err)
-    } else {
-      var result = StringUtils.tryParseJSON(body)
-
-      if (result) {
-        self.currentSession = new Session(result)
-        return cb(null, self.currentSession)
-      }
+    } else if (result) {
+      self.currentSession = new Session(result)
+      return cb(null, self.currentSession)
     }
 
     cb('updateSession error')
@@ -382,20 +371,15 @@ Snapchat.prototype.registerEmail = function (email, password, birthday, cb) {
     'email': email,
     'password': password,
     'birthday': birthday
-  }, function (err, response, body) {
+  }, function (err, result) {
     if (err) {
       debug('registerEmail error %s', err)
       return cb(err)
-    } else {
-      var result = StringUtils.tryParseJSON(body)
-
-      if (result && !!result.logged) {
-        return cb(null, result)
-      }
+    } else if (result && !!result.logged) {
+      return cb(null, result)
     }
 
-    debug('registerEmail parse error %s', body)
-    cb('registerEmail error')
+    cb('registerEmail parse error')
   })
 }
 
@@ -423,21 +407,17 @@ Snapchat.prototype.registerUsername = function (username, registeredEmail, gmail
     self.post(constants.endpoints.account.registration.username, {
       'username': registeredEmail,
       'selected_username': username
-    }, function (err, response, body) {
+    }, function (err, result) {
       if (err) {
         debug('registerUsername error %s', err)
         return cb(err)
-      } else {
-        var result = StringUtils.tryParseJSON(body)
-
-        if (result) {
-          self.currentSession = new Session(result)
-          self._googleAuthToken = gauth
-          return cb(null)
-        }
+      } else if (result) {
+        self.currentSession = new Session(result)
+        self._googleAuthToken = gauth
+        return cb(null)
       }
 
-      cb('registerUsername error')
+      cb('registerUsername parse error')
     })
   })
 }
@@ -469,13 +449,13 @@ Snapchat.prototype.sendPhoneVerification = function (mobile, sms, cb) {
     'countryCode': countryCode,
     'action': 'updatePhoneNumber',
     'skipConfirmation': true
-  }, function (err, response, body) {
+  }, function (err, result) {
     if (err) {
       debug('sendPhoneVerification error %s', err)
       return cb(err)
     } else {
-      debug('sendPhoneVerification post body %s', body)
-      cb(null)
+      debug('sendPhoneVerification result %j', result)
+      return cb(null, result)
     }
   })
 }
@@ -500,14 +480,14 @@ Snapchat.prototype.verifyPhoneNumber = function (code, cb) {
     'action': 'verifyPhoneNumber',
     'username': self._username,
     'code': code
-  }, self._googleAuthToken, constants.core.staticToken, function (err, response, body) {
+  }, self._googleAuthToken, constants.core.staticToken, function (err, result) {
     if (err) {
       debug('verifyPhoneNumber error %s', err)
       return cb(err)
     }
 
-    debug('verifyPhoneNumber post body %s', body)
-    cb(null)
+    debug('verifyPhoneNumber result %j', result)
+    cb(null, result)
   })
 }
 
@@ -527,21 +507,22 @@ Snapchat.prototype.getCaptcha = function (cb) {
 
   self.post(constants.endpoints.account.registration.getCaptcha, {
     'username': self._username
-  }, function (err, response, body) {
+  }, function (err, body) {
     if (err) {
       debug('getCaptcha error %s', err)
       return cb(err)
+    } else {
+
+      zlib.gunzip(new Buffer(body), function (err, data) {
+        if (err) {
+          debug('getCaptcha gunzip error %s', err)
+          return cb(err)
+        }
+
+        // TODO
+        cb(new Error('Snapchat.getCaptcha TODO'))
+      })
     }
-
-    zlib.gunzip(new Buffer(body), function (err, data) {
-      if (err) {
-        debug('getCaptcha gunzip error %s', err)
-        return cb(err)
-      }
-
-      // TODO
-      cb(new Error('Snapchat.getCaptcha TODO'))
-    })
   })
 }
 
@@ -597,13 +578,13 @@ Snapchat.prototype.sendEvents = function (events, snapInfo, cb) {
     'events': JSON.stringify(events),
     'json': JSON.stringify(snapInfo),
     'username': self._username
-  }, function (err, response, body) {
+  }, function (err, result) {
     if (err) {
       debug('sendEvents error %s', err)
       return cb(err)
     } else {
-      debug('sendEvents post body %s', body)
-      cb(null)
+      debug('sendEvents result %j', result)
+      cb(null, result)
     }
   })
 }
@@ -642,9 +623,9 @@ Snapchat.prototype._getGoogleAuthToken = function (gmailEmail, gmailPassword, cb
     url: 'https://android.clients.google.com/auth',
     form: params,
     headers: headers
-  }, function (err, response, body) {
+  }, function (err, body) {
     if (err) {
-      debug('_getGoogleAuthToken error %s', response)
+      debug('_getGoogleAuthToken error %s', err)
       cb(err)
     } else {
       cb(null, StringUtils.matchGroup(body, /Auth=([\w\.-]+)/i, 1))
@@ -675,28 +656,24 @@ Snapchat.prototype._getDeviceTokens = function (cb) {
   if (dt1i && dt1v) {
     return completion()
   } else {
-    Request.post(constants.endpoints.device.identifier, { }, null, null, function (err, response, body) {
+    Request.post(constants.endpoints.device.identifier, { }, null, null, function (err, result) {
       if (err) {
-        debug('_getDeviceTokens error %s', response)
+        debug('_getDeviceTokens error %s', err)
         return cb(err)
-      } else {
-        var result = StringUtils.tryParseJSON(body)
+      } else if (result) {
+        dt1i = result[constants.core.deviceToken1i]
+        dt1v = result[constants.core.deviceToken1v]
 
-        if (result) {
-          dt1i = result[constants.core.deviceToken1i]
-          dt1v = result[constants.core.deviceToken1v]
+        if (dt1i && dt1v) {
+          sDeviceToken1i = dt1i
+          sDeviceToken1v = dt1v
 
-          if (dt1i && dt1v) {
-            sDeviceToken1i = dt1i
-            sDeviceToken1v = dt1v
-
-            return completion()
-          }
+          return completion()
         }
       }
 
-      debug('_getDeviceTokens parse error %s', body)
-      cb('_getDeviceTokens parse error')
+      debug('Snapchat._getDeviceTokens parse error %j', result)
+      cb('Snapchat._getDeviceTokens parse error')
     })
   }
 }
@@ -732,7 +709,7 @@ Snapchat.prototype._getGoogleCloudMessagingIdentifier = function (cb) {
     url: 'https://android.clients.google.com/c2dm/register3',
     form: params,
     headers: headers
-  }, function (err, response, body) {
+  }, function (err, body) {
     if (err) {
       return cb(err)
     } else {
@@ -772,17 +749,13 @@ Snapchat.prototype._getAttestation = function (username, password, ts, cb) {
   request.post({
     url: constants.attestation.URLCaspter,
     form: params
-  }, function (err, response, body) {
+  }, function (err, result) {
     if (err) {
       return cb(err)
-    } else {
-      var result = StringUtils.tryParseJSON(body)
-
-      if (result && +result.code === 200) {
-        return cb(null, result.signedAttestation)
-      } else {
-        return cb('unknown error')
-      }
+    } else if (result && +result.code === 200) {
+      return cb(null, result.signedAttestation)
     }
+
+    return cb('Snapchat._getAttestation unknown error')
   })
 }

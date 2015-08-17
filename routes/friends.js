@@ -3,7 +3,6 @@ module.exports = Friends
 var debug = require('debug')('snapchat:friends')
 
 var constants = require('../lib/constants')
-var StringUtils = require('../lib/string-utils')
 
 var FoundFriend = require('../models/found-friend')
 var NearbyUser = require('../models/nearby-user')
@@ -130,14 +129,10 @@ Friends.prototype.findFriends = function (friends, cb) {
     'username': self.client.username,
     'countryCode': self.client.currentSession.countryCode,
     'numbers': friends
-  }, function (err, response, body) {
+  }, function (err, result) {
     if (err) {
       return cb(err)
-    }
-
-    var result = StringUtils.tryParseJSON(body)
-
-    if (result && result.results) {
+    } else if (result && result.results) {
       return cb(null, result.results.map(function (friend) {
         return new FoundFriend(friend)
       }))
@@ -168,14 +163,10 @@ Friends.prototype.findFriendsNear = function (location, accuracy, milliseconds, 
     'lat': location.lat,
     'lng': location.lng,
     'totalPollingDurationMillis': milliseconds
-  }, function (err, response, body) {
+  }, function (err, result) {
     if (err) {
       return cb(err)
-    }
-
-    var result = StringUtils.tryParseJSON(body)
-
-    if (result && result['nearby_snapchatters']) {
+    } else if (result && result['nearby_snapchatters']) {
       return cb(null, result['nearby_snapchatters'].map(function (user) {
         return new NearbyUser(user['username'], user['user_id'])
       }))
@@ -211,13 +202,10 @@ Friends.prototype.userExists = function (username, cb) {
   self.client.post(constants.endpoints.friends.search, {
     'request_username': username,
     'username': self.client.username
-  }, function (err, response, body) {
+  }, function (err, result) {
     if (err) {
       return cb(err)
-    }
-
-    var result = StringUtils.tryParseJSON(body)
-    if (result) {
+    } else if (result) {
       return cb(null, !!result.exists)
     }
 
@@ -242,17 +230,15 @@ Friends.prototype.updateDisplayNameForUser = function (friend, displayName, cb) 
     'friend': friend,
     'friend_id': '',
     'username': self.client.username
-  }, function (err, response, body) {
+  }, function (err, result) {
     if (err) {
       return cb(err)
-    }
-
-    var result = StringUtils.tryParseJSON(body)
-    if (result && result.object) {
+    } else if (result && result.object) {
       var updated = new User(result.object)
 
       self._removeFriendsFromSession([ updated ])
       self._addFriendsToSession([ updated ])
+      return cb(null, updated)
     }
 
     cb('Friends.updateDisplayNameForUser parse error')
@@ -303,14 +289,10 @@ Friends.prototype.seenSuggestedFriends = function (usernames, seen, cb) {
     'seen': !!seen,
     'seen_suggested_friend_list': usernames,
     'username': self.client.username
-  }, function (err, response, body) {
+  }, function (err, result) {
     if (err) {
       return cb(err)
-    }
-
-    var result = StringUtils.tryParseJSON(body)
-
-    if (result) {
+    } else if (result) {
       return cb(null, !!result.logged)
     }
 

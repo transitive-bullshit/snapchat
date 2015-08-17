@@ -36,16 +36,12 @@ Account.prototype.updateBestFriendsCount = function (number, cb) {
   self.client.post(constants.endpoints.account.setBestsCount, {
     'num_best_friends': number | 0,
     'username': self.client.username
-  }, function (err, response, body) {
+  }, function (err, result) {
     if (err) {
       return cb(err)
-    } else {
-      var result = StringUtils.tryParseJSON(body)
-
-      if (result) {
-        self.client.currentSession.bestFriendUsernames = result['best_friends']
-        return cb(null)
-      }
+    } else if (result) {
+      self.client.currentSession.bestFriendUsernames = result['best_friends']
+      return cb(null)
     }
 
     cb('Snapchat.Account.updateBestFriendsCount parse error')
@@ -207,7 +203,7 @@ Account.prototype.downloadSnaptag = function (cb) {
     'image': self.client.currentSession.QRPath,
     'type': 'SVG',
     'username': self.client.username
-  }, function (err, response, body) {
+  }, function (err, body) {
     if (err) {
       cb(err)
     } else {
@@ -245,7 +241,7 @@ Account.prototype.downloadAvatar = function (username, cb) {
     'username_image': username,
     'username': self.client.username,
     'size': 'MEDIUM'
-  }, function (err, response, body) {
+  }, function (err, body) {
     if (err) {
       cb(err)
     } else {

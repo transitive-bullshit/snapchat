@@ -53,19 +53,15 @@ Stories.prototype.postStory = function (blob, opts, cb) {
       "my_story": 'true',
       "zipped": 0,
       "shared_ids": "{}"
-    }, function (err, response, body) {
+    }, function (err, result) {
       if (err) {
         debug('Snapchat.Stories.postStory error %s', err)
         return cb(err)
+      } else if (result) {
+        return cb(null, result)
       }
 
-      var result = StringUtils.tryParseJSON(body)
-      if (result) {
-        cb(null, result)
-      } else {
-        debug('Snapchat.Stories.postStory parse error %s', body)
-        cb('Snapchat.Stories.postStory error')
-      }
+      cb('Snapchat.Stories.postStory parse error')
     })
   })
 }
@@ -80,7 +76,7 @@ Stories.prototype.loadStoryBlob = function (story, cb) {
   var self = this
   debug('Stories.loadStoryBlob (%s)', story.identifier)
 
-  function blobHandler (err, response, body) {
+  function blobHandler (err, body) {
     if (err) {
       debug('Snapchat.Stories.loadStoryBlob error %s', err)
       return cb(err)
@@ -109,7 +105,7 @@ Stories.prototype.loadStoryThumbnailBlob = function (story, cb) {
   var self = this
   debug('Stories.loadStoryThumbnailBlob (%s)', story.identifier)
 
-  self.client.get(constants.endpoints.stories.thumb + story.mediaIdentifier, function (err, response, body) {
+  self.client.get(constants.endpoints.stories.thumb + story.mediaIdentifier, function (err, body) {
     if (err) {
       debug('Snapchat.Stories.loadStoryThumbnailBlob error %s', err)
       return cb(err)
@@ -265,15 +261,11 @@ Stories.prototype.getSharedDescriptionForStory = function (sharedStory, cb) {
 
   var endpoint = constants.endpoints.sharedDescription + '?ln=en&shared_id=' + sharedStory.sharedStoryIdentifier
 
-  self.client.get(endpoint, function (err, response, body) {
+  self.client.get(endpoint, function (err, result) {
     if (err) {
       return cb(err)
-    } else {
-      var result = StringUtils.tryParseJSON(body)
-
-      if (result) {
-        return cb(null, new SharedStoryDescription(result))
-      }
+    } else if (result) {
+      return cb(null, new SharedStoryDescription(result))
     }
 
     cb('Snapchat.Stories.getSharedDescriptionForStory parse error')

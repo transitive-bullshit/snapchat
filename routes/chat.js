@@ -85,18 +85,14 @@ Chat.prototype.conversationAuth = function (username, cb) {
   self.client.post(constants.endpoints.chat.authToken, {
     'username': self.client.username,
     'conversation_id': cid
-  }, function (err, response, body) {
+  }, function (err, result) {
     if (err) {
       return cb(err)
-    } else {
-      var result = StringUtils.tryParseJSON(body)
+    } else if (result) {
+      result = result['messaging_auth']
 
-      if (result) {
-        result = result['messaging_auth']
-
-        if (result && result['mac'] && result['payload']) {
-          return cb(null, result)
-        }
+      if (result && result['mac'] && result['payload']) {
+        return cb(null, result)
       }
 
       cb('Chat.conversationAuth parse error')
@@ -199,20 +195,18 @@ Chat.prototype.conversationsWithUsers = function (usernames, cb) {
       'auth_token': self.client.authToken,
       'messages': messages,
       'username': self.client.username
-    }, function (err, response, body) {
+    }, function (err, result) {
       if (err) {
         return cb(err)
-      } else {
-        var result = StringUtils.tryParseJSON(body)
-
-        if (result && result.conversations && result.conversations.length) {
+      } else if (result) {
+        if (result.conversations && result.conversations.length) {
           results.conversations = result.conversations.map(function (convo) {
             return new Conversation(convo)
           })
 
           return cb(null, results)
         } else {
-          debug('Chat.conversationsWithUsers parse error %s', body)
+          debug('Chat.conversationsWithUsers parse error %j', result)
         }
       }
 
@@ -327,20 +321,18 @@ Chat.prototype.sendMessages = function (message, usernames, cb) {
       'auth_token': self.client.authToken,
       'messages': messages,
       'username': self.client.username
-    }, function (err, response, body) {
+    }, function (err, result) {
       if (err) {
         return cb(err)
-      } else {
-        var result = StringUtils.tryParseJSON(body)
-
-        if (result && result.conversations && result.conversations.length) {
+      } else if (result) {
+        if (result.conversations && result.conversations.length) {
           results.conversations = result.conversations.map(function (convo) {
             return new Conversation(convo)
           })
 
           return cb(null, results)
         } else {
-          debug('Chat.sendMessages parse error %s', body)
+          debug('Chat.sendMessages parse error %j', result)
         }
       }
 
@@ -369,25 +361,21 @@ Chat.prototype.loadConversationsAfter = function (conversation, cb) {
     'username': self.client.username,
     'checksum': StringUtils.md5HashToHex(self.client.username),
     'offset': conversation.pagination,
-  }, function (err, response, body) {
+  }, function (err, result) {
     if (err) {
       return cb(err)
-    } else {
-      var result = StringUtils.tryParseJSON(body)
+    } else if (result) {
+      result = result['conversations_response']
 
       if (result) {
-        result = result['conversations_response']
+        var conversations = result.map(function (result) {
+          var convo = new Conversation(result)
 
-        if (result && result.length) {
-          var conversations = result.map(function (result) {
-            var convo = new Conversation(result)
+          self.client.currentSession.conversations.push(convo)
+          return convo
+        })
 
-            self.client.currentSession.conversations.push(convo)
-            return convo
-          })
-
-          return cb(null, conversations)
-        }
+        return cb(null, conversations)
       }
 
       cb('Chat.loadConversationsAfter parse error')
@@ -459,18 +447,14 @@ Chat.prototype.loadMessagesAfterPagination = function (messageOrTransaction, cb)
     'username': self.client.username,
     'conversation_id': messageOrTransaction.conversationIdentifier,
     'offset': messageOrTransaction.pagination
-  }, function (err, response, body) {
+  }, function (err, result) {
     if (err) {
       return cb(err)
-    } else {
-      var result = StringUtils.tryParseJSON(body)
-
-      if (result && result.conversation) {
-        return cb(null, new Conversation(result.conversation))
-      }
-
-      cb('Chat.loadConversationsAfter parse error')
+    } else if (result && result.conversation) {
+      return cb(null, new Conversation(result.conversation))
     }
+
+    cb('Chat.loadConversationsAfter parse error')
   })
 }
 

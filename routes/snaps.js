@@ -174,14 +174,10 @@ Snaps.prototype.loadFiltersForLocation = function (location, cb) {
     'screen_width': self.client.screenSize.width,
     'screen_height': self.client.screenSize.height,
     'username': self.client.username
-  }, function (err, response, body) {
+  }, function (err, result) {
     if (err) {
       return cb(err)
-    }
-
-    var result = StringUtils.tryParseJSON(body)
-
-    if (result) {
+    } else if (result) {
       return cb(null, new SKLocation(result))
     }
 
@@ -198,7 +194,7 @@ Snaps.prototype._loadSnapWithIdentifier = function (identifier, cb) {
   self.client.post(constants.endpoints.snaps.loadBlob, {
     'id': identifier,
     'username': self.client.username
-  }, function (err, response, body) {
+  }, function (err, body) {
     if (err) {
       return cb(err)
     }
