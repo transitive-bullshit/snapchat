@@ -229,6 +229,11 @@ Chat.prototype.conversationsWithUsers = function (usernames, cb) {
 Chat.prototype.clearConversationWithIdentifier = function (identifier, cb) {
   var self = this
   debug('Chat.clearConversationWithIdentifier (%s)', identifier)
+
+  self.client.post(constants.endpoints.chat.clearConvo, {
+    'conversation_id': identifier,
+    'username': self.client.username
+  }, cb)
 }
 
 /**
@@ -239,6 +244,10 @@ Chat.prototype.clearConversationWithIdentifier = function (identifier, cb) {
 Chat.prototype.clearFeed = function (cb) {
   var self = this
   debug('Chat.clearFeed')
+
+  self.client.post(constants.endpoints.chat.clearFeed, {
+    'username': self.client.username
+  }, cb)
 }
 
 /**
@@ -251,18 +260,92 @@ Chat.prototype.clearFeed = function (cb) {
 Chat.prototype.sendMessage = function (message, username, cb) {
   var self = this
   debug('Chat.sendMessage (%s, %s)', message, username)
+
+  self.sendMessages(message, [ username ], function (err, results) {
+    if (err) {
+      cb(err)
+    } else if (!results.conversations.length) {
+      cb('Chat.conversationWithUser error')
+    } else {
+      cb(null, results.conversations[0])
+    }
+  })
 }
 
 /**
- * Sends a message \e message to each user in \e recipients.
+ * Sends a message \e message to each user in \e usernames.
  *
  * @param message The message to send.
- * @param recipients An array of username strings.
+ * @param usernames An array of username strings as recipients.
  * @param {function} cb
  */
-Chat.prototype.sendMessages = function (message, recipients, cb) {
+Chat.prototype.sendMessages = function (message, usernames, cb) {
   var self = this
-  debug('Chat.sendMessage (%s, %s)', message, JSON.stringify(recipients))
+  debug('Chat.sendMessages (%s, %s)', message, JSON.stringify(usernames))
+
+  var results = {
+    conversations: [ ],
+    failed: [ ],
+    errors: [ ]
+  }
+
+  self.conversationsWithUsers(usernames, function (err, convoResults) {
+    if (err) {
+      return cb(err)
+    }
+
+    results.failed = convoResults.failed
+    results.errors = convoResults.errors
+
+    var messages = convoResults.conversations.map(function (convo) {
+      var identifier = StringUtils.uniqueIdentifer()
+      var sequenceNum = ((convo.state['conversation_state']['user_sequences'][self.client.username]) || 0) | 0
+
+      var header = {
+        'auth': convo.messagingAuth,
+        'to': [ convo.recipient ],
+        'from': self.client.username,
+        //'conn_sequence_number': 1,
+        'conn_sequ_num': 1,
+        'conv_id': convo.identifier
+      }
+
+      return {
+        'body': { 'type': 'text', 'text': message },
+        'chat_message_id': identifier,
+        'seq_num': sequenceNum + 1,
+        'timestamp': StringUtils.timestamp(),
+        'retried': false,
+        'id': identifier,
+        'type': 'chat_message',
+        'header': header
+      }
+    })
+
+    self.client.post(constants.endpoints.chat.sendMessage, {
+      'auth_token': self.client.authToken,
+      'messages': JSON.stringify(messages),
+      'username': self.client.username
+    }, function (err, response, body) {
+      if (err) {
+        return cb(err)
+      } else {
+        var result = StringUtils.tryParseJSON(body)
+
+        if (result && result.conversations && result.conversations.length) {
+          results.conversations = result.conversations.map(function (convo) {
+            return new Conversation(convo)
+          })
+
+          cb(null, results)
+        } else {
+          debug('Chat.sendMessages parse error %s', body)
+        }
+      }
+
+      cb('Chat.sendMessages parse error')
+    })
+  })
 }
 
 /**
