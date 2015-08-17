@@ -6,9 +6,9 @@ var constants = require('../lib/constants')
 var StringUtils = require('../lib/string-utils')
 var Request = require('../lib/request')
 
-var SnapOptions = require('../lib/snap-options')
-var SKBlob = require('../lib/blob')
-var SKLocation = require('../lib/location')
+var SnapOptions = require('../models/snap-options')
+var SKBlob = require('../models/blob')
+var SKLocation = require('../models/location')
 
 /**
  * Snapchat wrapper for friends-related API calls.
