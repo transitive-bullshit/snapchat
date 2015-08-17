@@ -1,15 +1,18 @@
 module.exports = Snapchat
 
+// external
 var debug = require('debug')('snapchat')
 var request = require('request')
 var phone = require('phone')
 var zlib = require('zlib')
 
+// utilities
 var constants = require('./lib/constants')
 var Request = require('./lib/request')
 var BufferUtils = require('./lib/buffer-utils')
 var StringUtils = require('./lib/string-utils')
 
+// routes
 var Account = require('./routes/account')
 var Chat = require('./routes/chat')
 var Device = require('./routes/device')
@@ -17,6 +20,7 @@ var Friends = require('./routes/friends')
 var Snaps = require('./routes/snaps')
 var Stories = require('./routes/stories')
 
+// models
 var Session = require('./models/session')
 
 /**
@@ -536,7 +540,7 @@ Snapchat.prototype.getCaptcha = function (cb) {
       }
 
       // TODO
-      cb(new Error('TODO'))
+      cb(new Error('Snapchat.getCaptcha TODO'))
     })
   })
 }
@@ -557,7 +561,7 @@ Snapchat.prototype.solveCaptcha = function (solution, cb) {
     return cb(new Error('signin required'))
   }
 
-  throw new Error('TODO')
+  throw new Error('Snapchat.solveCaptcha TODO')
 }
 
 /**
