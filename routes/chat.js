@@ -32,7 +32,7 @@ Chat.prototype.sendTypingToUsers = function (recipients, cb) {
   var self = this
   debug('Chat.sendTypingToUsers')
 
-  self._sendTyping(JSON.stringify(recipients), cb)
+  self._sendTyping(recipients, cb)
 }
 
 /**
@@ -45,7 +45,7 @@ Chat.prototype.sendTypingToUser = function (username, cb) {
   var self = this
   debug('Chat.sendTypingToUser (%s)', username)
 
-  self._sendTyping(JSON.stringify([ username ]), cb)
+  self._sendTyping([ username ], cb)
 }
 
 /**
@@ -197,7 +197,7 @@ Chat.prototype.conversationsWithUsers = function (usernames, cb) {
   }, function () {
     self.client.post(constants.endpoints.chat.sendMessage, {
       'auth_token': self.client.authToken,
-      'messages': JSON.stringify(messages),
+      'messages': messages,
       'username': self.client.username
     }, function (err, response, body) {
       if (err) {
@@ -325,7 +325,7 @@ Chat.prototype.sendMessages = function (message, usernames, cb) {
 
     self.client.post(constants.endpoints.chat.sendMessage, {
       'auth_token': self.client.authToken,
-      'messages': JSON.stringify(messages),
+      'messages': messages,
       'username': self.client.username
     }, function (err, response, body) {
       if (err) {
@@ -506,11 +506,11 @@ Chat.prototype.fullConversation = function (conversation, cb) {
 /**
  * @internal
  */
-Chat.prototype._sendTyping = function (recipientString, cb) {
+Chat.prototype._sendTyping = function (recipients, cb) {
   var self = this
 
   self.client.post(constants.endpoints.chat.typing, {
-    'recipient_usernames': recipientString,
+    'recipient_usernames': recipients,
     'username': self.client.username
   }, cb)
 }

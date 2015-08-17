@@ -94,7 +94,7 @@ Account.prototype.updateStoryPrivacy = function (privacy, friends, cb) {
   }
 
   if (friends) {
-    params.storyFriendsToBlock = JSON.stringify(friends)
+    params.storyFriendsToBlock = friends
   }
 
   self.client.post(constants.endpoints.account.settings, params, cb)
@@ -189,7 +189,7 @@ Account.prototype.updateFeatureSettings = function (settings, cb) {
   features[constants.featureSettings.travelMode] = settings[constants.featureSettings.travelMode] || self.client.currentSession.enableTravelMode
 
   self.client.post(constants.endpoints.update.featureSettings, {
-    'settings': JSON.stringify(features),
+    'settings': features,
     'username': self.client.username
   }, cb)
 }

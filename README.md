@@ -58,6 +58,10 @@ DEBUG=snapchat,snapchat:*; # debug all snapchat submodules
 ### Todo
 
 * ts/timestamps milliseconds or seconds
+* JSON.stringify internal params or nah?
+
+* move tryParseJSON into Request success handler
+* also move response out and just return parsed JSON body
 
 ### License
 

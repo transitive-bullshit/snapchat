@@ -195,7 +195,7 @@ Stories.prototype.markStoriesViewed = function (stories, cb) {
 
   self.client.post(constants.endpoints.update.stories, {
     "username": self.client.username,
-    "friend_stories": JSON.stringify(friendStories)
+    "friend_stories": friendStories
   }, cb)
 }
 

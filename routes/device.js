@@ -45,7 +45,7 @@ Device.prototype.sendDidOpenAppEvent = function (cb) {
     var timestamp = StringUtils.timestamp()
 
     self.client.sendEvents({
-      'common_params': JSON.stringify({
+      'common_params': {
         'user_id': StringUtils.md5HashToHex(self.client.username),
         'city': unimplemented,
         'sc_user_agent': constants.core.userAgent,
@@ -54,17 +54,17 @@ Device.prototype.sendDidOpenAppEvent = function (cb) {
         'latlon': unimplemented,
         'friend_count': friendCount,
         'country': unimplemented
-      }),
-      'events': JSON.stringify([
-        JSON.stringify({
+      },
+      'events': [
+        {
           'event_name': 'APP_OPEN',
           'event_timestamp': timestamp,
-          'event_params': JSON.stringify({
+          'event_params': {
             'open_state': 'NORMAL',
             'intent_action': 'NULL'
-          })
-        })
-      ]),
+          }
+        }
+      ],
       'batch_id': uuid + '-' + constants.core.userAgent.replace(/\w+/, '') + timestamp
     }, null, cb)
   })
