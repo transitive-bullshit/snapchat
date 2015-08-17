@@ -12,6 +12,10 @@ function SKBlob (data) {
   var self = this
   if (!(self instanceof SKBlob)) return new SKBlob(data)
 
+  if (!(data instanceof Buffer)) {
+    data = new Buffer(data)
+  }
+
   self._data = data
   self._isImage = BufferUtils.isImage(data)
   self._isVideo = BufferUtils.isMPEG4(data)
@@ -66,7 +70,7 @@ Object.defineProperty(SKBlob.prototype, 'isVideo', {
  */
 SKBlob.initWithStoryData = function (data, story, cb) {
   if (BufferUtils.isCompressed(data)) {
-    SKBlob.decompress(data, story, cb)
+    SKBlob.decompress(data, cb)
   } else {
     SKBlob.decrypt(data, story, cb)
   }
@@ -77,10 +81,9 @@ SKBlob.initWithStoryData = function (data, story, cb) {
  *
  * @static
  * @param {Buffer} data
- * @param {Story} story
  * @param {function} cb
  */
-SKBlob.decompress = function (data, story, cb) {
+SKBlob.decompress = function (data, cb) {
   zlib.gunzip(data, function (err, decompressed) {
     if (err) {
       cb(err)
@@ -97,7 +100,7 @@ SKBlob.decompress = function (data, story, cb) {
  * @param {function} cb
  */
 SKBlob.decrypt = function (data, story, cb) {
-  if (!BufferUtils.isCompressed(data) && !BufferUtils.isMedia(data)) {
+  if (!BufferUtils.isCompressed(data) && !BufferUtils.isMedia(data) && story) {
     data = BufferUtils.decryptStory(data, story.mediaKey, story.mediaIV)
   }
 

@@ -1,6 +1,6 @@
 module.exports = Stories
 
-var debug = require('debug')('snapchat: stories')
+var debug = require('debug')('snapchat:stories')
 var async = require('async')
 
 var constants = require('../lib/constants')
@@ -33,6 +33,7 @@ function Stories (client, opts) {
  */
 Stories.prototype.postStory = function (blob, opts, cb) {
   var self = this
+  debug('Stories.postStory')
 
   self._uploadStory(blob, function (err, mediaID) {
     if (err) {
@@ -77,6 +78,7 @@ Stories.prototype.postStory = function (blob, opts, cb) {
  */
 Stories.prototype.loadStoryBlob = function (story, cb) {
   var self = this
+  debug('Stories.loadStoryBlob (%s)', story.identifier)
 
   function blobHandler (err, response, body) {
     if (err) {
@@ -105,6 +107,7 @@ Stories.prototype.loadStoryBlob = function (story, cb) {
  */
 Stories.prototype.loadStoryThumbnailBlob = function (story, cb) {
   var self = this
+  debug('Stories.loadStoryThumbnailBlob (%s)', story.identifier)
 
   self.client.get(constants.endpoints.stories.thumb + story.mediaIdentifier, function (err, response, body) {
     if (err) {
@@ -123,6 +126,8 @@ Stories.prototype.loadStoryThumbnailBlob = function (story, cb) {
  * @param {function} cb
  */
 Stories.prototype.loadStories = function (stories, cb) {
+  debug('Stories.loadStories (%d)', stories.length)
+
   var results = {
     loaded: [ ],
     failed: [ ],
@@ -153,6 +158,7 @@ Stories.prototype.loadStories = function (stories, cb) {
  */
 Stories.prototype.deleteStory = function (story, cb) {
   var self = this
+  debug('Stories.deleteStory (%s)', story.identifier)
 
   self.client.post(constants.endpoints.stories.remove, {
     'story_id': story.identifier,
@@ -177,6 +183,7 @@ Stories.prototype.deleteStory = function (story, cb) {
  */
 Stories.prototype.markStoriesViewed = function (stories, cb) {
   var self = this
+  debug('Stories.markStoriesViewed (%d)', stories.length)
 
   var friendStories = stories.map(function (update) {
     return {
@@ -202,6 +209,7 @@ Stories.prototype.markStoriesViewed = function (stories, cb) {
  */
 Stories.prototype.markStoryViewed = function (story, sscount, cb) {
   var self = this
+  debug('Stories.markStoryViewed (%s)', story.identifier)
 
   self.markStoriesViewed([
     new StoryUpdater(story.identifier, StringUtils.timestamp(), sscount)
@@ -215,6 +223,7 @@ Stories.prototype.markStoryViewed = function (story, sscount, cb) {
  */
 Stories.prototype.hideSharedStory = function (story, cb) {
   var self = this
+  debug('Stories.hideSharedStory (%s)', story.identifier)
 
   self.client.post(constants.endpoints.friends.hide, {
     'friend': story.username,
@@ -231,6 +240,7 @@ Stories.prototype.hideSharedStory = function (story, cb) {
  */
 Stories.prototype.provideSharedDescription = function (sharedStory, cb) {
   var self = this
+  debug('Stories.provideSharedDescription (%s)', sharedStory.identifier)
   if (!sharedStory.shared) return
 
   self.client.post(constants.endpoints.sharedDescription, {
@@ -247,6 +257,7 @@ Stories.prototype.provideSharedDescription = function (sharedStory, cb) {
  */
 Stories.prototype.getSharedDescriptionForStory = function (sharedStory, cb) {
   var self = this
+  debug('Stories.getSharedDescriptionForStory (%s)', sharedStory.identifier)
 
   if (!sharedStory.sharedStoryIdentifier) {
     throw new Error('Snapchat.Stories.getSharedDescriptionForStory error invalid story')
