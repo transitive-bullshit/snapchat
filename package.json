@@ -11,6 +11,7 @@
     "url": "https://github.com/fisch0920/snapchat/issues"
   },
   "dependencies": {
+    "async": "^1.4.2",
     "debug": "^2.1.0",
     "enum": "^2.1.0",
     "inherits": "^2.0.1",
