@@ -55,6 +55,10 @@ DEBUG=snapchat,snapchat:*; # debug all snapchat submodules
 <tr><th align="left">Travis Fischer</th><td><a href="https://github.com/fisch0920">GitHub/fisch0920</a></td><td><a href="http://twitter.com/fisch0920">Twitter/@fisch0920</a></td></tr>
 </tbody></table>
 
+### Todo
+
+* ts/timestamps milliseconds or seconds
+
 ### License
 
 MIT. Copyright (c) [Travis Fischer](https://makesnaps.com).

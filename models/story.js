@@ -1,4 +1,3 @@
-/* jshint -W069 */
 module.exports = Story
 
 var BufferUtils = require('../lib/buffer-utils')

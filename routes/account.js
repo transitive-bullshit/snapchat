@@ -255,8 +255,11 @@ Account.prototype.downloadAvatar = function (username, cb) {
 }
 
 /**
- * Updates your TOS agreement status for each of the three Terms of Service's.
+ * Updates your TOS agreement status for each of the three Terms of Service.
  *
+ * @param {boolean} snapcash
+ * @param {boolean} snapcashV2
+ * @param {boolean} square
  * @param {function} cb
  */
 Account.prototype.updateTOSAgreementStatus = function (snapcash, snapcashV2, square, cb) {

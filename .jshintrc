@@ -10,5 +10,6 @@
   "asi": true,
   "browser": true,
   "jquery": false,
-  "node": true
+  "node": true,
+  "sub": true
 }

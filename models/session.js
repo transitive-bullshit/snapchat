@@ -1,4 +1,3 @@
-/* jshint -W069 */
 module.exports = Session
 
 var constants = require('../lib/constants')
