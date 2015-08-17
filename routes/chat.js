@@ -208,6 +208,8 @@ Chat.prototype.conversationsWithUsers = function (usernames, cb) {
           results.conversations = result.conversations.map(function (convo) {
             return new Conversation(convo)
           })
+
+          cb(null, results)
         } else {
           debug('Chat.conversationsWithUsers parse error %s', body)
         }
