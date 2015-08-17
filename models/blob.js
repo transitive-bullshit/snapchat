@@ -19,6 +19,7 @@ function SKBlob (data) {
   self._data = data
   self._isImage = BufferUtils.isImage(data)
   self._isVideo = BufferUtils.isMPEG4(data)
+  self._isMedia = BufferUtils.isMedia(data)
 
   // TODO
   self._overlay = null
@@ -61,6 +62,36 @@ Object.defineProperty(SKBlob.prototype, 'isVideo', {
 })
 
 /**
+ * Whether or not this blob represents a supported image or video format.
+ *
+ * @type {boolean}
+ */
+Object.defineProperty(SKBlob.prototype, 'isMedia', {
+  get: function () { return this._isMedia }
+})
+
+/**
+ * Initializes and returns a new SKBlob from the given raw data.
+ * Does not handle encrypted data.
+ *
+ * @static
+ * @param {Buffer} data
+ * @param {function} cb
+ */
+SKBlob.initWithData = function (data, cb) {
+  if (data instanceof String) {
+    data = new Buffer(data)
+  }
+
+  if (BufferUtils.isCompressed(data)) {
+    SKBlob.decompress(data, cb)
+  } else {
+    var blob = new SKBlob(data)
+    cb(blob.isMedia ? null : 'unknown blob format', blob)
+  }
+}
+
+/**
  * Initializes and returns a new SKBlob from the given story and raw data.
  *
  * @static
@@ -69,6 +100,10 @@ Object.defineProperty(SKBlob.prototype, 'isVideo', {
  * @param {function} cb
  */
 SKBlob.initWithStoryData = function (data, story, cb) {
+  if (data instanceof String) {
+    data = new Buffer(data)
+  }
+
   if (BufferUtils.isCompressed(data)) {
     SKBlob.decompress(data, cb)
   } else {
@@ -88,7 +123,9 @@ SKBlob.decompress = function (data, cb) {
     if (err) {
       cb(err)
     } else {
-      cb(null, new SKBlob(decompressed))
+      var blob = new SKBlob(decompressed)
+
+      cb(blob.isMedia ? null : 'unknown blob format', blob)
     }
   })
 }
@@ -109,6 +146,6 @@ SKBlob.decrypt = function (data, story, cb) {
   } else {
     var blob = new SKBlob(data)
 
-    cb(BufferUtils.isMedia(data) ? null : 'unknown blob format', blob)
+    cb(blob.isMedia ? null : 'unknown blob format', blob)
   }
 }
