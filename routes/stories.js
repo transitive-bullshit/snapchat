@@ -1,6 +1,7 @@
 module.exports = Stories
 
 var debug = require('debug')('snapchat: stories')
+var async = require('async')
 
 var constants = require('../lib/constants')
 var Request = require('../lib/request')
@@ -70,7 +71,7 @@ Stories.prototype.postStory = function (blob, opts, cb) {
  * Downloads media for a story.
  *
  * @param {Story} story The story to download.
- * @param {function} cb
+ * @param {function} cb SKBlob
  */
 Stories.prototype.loadStoryBlob = function (story, cb) {
   var self = this
@@ -98,7 +99,7 @@ Stories.prototype.loadStoryBlob = function (story, cb) {
  * Downloads the thumbnail for a story.
  *
  * @param story The story whose thumbnail you wish to download.
- * @param {function} cb
+ * @param {function} cb SKBlob
  */
 Stories.prototype.loadStoryThumbnailBlob = function (story, cb) {
   var self = this
@@ -116,22 +117,54 @@ Stories.prototype.loadStoryThumbnailBlob = function (story, cb) {
 /**
  * Batch loads media for a set of stories.
  *
- * @param stories An array of \c Story objects whose media you wish to download.
+ * @param {Array[Story]} stories An array of \c Story objects whose media you wish to download.
  * @param {function} cb
  */
 Stories.prototype.loadStories = function (stories, cb) {
-  var self = this
+  var results = {
+    loaded: [ ],
+    failed: [ ],
+    errors: [ ]
+  }
 
+  async.eachLimit(stories, 4, function (story, cb) {
+    story.load(function (err) {
+      if (err) {
+        results.failed.push(story)
+        results.errors.push(err)
+      } else {
+        results.loaded.push(story)
+      }
 
+      cb(err)
+    })
+  }, function (err) {
+    cb(err, results)
+  })
 }
 
 /**
  * Deletes a story of yours.
  *
+ * @param {UserStory} story
  * @param {function} cb
  */
 Stories.prototype.deleteStory = function (story, cb) {
   var self = this
+
+  self.client.post(constants.endpoints.stories.remove, {
+    'story_id': story.identifier,
+    'username': self.client.username
+  }, function (err) {
+    if (!err) {
+      var index = self.client.currentSession.userStories.indexOf(story)
+      if (index >= 0) {
+        self.client.currentSession.userStories.splice(index, 1)
+      }
+    }
+
+    cb(err)
+  })
 }
 
 /**
@@ -166,7 +199,7 @@ Stories.prototype.hideSharedStory = function (story, cb) {
 }
 
 /**
- * I forget what this is for. Does nothing if the story is not a shared story.
+ * Does nothing if the story is not a shared story.
  *
  * @param sharedStory A shared story.
  * @param {function} cb
