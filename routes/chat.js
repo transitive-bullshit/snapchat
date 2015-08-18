@@ -252,7 +252,7 @@ Chat.prototype.clearFeed = function (cb) {
  */
 Chat.prototype.sendMessage = function (message, username, cb) {
   var self = this
-  debug('Chat.sendMessage (%s, %s)', message, username)
+  debug('Chat.sendMessage ("%s", %s)', message, username)
 
   self.sendMessageToUsers(message, [ username ], function (err, results) {
     if (err) {
@@ -276,7 +276,7 @@ Chat.prototype.sendMessage = function (message, username, cb) {
  */
 Chat.prototype.sendMessageToUsers = function (message, usernames, cb) {
   var self = this
-  debug('Chat.sendMessageToUsers (%s, %j)', message, usernames)
+  debug('Chat.sendMessageToUsers ("%s", %j)', message, usernames)
 
   var results = {
     conversations: [ ],
@@ -291,6 +291,10 @@ Chat.prototype.sendMessageToUsers = function (message, usernames, cb) {
 
     results.failed = convoResults.failed
     results.errors = convoResults.errors
+
+    console.log('failed', results.failed)
+    console.log('errors', results.errors)
+    console.log('results', convoResults.conversations)
 
     var messages = convoResults.conversations.map(function (convo) {
       var identifier = StringUtils.uniqueIdentifer()
@@ -317,27 +321,31 @@ Chat.prototype.sendMessageToUsers = function (message, usernames, cb) {
       }
     })
 
-    self.client.post(constants.endpoints.chat.sendMessage, {
-      'auth_token': self.client.authToken,
-      'messages': messages,
-      'username': self.client.username
-    }, function (err, result) {
-      if (err) {
-        return cb(err)
-      } else if (result) {
-        if (result.conversations && result.conversations.length) {
-          results.conversations = result.conversations.map(function (convo) {
-            return new Conversation(convo)
-          })
+    if (!messages.length) {
+      debug('Chat.sendMessageToUsers error retrieving conversations')
+    } else {
+      self.client.post(constants.endpoints.chat.sendMessage, {
+        'auth_token': self.client.authToken,
+        'messages': messages,
+        'username': self.client.username
+      }, function (err, result) {
+        if (err) {
+          return cb(err)
+        } else if (result) {
+          if (result.conversations && result.conversations.length) {
+            results.conversations = result.conversations.map(function (convo) {
+              return new Conversation(convo)
+            })
 
-          return cb(null, results)
-        } else {
-          debug('Chat.sendMessageToUsers parse error %j', result)
+            return cb(null, results)
+          } else {
+            debug('Chat.sendMessageToUsers parse error %j', result)
+          }
         }
-      }
 
-      cb('Chat.sendMessageToUsers parse error')
-    })
+        cb('Chat.sendMessageToUsers parse error')
+      })
+    }
   })
 }
 
