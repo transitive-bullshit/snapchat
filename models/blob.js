@@ -79,6 +79,10 @@ Object.defineProperty(SKBlob.prototype, 'isMedia', {
  * @param {function} cb
  */
 SKBlob.initWithData = function (data, cb) {
+  if (!data) {
+    return cb('error empty blob')
+  }
+
   if (data instanceof String) {
     data = new Buffer(data)
   }

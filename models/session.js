@@ -68,17 +68,17 @@ function Session (client, params) {
   })
 
   // Conversations
-  self.conversations = conversations.map(function (conversation) {
+  self.conversations = (conversations || []).map(function (conversation) {
     return new Conversation(conversation)
   })
 
   // Story collections
-  self.stories = friendStories.map(function (collection) {
+  self.stories = (friendStories || []).map(function (collection) {
     return new StoryCollection(self.client, collection)
   })
 
   // User stories
-  self.userStories = myStories.map(function (story) {
+  self.userStories = (myStories || []).map(function (story) {
     return new UserStory(story)
   })
 
