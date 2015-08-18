@@ -246,7 +246,11 @@ Snapchat.prototype.signIn = function (username, password, gmailEmail, gmailPassw
             'timestamp': timestamp
           }
 
-          Request.post(constants.endpoints.account.login, params, self._googleAuthToken, null, function (err, result) {
+          var headers = { }
+          headers[constants.headers.clientAuthToken] = 'Bearer ' + self._googleAuthToken
+          headers[constants.headers.clientAuth] = ''
+
+          Request.postCustom(constants.endpoints.account.login, params, headers, null, function (err, result) {
             if (err) {
               debug('Snapchat.signIn error %s', err)
               return cb(err)
