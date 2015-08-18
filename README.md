@@ -22,10 +22,10 @@ npm install snapchat
 
 Snapchat defaults to using required signin credentials stored in environment variables:
 
-`SNAPCHAT_USERNAME` The Snapchat username to sign in with.
-`SNAPCHAT_PASSWORD` The password to the Snapchat account to sign in with.
-`SNAPCHAT_GMAIL_EMAIL` A valid GMail address.
-`SNAPCHAT_GMAIL_PASSWORD` The password for the GMail address.
+- `SNAPCHAT_USERNAME` The Snapchat username to sign in with.
+- `SNAPCHAT_PASSWORD` The password to the Snapchat account to sign in with.
+- `SNAPCHAT_GMAIL_EMAIL` A valid GMail address.
+- `SNAPCHAT_GMAIL_PASSWORD` The password for the GMail address.
 
 ```javascript
 var Snapchat = require('snapchat')
