@@ -8,8 +8,7 @@ var Snapchat = require('../')
 var Conversation = require('../models/conversation')
 
 var client = new Snapchat()
-var TEST_USERNAME = 'fisch0920'
-var TEST_GLOBAL_USERNAME = 'teamsnapchat'
+var TEST_USERNAME = 'teamsnapchat'
 
 client.signIn(function (err) {
   if (err) {
@@ -18,22 +17,22 @@ client.signIn(function (err) {
 
   // TODO: causes 500 errors; need to figure out why before reenabling otherwise
   // our test accounts might be flagged by snapchat as suspicious.
-  /*test('Snapchat.chat.sendTypingToUsers', function (t) {
-    client.chat.sendTypingToUsers([ TEST_GLOBAL_USERNAME ], function (err) {
+  test('Snapchat.chat.sendTypingToUsers', function (t) {
+    client.chat.sendTypingToUsers([ TEST_USERNAME ], function (err) {
       t.notOk(err)
       t.end()
     })
   })
 
   test('Snapchat.chat.sendTypingToUser', function (t) {
-    client.chat.sendTypingToUsers(TEST_GLOBAL_USERNAME, function (err) {
+    client.chat.sendTypingToUser(TEST_USERNAME, function (err) {
       t.notOk(err)
       t.end()
     })
-  })*/
+  })
 
   test('Snapchat.chat.conversationAuth', function (t) {
-    client.chat.conversationAuth(TEST_GLOBAL_USERNAME, function (err, result) {
+    client.chat.conversationAuth(TEST_USERNAME, function (err, result) {
       t.notOk(err)
       t.ok(result)
       t.ok(result.mac)
@@ -43,7 +42,7 @@ client.signIn(function (err) {
   })
 
   test('Snapchat.chat.conversationWithUser', function (t) {
-    client.chat.conversationWithUser(TEST_GLOBAL_USERNAME, function (err, result) {
+    client.chat.conversationWithUser(TEST_USERNAME, function (err, result) {
       t.notOk(err)
       t.notOk(result) // should be an empty conversation
       t.end()
@@ -58,7 +57,7 @@ client.signIn(function (err) {
   })
 
   test('Snapchat.chat.sendMessage', function (t) {
-    client.chat.sendMessage('holla', TEST_GLOBAL_USERNAME, function (err, result) {
+    client.chat.sendMessage('holla', TEST_USERNAME, function (err, result) {
       t.notOk(err)
       t.ok(result)
       t.ok(result instanceof Conversation)

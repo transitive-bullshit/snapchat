@@ -268,6 +268,8 @@ Chat.prototype.sendMessage = function (message, username, cb) {
 /**
  * Sends a message \e message to each user in \e usernames.
  *
+ * @TODO: what to do if message fails to send
+ *
  * @param {string} message The message to send.
  * @param {Array[string]} usernames An array of username strings as recipients.
  * @param {function} cb
@@ -457,7 +459,7 @@ Chat.prototype.loadMessagesAfterPagination = function (messageOrTransaction, cb)
 }
 
 /**
- * Loads every message in the given thread and adds them to that Conversation object.
+ * Loads all messages in the given thread and adds them to that Conversation object.
  *
  * @param {Conversation} conversation The conversation to load completely.
  * @param {function} cb
@@ -492,7 +494,7 @@ Chat.prototype._sendTyping = function (recipients, cb) {
   var self = this
 
   self.client.post(constants.endpoints.chat.typing, {
-    'recipient_usernames': recipients,
+    'recipient_usernames': JSON.stringify(recipients),
     'username': self.client.username
   }, cb)
 }
