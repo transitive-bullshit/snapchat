@@ -30,8 +30,7 @@ function Friends (client, opts) {
  */
 Friends.prototype.addFriends = function (toAdd, toUnfriend, cb) {
   var self = this
-  debug('Friends.addFriends (toAd %s, toUnfriend %s)',
-        JSON.stringify(toAdd), JSON.stringify(toUnfriend))
+  debug('Friends.addFriends (toAdd %j, toUnfriend %j)', toAdd, toUnfriend)
 
   if (!toAdd) toAdd = []
   if (!toUnfriend) toUnfriend = []
@@ -118,7 +117,7 @@ Friends.prototype.unfriend = function (username, cb) {
  */
 Friends.prototype.findFriends = function (friends, cb) {
   var self = this
-  debug('Friends.findFriends (%s)', JSON.stringify(friends))
+  debug('Friends.findFriends (%j)', friends)
 
   if (self.client.currentSession.shouldTextToVerifyNumber ||
       self.client.curentSession.shouldCallToVerifyNumber) {
@@ -280,7 +279,7 @@ Friends.prototype.unblockUser = function (username, cb) {
  */
 Friends.prototype.seenSuggestedFriends = function (usernames, seen, cb) {
   var self = this
-  debug('Friends.seenSuggestedFriends (%s, %d)', JSON.stringify(usernames), seen)
+  debug('Friends.seenSuggestedFriends (%j, %d)', usernames, seen)
 
   if (!usernames || !usernames.length) usernames = [ ]
 

@@ -601,8 +601,8 @@ Snapchat.prototype.sendEvents = function (events, snapInfo, cb) {
   snapInfo = snapInfo || { }
 
   self._post(constants.endpoints.update.snaps, {
-    'events': JSON.stringify(events),
-    'json': JSON.stringify(snapInfo),
+    'events': events,
+    'json': snapInfo,
     'username': self._username
   }, function (err, result) {
     if (err) {

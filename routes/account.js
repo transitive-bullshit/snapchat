@@ -208,6 +208,7 @@ Account.prototype.downloadSnaptag = function (cb) {
     } else {
       // TODO: this returns application/json but it's actually an XML doc:
       // '<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n<svg height="320" version="1.1" viewBox="0 0 320 320" width="320" xmlns="http://www.w3.org/2000/svg">\n  <path d="M162.31,52.4......74" fill="#FFFC00"/>\n</svg>\n'
+      throw new Error('downloadSnaptag TODO')
       SKBlob.initWithData(body, cb)
     }
   })

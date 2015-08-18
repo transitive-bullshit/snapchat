@@ -113,8 +113,6 @@ Chat.prototype.conversationWithUser = function (username, cb) {
   self.conversationsWithUsers([ username ], function (err, results) {
     if (err) {
       cb(err)
-    } else if (!results.conversations.length) {
-      cb('Chat.conversationWithUser error')
     } else {
       cb(null, results.conversations[0])
     }
@@ -129,7 +127,7 @@ Chat.prototype.conversationWithUser = function (username, cb) {
  */
 Chat.prototype.conversationsWithUsers = function (usernames, cb) {
   var self = this
-  debug('Chat.conversationsWithUsers (%d)', usernames.length)
+  debug('Chat.conversationsWithUsers (%j)', usernames)
 
   var results = {
     conversations: [ ],
@@ -199,7 +197,7 @@ Chat.prototype.conversationsWithUsers = function (usernames, cb) {
       if (err) {
         return cb(err)
       } else if (result) {
-        if (result.conversations && result.conversations.length) {
+        if (result.conversations) {
           results.conversations = result.conversations.map(function (convo) {
             return new Conversation(convo)
           })
@@ -256,7 +254,7 @@ Chat.prototype.sendMessage = function (message, username, cb) {
   var self = this
   debug('Chat.sendMessage (%s, %s)', message, username)
 
-  self.sendMessages(message, [ username ], function (err, results) {
+  self.sendMessageToUsers(message, [ username ], function (err, results) {
     if (err) {
       cb(err)
     } else if (!results.conversations.length) {
@@ -274,9 +272,9 @@ Chat.prototype.sendMessage = function (message, username, cb) {
  * @param {Array[string]} usernames An array of username strings as recipients.
  * @param {function} cb
  */
-Chat.prototype.sendMessages = function (message, usernames, cb) {
+Chat.prototype.sendMessageToUsers = function (message, usernames, cb) {
   var self = this
-  debug('Chat.sendMessages (%s, %s)', message, JSON.stringify(usernames))
+  debug('Chat.sendMessageToUsers (%s, %j)', message, usernames)
 
   var results = {
     conversations: [ ],
@@ -332,11 +330,11 @@ Chat.prototype.sendMessages = function (message, usernames, cb) {
 
           return cb(null, results)
         } else {
-          debug('Chat.sendMessages parse error %j', result)
+          debug('Chat.sendMessageToUsers parse error %j', result)
         }
       }
 
-      cb('Chat.sendMessages parse error')
+      cb('Chat.sendMessageToUsers parse error')
     })
   })
 }
@@ -384,14 +382,14 @@ Chat.prototype.loadConversationsAfter = function (conversation, cb) {
 }
 
 /**
- * Loads every conversation.
+ * Loads all conversations into the current session.
  *
  * @discussion This method will update \c client.currentSession.conversations accordingly.
  * @param {function} cb
  */
-Chat.prototype.allConversations = function (cb) {
+Chat.prototype.loadAllConversations = function (cb) {
   var self = this
-  debug('Chat.allConversations')
+  debug('Chat.loadAllConversations')
 
   self.client.updateSession(function (err) {
     if (err) {
@@ -464,9 +462,9 @@ Chat.prototype.loadMessagesAfterPagination = function (messageOrTransaction, cb)
  * @param {Conversation} conversation The conversation to load completely.
  * @param {function} cb
  */
-Chat.prototype.fullConversation = function (conversation, cb) {
+Chat.prototype.loadFullConversation = function (conversation, cb) {
   var self = this
-  debug('Chat.fullConversation')
+  debug('Chat.loadFullConversation')
 
   var last = conversation.messages[conversation.messages.length - 1]
 
