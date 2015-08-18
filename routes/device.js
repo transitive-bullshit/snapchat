@@ -49,7 +49,7 @@ Device.prototype.sendDidOpenAppEvent = function (cb) {
         'user_id': StringUtils.md5HashToHex(self.client.username),
         'city': unimplemented,
         'sc_user_agent': constants.core.userAgent,
-        'session_id': "00000000-0000-0000-0000-000000000000",
+        'session_id': '00000000-0000-0000-0000-000000000000',
         'region': unimplemented,
         'latlon': unimplemented,
         'friend_count': friendCount,

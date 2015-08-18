@@ -42,17 +42,17 @@ Stories.prototype.postStory = function (blob, opts, cb) {
     }
 
     self.client.post(constants.endpoints.stories.post, {
-      "caption_text_display": opts.text,
-      "story_timestamp": StringUtils.timestamp(),
+      'caption_text_display': opts.text,
+      'story_timestamp': StringUtils.timestamp(),
       'type': blob.isImage ? constants.MediaKind.Image : constants.MediaKind.Video,
-      "media_id": mediaID,
-      "client_id": mediaID,
-      "time": opts.timer | 0,
-      "username": self.client.username,
-      "camera_front_facing": opts.cameraFrontFacing,
-      "my_story": 'true',
-      "zipped": 0,
-      "shared_ids": "{}"
+      'media_id': mediaID,
+      'client_id': mediaID,
+      'time': opts.timer | 0,
+      'username': self.client.username,
+      'camera_front_facing': opts.cameraFrontFacing,
+      'my_story': 'true',
+      'zipped': 0,
+      'shared_ids': '{}'
     }, function (err, result) {
       if (err) {
         debug('Snapchat.Stories.postStory error %s', err)
@@ -88,7 +88,7 @@ Stories.prototype.loadStoryBlob = function (story, cb) {
   if (story.needsAuth) {
     Request.post(constants.endpoints.stories.authBlob, {
       'story_id': story.mediaIdentifier,
-      'username':  self.client.username
+      'username': self.client.username
     }, self.client.googleAuthToken, self.client.authToken, blobHandler)
   } else {
     self.client.get(story.mediaURL.replace(constants.endpoints.baseURL), blobHandler)
@@ -183,15 +183,15 @@ Stories.prototype.markStoriesViewed = function (stories, cb) {
 
   var friendStories = stories.map(function (update) {
     return {
-      "id": update.storyID,
-      "screenshot_count": update.screenshotCount,
-      "timestamp": update.timestamp
+      'id': update.storyID,
+      'screenshot_count': update.screenshotCount,
+      'timestamp': update.timestamp
     }
   })
 
   self.client.post(constants.endpoints.update.stories, {
-    "username": self.client.username,
-    "friend_stories": friendStories
+    'username': self.client.username,
+    'friend_stories': friendStories
   }, cb)
 }
 

@@ -69,7 +69,6 @@ Snaps.prototype.sendSnapCustom = function (blob, opts, cb) {
   })
 }
 
-
 /**
  * Marks a snap as opened for \c secondsViewed seconds.
  *

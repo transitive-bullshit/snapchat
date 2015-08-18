@@ -300,7 +300,7 @@ Chat.prototype.sendMessages = function (message, usernames, cb) {
         'auth': convo.messagingAuth,
         'to': [ convo.recipient ],
         'from': self.client.username,
-        //'conn_sequence_number': 1,
+        // 'conn_sequence_number': 1,
         'conn_sequ_num': 1,
         'conv_id': convo.identifier
       }
@@ -360,7 +360,7 @@ Chat.prototype.loadConversationsAfter = function (conversation, cb) {
   self.client.post(constants.endpoints.chat.conversations, {
     'username': self.client.username,
     'checksum': StringUtils.md5HashToHex(self.client.username),
-    'offset': conversation.pagination,
+    'offset': conversation.pagination
   }, function (err, result) {
     if (err) {
       return cb(err)
@@ -436,7 +436,7 @@ Chat.prototype.loadMessagesAfterPagination = function (messageOrTransaction, cb)
 
   if (messageOrTransaction instanceof Conversation ||
      !messageOrTransaction.conversationIdentifier) {
-    throw new Error("Chat.loadMessagesAfterPagination invalid param")
+    throw new Error('Chat.loadMessagesAfterPagination invalid param')
   }
 
   if (!messageOrTransaction.pagination.length) {

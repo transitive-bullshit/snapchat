@@ -12,7 +12,7 @@ var Snapchat = require('../')
 function Story (client, params) {
   var self = this
   if (!(self instanceof Story)) return new Story(client, params)
-  if (!(client instanceof Snapchat)) throw new Error("invalid client")
+  if (!(client instanceof Snapchat)) throw new Error('invalid client')
 
   self.client = client
 
@@ -22,33 +22,33 @@ function Story (client, params) {
   // null until you call loadThumbnail
   self.thumbnailBlob = null
 
-  self.author = params["username"]
-  self.viewed = !!params["viewed"]
-  self.shared = !!params["is_shared"]
-  self.zipped = !!params["zipped"]
-  self.matureContent = !!params["mature_content"]
-  self.needsAuth = !!params["needs_auth"]
+  self.author = params['username']
+  self.viewed = !!params['viewed']
+  self.shared = !!params['is_shared']
+  self.zipped = !!params['zipped']
+  self.matureContent = !!params['mature_content']
+  self.needsAuth = !!params['needs_auth']
 
-  self.duration = params["time"] | 0
+  self.duration = params['time'] | 0
 
-  self.identifier = params["id"]
-  self.text = params["caption_text_display"]
-  self.clientIdentifier = params["client_id"]
+  self.identifier = params['id']
+  self.text = params['caption_text_display']
+  self.clientIdentifier = params['client_id']
 
-  self.storyFilterIdentifier = params["story_filter_id"]
-  self.adCanFollow = !!params["ad_can_follow"]
+  self.storyFilterIdentifier = params['story_filter_id']
+  self.adCanFollow = !!params['ad_can_follow']
 
-  self.mediaIdentifier = params["media_id"]
-  self.mediaIV = params["media_iv"]
-  self.mediaKey = params["media_key"]
-  self.mediaKind = params["media_type"] | 0
-  self.mediaURL = params["media_url"]
+  self.mediaIdentifier = params['media_id']
+  self.mediaIV = params['media_iv']
+  self.mediaKey = params['media_key']
+  self.mediaKind = params['media_type'] | 0
+  self.mediaURL = params['media_url']
 
-  self.thumbIV = params["thumbnail_iv"]
-  self.thumbURL = params["thumbnail_url"]
+  self.thumbIV = params['thumbnail_iv']
+  self.thumbURL = params['thumbnail_url']
 
-  self.timeLeft = params["time_left"] | 0
-  self.created = new Date(+params["timestamp"])
+  self.timeLeft = params['time_left'] | 0
+  self.created = new Date(+params['timestamp'])
 }
 
 /**

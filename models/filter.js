@@ -1,7 +1,5 @@
 module.exports = Filter
 
-var Filter = require('./filter')
-
 /**
  * Snapchat Filter
  *

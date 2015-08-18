@@ -16,7 +16,7 @@ var StoryCollection = require('./story-collection')
 function Session (client, params) {
   var self = this
   if (!(self instanceof Session)) return new Session(client, params)
-  if (!(client instanceof Snapchat)) throw new Error("invalid client")
+  if (!(client instanceof Snapchat)) throw new Error('invalid client')
 
   self.client = client
 

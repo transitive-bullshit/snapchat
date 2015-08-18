@@ -17,7 +17,7 @@ var HAS_AUTH = SNAPCHAT_USERNAME && SNAPCHAT_PASSWORD &&
                SNAPCHAT_GMAIL_EMAIL && SNAPCHAT_GMAIL_PASSWORD
 
 if (!HAS_AUTH) {
-  throw new Error("missing required environment auth variables")
+  throw new Error('missing required environment auth variables')
 }
 
 test('Snapchat._getGoogleAuthToken', function (t) {

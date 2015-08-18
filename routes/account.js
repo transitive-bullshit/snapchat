@@ -3,7 +3,6 @@ module.exports = Account
 var debug = require('debug')('snapchat:account')
 
 var constants = require('../lib/constants')
-var StringUtils = require('../lib/string-utils')
 
 var SKBlob = require('../models/blob')
 
@@ -131,7 +130,7 @@ Account.prototype.updateSearchableByNumber = function (searchable, cb) {
 }
 
 /**
- * Updates your "notification sounds" preference.
+ * Updates your 'notification sounds' preference.
  *
  * @param {boolean} enableSound The new value for this preference.
  * @param {function} cb
@@ -150,7 +149,7 @@ Account.prototype.updateNotificationSoundSetting = function (enableSound, cb) {
 /**
  * Updates your display name.
  *
- * @discussion Your "display name" is what your contact name defaults to when someone new adds you, not your username.
+ * @discussion Your 'display name' is what your contact name defaults to when someone new adds you, not your username.
  * @param {string} displayName Your new display name.
  * @param {function} cb
  */
@@ -219,12 +218,11 @@ Account.prototype.downloadSnaptag = function (cb) {
  * @param {function} cb
  */
 Account.prototype.uploadAvatar = function (images, cb) {
-  var self = this
   debug('Account.uploadAvatar')
 
-  throw new Error("Account.uploadAvatar TODO")
+  throw new Error('Account.uploadAvatar TODO', images, cb)
   // SKEPAccount.avatar.set
-  // multipart/form-data; takes a single "data" parameter in addition to the usual "username" param
+  // multipart/form-data; takes a single 'data' parameter in addition to the usual 'username' param
 }
 
 /**
