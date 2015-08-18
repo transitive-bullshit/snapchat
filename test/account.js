@@ -7,23 +7,9 @@ var test = require('tape')
 var constants = require('../lib/constants')
 var Snapchat = require('../')
 
-var SNAPCHAT_USERNAME = process.env.SNAPCHAT_USERNAME
-var SNAPCHAT_PASSWORD = process.env.SNAPCHAT_PASSWORD
-var SNAPCHAT_GMAIL_EMAIL = process.env.SNAPCHAT_GMAIL_EMAIL
-var SNAPCHAT_GMAIL_PASSWORD = process.env.SNAPCHAT_GMAIL_PASSWORD
-
-var HAS_AUTH = SNAPCHAT_USERNAME && SNAPCHAT_PASSWORD &&
-               SNAPCHAT_GMAIL_EMAIL && SNAPCHAT_GMAIL_PASSWORD
-
-if (!HAS_AUTH) {
-  throw new Error('missing required environment auth variables')
-}
-
 var client = new Snapchat()
 
-client.signIn(SNAPCHAT_USERNAME, SNAPCHAT_PASSWORD,
-              SNAPCHAT_GMAIL_EMAIL, SNAPCHAT_GMAIL_PASSWORD,
-              function (err) {
+client.signIn(function (err) {
   if (err) {
     throw new Error('signIn error', err)
   }
