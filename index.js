@@ -2,14 +2,12 @@ module.exports = Snapchat
 
 // external
 var debug = require('debug')('snapchat')
-var request = require('request')
 var phone = require('phone')
 var zlib = require('zlib')
 
 // utilities
 var constants = require('./lib/constants')
 var Request = require('./lib/request')
-var BufferUtils = require('./lib/buffer-utils')
 var StringUtils = require('./lib/string-utils')
 
 // routes
@@ -541,7 +539,6 @@ Snapchat.prototype.getCaptcha = function (cb) {
       debug('getCaptcha error %s', err)
       return cb(err)
     } else {
-
       zlib.gunzip(new Buffer(body), function (err, data) {
         if (err) {
           debug('getCaptcha gunzip error %s', err)
