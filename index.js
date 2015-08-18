@@ -727,7 +727,7 @@ Snapchat.prototype._getGoogleCloudMessagingIdentifier = function (cb) {
       'Accept-Language': 'en',
       'Accept-Locale': 'en_US',
       'app': 'com.snapchat.android',
-      'Authorization': 'AidLogin 4343470343591528399: 5885638743641649694',
+      'Authorization': 'AidLogin 4343470343591528399:5885638743641649694',
       'Gcm-ver': '7097038',
       'Accept-Encoding': 'gzip',
       'User-Agent': 'Android-GCM/1.5 (A116 _Quad KOT49H)'
