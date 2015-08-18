@@ -58,7 +58,7 @@ client.signIn(function (err) {
   })
 
   test('Snapchat.chat.sendMessage', function (t) {
-    client.chat.sendMessage('hello world', TEST_USERNAME, function (err, result) {
+    client.chat.sendMessage('holla', TEST_GLOBAL_USERNAME, function (err, result) {
       t.notOk(err)
       t.ok(result)
       t.ok(result instanceof Conversation)
