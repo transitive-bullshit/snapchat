@@ -183,7 +183,7 @@ Object.defineProperty(Snapchat.prototype, 'googleAttestation', {
  *
  * A valid GMail account is necessary to trick Snapchat into thinking we're using the first party client.
  *
- * Note that username, password, gmailEmail, and gmailPassword are all optional if
+ * Note that username, password, gmailEmail, and gmailPassword are all optional only if
  * their environment variable equivalents exist. E.g.,
  *
  * SNAPCHAT_USERNAME
@@ -191,10 +191,10 @@ Object.defineProperty(Snapchat.prototype, 'googleAttestation', {
  * SNAPCHAT_GMAIL_EMAIL
  * SNAPCHAT_GMAIL_PASSWORD
  *
- * @param {string} username The Snapchat username to sign in with.
- * @param {string} password The password to the Snapchat account to sign in with.
- * @param {string} gmailEmail A valid GMail address.
- * @param {string} gmailPassword The password associated with \c gmailEmail.
+ * @param {string} Optional username The Snapchat username to sign in with.
+ * @param {string} Optional password The password to the Snapchat account to sign in with.
+ * @param {string} Optional gmailEmail A valid GMail address.
+ * @param {string} Optional gmailPassword The password associated with \c gmailEmail.
  * @param {function} cb
  */
 Snapchat.prototype.signIn = function (username, password, gmailEmail, gmailPassword, cb) {
@@ -216,7 +216,7 @@ Snapchat.prototype.signIn = function (username, password, gmailEmail, gmailPassw
 
   self._getGoogleAuthToken(gmailEmail, gmailPassword, function (err, gauth) {
     if (err) {
-      debug('could not retrieve google auth token')
+      debug('error getting google auth token')
       return cb(err)
     }
 
@@ -224,13 +224,13 @@ Snapchat.prototype.signIn = function (username, password, gmailEmail, gmailPassw
 
     self._getAttestation(username, password, timestamp, function (err, attestation) {
       if (err) {
-        debug('could not retrieve attestation')
+        debug('error getting attestation')
         return cb(err)
       }
 
       self._getGoogleCloudMessagingIdentifier(function (err, ptoken) {
         if (err) {
-          debug('could not google cloud messaging identifier')
+          debug('error getting google cloud messaging identifier')
           return cb(err)
         }
 
@@ -284,7 +284,7 @@ Snapchat.prototype.signIn = function (username, password, gmailEmail, gmailPassw
               return cb(null, self.currentSession)
             }
 
-            cb('signIn parse error', result)
+            cb('Snapchat.signIn parse error', result)
           })
         })
       })
