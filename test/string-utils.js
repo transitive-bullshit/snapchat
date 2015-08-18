@@ -11,6 +11,6 @@ test('timestamp', function (t) {
   t.ok(timestamp)
   t.equal(typeof timestamp, 'string')
   t.equal(typeof +timestamp, 'number')
-  t.ok(new Date(+timestamp) < new Date())
+  t.ok(new Date(+timestamp) <= new Date())
   t.end()
 })
