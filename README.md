@@ -60,9 +60,8 @@ DEBUG=snapchat,snapchat:*; # debug all snapchat submodules
 * ts/timestamps milliseconds or seconds
 * JSON.stringify internal params or nah?
 * sendEvents inconsistent between `Array[event]` and `event`
-
-* move tryParseJSON into Request success handler
-* also move response out and just return parsed JSON body
+* encrypt gmail password
+* cleanup headers initialization contentType etc.
 
 ### License
 

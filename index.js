@@ -602,7 +602,8 @@ Snapchat.prototype._getGoogleAuthToken = function (gmailEmail, gmailPassword, cb
     'accountType': 'HOSTED_OR_GOOGLE',
     'Email': gmailEmail,
     'Passwd': gmailPassword,
-    'service': 'audience: server: client_id: 694893979329-l59f3phl42et9clpoo296d8raqoljl6p.apps.googleusercontent.com',
+    //'EncryptedPasswd': encryptedGmailPassword, // TODO
+    'service': 'audience:server:client_id:694893979329-l59f3phl42et9clpoo296d8raqoljl6p.apps.googleusercontent.com',
     'source': 'android',
     'androidId': '378c184c6070c26c',
     'app': 'com.snapchat.android',
@@ -742,7 +743,7 @@ Snapchat.prototype._getAttestation = function (username, password, ts, cb) {
   var params = {
     'nonce': nonce,
     'authentication': constants.attestation.auth,
-    'apk_digest': constants.attestation.digest9_12_2,
+    'apk_digest': constants.attestation['digest9_12_2'],
     'timestamp': ts
   }
 
