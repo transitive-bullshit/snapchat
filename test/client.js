@@ -8,6 +8,7 @@ var Snapchat = require('../')
 test('Snapchat.registerEmail', function (t) {
   var client = new Snapchat()
 
+  // note: it's okay to register an email multiple times without completing signup
   client.registerEmail('test@textblast.io', 'Testpassword7', '1994-03-20', function (err, result) {
     t.notOk(err)
     t.ok(result)
@@ -30,15 +31,3 @@ test('Snapchat._getDeviceTokens', function (t) {
     t.end()
   })
 })
-
-/*test('Snapchat._getGoogleCloudMessagingIdentifier', function (t) {
-  var client = new Snapchat()
-
-  client._getGoogleCloudMessagingIdentifier(function (err, result) {
-    t.notOk(err)
-    t.ok(result)
-    t.equal(typeof result, 'string')
-    console.log(result)
-    t.end()
-  })
-})*/

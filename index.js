@@ -183,14 +183,35 @@ Object.defineProperty(Snapchat.prototype, 'googleAttestation', {
  *
  * A valid GMail account is necessary to trick Snapchat into thinking we're using the first party client.
  *
+ * Note that username, password, gmailEmail, and gmailPassword are all optional if
+ * their environment variable equivalents exist. E.g.,
+ *
+ * SNAPCHAT_USERNAME
+ * SNAPCHAT_PASSWORD
+ * SNAPCHAT_GMAIL_EMAIL
+ * SNAPCHAT_GMAIL_PASSWORD
+ *
  * @param {string} username The Snapchat username to sign in with.
  * @param {string} password The password to the Snapchat account to sign in with.
- * @param {string} gmailEmail A vaild GMail address.
+ * @param {string} gmailEmail A valid GMail address.
  * @param {string} gmailPassword The password associated with \c gmailEmail.
  * @param {function} cb
  */
 Snapchat.prototype.signIn = function (username, password, gmailEmail, gmailPassword, cb) {
   var self = this
+
+  if (typeof username === 'function') {
+    cb = username
+    username = process.env.SNAPCHAT_USERNAME
+    password = process.env.SNAPCHAT_PASSWORD
+    gmailEmail = process.env.SNAPCHAT_GMAIL_EMAIL
+    gmailPassword = process.env.SNAPCHAT_GMAIL_PASSWORD
+  }
+
+  if (!(username && password && gmailEmail && gmailPassword)) {
+    throw new Error('missing required login credentials')
+  }
+
   debug('Snapchat.signIn (username %s)', username)
 
   self._getGoogleAuthToken(gmailEmail, gmailPassword, function (err, gauth) {

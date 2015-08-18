@@ -8,6 +8,10 @@ It provides an easy-to-use client interface to Snapchat's unofficial API, allowi
 
 **NOTE** This project is a pre-release alpha, and I would not recommend using it for production projects until it is more stable. PRs welcome :)
 
+### Status
+
+Login and request authentication are working and up-to-date with the latest version of Snapchat. Most of the REST API routes are untested.
+
 ### Install
 
 ```bash
@@ -16,7 +20,37 @@ npm install snapchat
 
 ### Usage
 
-TODO
+Snapchat defaults to using required signin credentials stored in environment variables:
+
+`SNAPCHAT_USERNAME` The Snapchat username to sign in with.
+`SNAPCHAT_PASSWORD` The password to the Snapchat account to sign in with.
+`SNAPCHAT_GMAIL_EMAIL` A valid GMail address.
+`SNAPCHAT_GMAIL_PASSWORD` The password for the GMail address.
+
+```javascript
+var Snapchat = require('snapchat')
+
+var client = new Snapchat()
+// note the signIn will default to credentials stored in environment variables
+client.signIn(function (err, session) {
+  if (!err) {
+    console.log('signed in', client.username)
+  }
+})
+```
+
+Or with explicit credentials:
+
+```javascript
+var Snapchat = require('snapchat')
+
+var client = new Snapchat()
+client.signIn('myusername', 'mypassword', 'mygmailaddress@gmail.com', 'mygmailpassword', function (err, session) {
+  if (!err) {
+    console.log('signed in', client.username)
+  }
+})
+```
 
 ### Contribute
 
@@ -57,8 +91,9 @@ DEBUG=snapchat,snapchat:*; # debug all snapchat submodules
 
 ### Todo
 
+* MORE TESTS
 * handle request encoding properly for blobs and non-text requests
-* ts/timestamps milliseconds or seconds
+* verify ts/timestamps milliseconds or seconds
 * JSON.stringify internal params or nah?
 * sendEvents inconsistent between `Array[event]` and `event`
 * encrypt gmail password

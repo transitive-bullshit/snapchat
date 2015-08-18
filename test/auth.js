@@ -10,20 +10,20 @@ var StringUtils = require('../lib/string-utils')
 
 var SNAPCHAT_USERNAME = process.env.SNAPCHAT_USERNAME
 var SNAPCHAT_PASSWORD = process.env.SNAPCHAT_PASSWORD
-var GMAIL_EMAIL = process.env.GMAIL_EMAIL
-var GMAIL_PASSWORD = process.env.GMAIL_PASSWORD
+var SNAPCHAT_GMAIL_EMAIL = process.env.SNAPCHAT_GMAIL_EMAIL
+var SNAPCHAT_GMAIL_PASSWORD = process.env.SNAPCHAT_GMAIL_PASSWORD
 
-var HAS_AUTH = SNAPCHAT_USERNAME && SNAPCHAT_PASSWORD && GMAIL_EMAIL && GMAIL_PASSWORD
+var HAS_AUTH = SNAPCHAT_USERNAME && SNAPCHAT_PASSWORD &&
+               SNAPCHAT_GMAIL_EMAIL && SNAPCHAT_GMAIL_PASSWORD
 
 if (!HAS_AUTH) {
-  console.error("error missing required auth variables in environment")
-  process.exit(1)
+  throw new Error("missing required environment auth variables")
 }
 
 test('Snapchat._getGoogleAuthToken', function (t) {
   var client = new Snapchat()
 
-  client._getGoogleAuthToken(GMAIL_EMAIL, GMAIL_PASSWORD, function (err, result) {
+  client._getGoogleAuthToken(SNAPCHAT_GMAIL_EMAIL, SNAPCHAT_GMAIL_PASSWORD, function (err, result) {
     t.notOk(err)
     t.ok(result)
     t.equal(typeof result, 'string')
@@ -60,7 +60,9 @@ test('Snapchat._getGoogleCloudMessagingIdentifier', function (t) {
 test('Snapchat.signIn', function (t) {
   var client = new Snapchat()
 
-  client.signIn(SNAPCHAT_USERNAME, SNAPCHAT_PASSWORD, GMAIL_EMAIL, GMAIL_PASSWORD, function (err, session) {
+  client.signIn(SNAPCHAT_USERNAME, SNAPCHAT_PASSWORD,
+                SNAPCHAT_GMAIL_EMAIL, SNAPCHAT_GMAIL_PASSWORD,
+                function (err, session) {
     t.notOk(err)
     t.ok(session)
     t.ok(session instanceof Session)
