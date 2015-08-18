@@ -1,6 +1,7 @@
 module.exports = Session
 
 var constants = require('../lib/constants')
+var Snapchat = require('../')
 var User = require('./user')
 var Conversation = require('./conversation')
 var UserStory = require('./user-story')
@@ -9,11 +10,15 @@ var StoryCollection = require('./story-collection')
 /**
  * Snapchat Session
  *
+ * @param {Snapchat} client
  * @param {Object} params
  */
-function Session (params) {
+function Session (client, params) {
   var self = this
-  if (!(self instanceof Session)) return new Session(params)
+  if (!(self instanceof Session)) return new Session(client, params)
+  if (!(client instanceof Snapchat)) throw new Error("invalid client")
+
+  self.client = client
 
   var storiesResponse = params['stories_response']
   var friendsResponse = params['friends_response']
@@ -69,7 +74,7 @@ function Session (params) {
 
   // Story collections
   self.stories = friendStories.map(function (collection) {
-    return new StoryCollection(collection)
+    return new StoryCollection(self.client, collection)
   })
 
   // User stories

@@ -1,15 +1,20 @@
 module.exports = StoryCollection
 
+var Snapchat = require('../')
 var Story = require('./story')
 
 /**
  * Snapchat StoryCollection
  *
+ * @param {Snapchat} client
  * @param {Object} params
  */
-function StoryCollection (params) {
+function StoryCollection (client, params) {
   var self = this
-  if (!(self instanceof StoryCollection)) return new StoryCollection(params)
+  if (!(self instanceof StoryCollection)) return new StoryCollection(client, params)
+  if (!(client instanceof Snapchat)) throw new Error("invalid client")
+
+  self.client = client
 
   var thumbs = params['thumbnails']
 
@@ -40,7 +45,7 @@ function StoryCollection (params) {
 
   // An array of Story objects.
   self.stories = (params.stories || [ ]).map(function (story) {
-    return new Story(story)
+    return new Story(self.client, story)
   })
 }
 

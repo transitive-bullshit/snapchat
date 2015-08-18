@@ -6,8 +6,8 @@ var Snapchat = require('../')
 /**
  * Snapchat Story
  *
+ * @param {Snapchat} client
  * @param {Object} params
- * @param {boolean} cameraFrontFacing
  */
 function Story (client, params) {
   var self = this

@@ -20,7 +20,7 @@ if (!HAS_AUTH) {
   process.exit(1)
 }
 
-/*test('Snapchat._getGoogleAuthToken', function (t) {
+test('Snapchat._getGoogleAuthToken', function (t) {
   var client = new Snapchat()
 
   client._getGoogleAuthToken(GMAIL_EMAIL, GMAIL_PASSWORD, function (err, result) {
@@ -55,7 +55,7 @@ test('Snapchat._getGoogleCloudMessagingIdentifier', function (t) {
     t.equal(typeof result, 'string')
     t.end()
   })
-})*/
+})
 
 test('Snapchat.signIn', function (t) {
   var client = new Snapchat()

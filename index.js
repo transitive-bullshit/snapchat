@@ -250,12 +250,16 @@ Snapchat.prototype.signIn = function (username, password, gmailEmail, gmailPassw
           headers[constants.headers.clientAuthToken] = 'Bearer ' + self._googleAuthToken
           headers[constants.headers.clientAuth] = ''
 
-          Request.postCustom(constants.endpoints.account.login, params, headers, null, function (err, result) {
+          var opts = {
+            'timestamp': timestamp
+          }
+
+          Request.postCustom(constants.endpoints.account.login, params, headers, null, opts, function (err, result) {
             if (err) {
               debug('Snapchat.signIn error %s', err)
               return cb(err)
             } else if (result) {
-              self.currentSession = new Session(result)
+              self.currentSession = new Session(self, result)
               return cb(null, self.currentSession)
             }
 
@@ -345,7 +349,7 @@ Snapchat.prototype.updateSession = function (cb) {
       debug('updateSession error %s', err)
       return cb(err)
     } else if (result) {
-      self.currentSession = new Session(result)
+      self.currentSession = new Session(self, result)
       return cb(null, self.currentSession)
     }
 
@@ -416,7 +420,7 @@ Snapchat.prototype.registerUsername = function (username, registeredEmail, gmail
         debug('registerUsername error %s', err)
         return cb(err)
       } else if (result) {
-        self.currentSession = new Session(result)
+        self.currentSession = new Session(self, result)
         self._googleAuthToken = gauth
         return cb(null)
       }
