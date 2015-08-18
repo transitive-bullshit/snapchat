@@ -27,6 +27,8 @@ Snapchat defaults to using required signin credentials stored in environment var
 - `SNAPCHAT_GMAIL_EMAIL` A valid GMail address.
 - `SNAPCHAT_GMAIL_PASSWORD` The password for the GMail address.
 
+**NOTE** Only Snapchat accounts created via an Android client should be used with this library. iOS accounts are handled separately by Snapchat, and your account will most likely be flagged / disabled as suspicious if you try to use a Snapchat account created on iOS.
+
 ```javascript
 var Snapchat = require('snapchat')
 
@@ -51,6 +53,8 @@ client.signIn('myusername', 'mypassword', 'mygmailaddress@gmail.com', 'mygmailpa
   }
 })
 ```
+
+NOTE Any valid gmail address and password may be used; it does not have to be the one the Snapchat user was created with.
 
 ### Contribute
 
