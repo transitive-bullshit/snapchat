@@ -57,6 +57,7 @@ DEBUG=snapchat,snapchat:*; # debug all snapchat submodules
 
 ### Todo
 
+* handle request encoding properly for blobs and non-text requests
 * ts/timestamps milliseconds or seconds
 * JSON.stringify internal params or nah?
 * sendEvents inconsistent between `Array[event]` and `event`

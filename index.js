@@ -255,7 +255,7 @@ Snapchat.prototype.signIn = function (username, password, gmailEmail, gmailPassw
               return cb(null, self.currentSession)
             }
 
-            cb('signIn parse error')
+            cb('signIn parse error', result)
           })
         })
       })
@@ -624,7 +624,7 @@ Snapchat.prototype._getGoogleAuthToken = function (gmailEmail, gmailPassword, cb
     url: 'https://android.clients.google.com/auth',
     form: params,
     headers: headers
-  }, function (err, body) {
+  }, function (err, response, body) {
     if (err) {
       debug('_getGoogleAuthToken error %s', err)
       return cb(err)
@@ -712,14 +712,14 @@ Snapchat.prototype._getGoogleCloudMessagingIdentifier = function (cb) {
 
   headers[constants.headers.userAgent] = 'Android-GCM/1.5 (A116 _Quad KOT49H)'
 
-  request.post({
+  Request.postRaw({
     url: 'https://android.clients.google.com/c2dm/register3',
     form: params,
     headers: headers
-  }, function (err, body) {
+  }, function (err, response, body) {
     if (err) {
       return cb(err)
-    } else {
+    } else if (body) {
       // parse token
       var token = StringUtils.matchGroup(body, /token=([\w\.-]+)/, 1)
 
@@ -753,10 +753,10 @@ Snapchat.prototype._getAttestation = function (username, password, ts, cb) {
     'timestamp': ts
   }
 
-  request.post({
-    url: constants.attestation.URLCaspter,
+  Request.postRaw({
+    url: constants.attestation.URLCasper,
     form: params
-  }, function (err, result) {
+  }, function (err, response, result) {
     if (err) {
       return cb(err)
     } else if (result && +result.code === 200) {
