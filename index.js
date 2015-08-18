@@ -593,37 +593,32 @@ Snapchat.prototype.sendEvents = function (events, snapInfo, cb) {
  * internal
  */
 Snapchat.prototype._getGoogleAuthToken = function (gmailEmail, gmailPassword, cb) {
-  var params = {
-    'google_play_services_version': '7097038',
-    'device_country': 'us',
-    'operatorCountry': 'us',
-    'lang': 'en_US',
-    'sdk_version': '19',
-    'accountType': 'HOSTED_OR_GOOGLE',
-    'Email': gmailEmail,
-    'Passwd': gmailPassword,
-    //'EncryptedPasswd': encryptedGmailPassword, // TODO
-    'service': 'audience:server:client_id:694893979329-l59f3phl42et9clpoo296d8raqoljl6p.apps.googleusercontent.com',
-    'source': 'android',
-    'androidId': '378c184c6070c26c',
-    'app': 'com.snapchat.android',
-    'client_sig': '49f6badb81d89a9e38d65de76f09355071bd67e7',
-    'callerPkg': 'com.snapchat.android',
-    'callerSig': '49f6badb81d89a9e38d65de76f09355071bd67e7'
-  }
-
-  var headers = {
-    'device': '378c184c6070c26c',
-    'app': 'com.snapchat.android',
-    'Accept-Encoding': 'gzip'
-  }
-
-  headers[constants.headers.userAgent] = 'GoogleAuth/1.4 (mako JDQ39)'
-
   Request.postRaw({
     url: 'https://android.clients.google.com/auth',
-    form: params,
-    headers: headers
+    form: {
+      'google_play_services_version': '7097038',
+      'device_country': 'us',
+      'operatorCountry': 'us',
+      'lang': 'en_US',
+      'sdk_version': '19',
+      'accountType': 'HOSTED_OR_GOOGLE',
+      'Email': gmailEmail,
+      'Passwd': gmailPassword,
+      //'EncryptedPasswd': encryptedGmailPassword, // TODO
+      'service': 'audience:server:client_id:694893979329-l59f3phl42et9clpoo296d8raqoljl6p.apps.googleusercontent.com',
+      'source': 'android',
+      'androidId': '378c184c6070c26c',
+      'app': 'com.snapchat.android',
+      'client_sig': '49f6badb81d89a9e38d65de76f09355071bd67e7',
+      'callerPkg': 'com.snapchat.android',
+      'callerSig': '49f6badb81d89a9e38d65de76f09355071bd67e7'
+    },
+    headers: {
+      'device': '378c184c6070c26c',
+      'app': 'com.snapchat.android',
+      'Accept-Encoding': 'gzip',
+      'User-Agent': 'GoogleAuth/1.4 (mako JDQ39)'
+    }
   }, function (err, response, body) {
     if (err) {
       debug('_getGoogleAuthToken error %s', err)
@@ -690,32 +685,27 @@ Snapchat.prototype._getDeviceTokens = function (cb) {
  * internal
  */
 Snapchat.prototype._getGoogleCloudMessagingIdentifier = function (cb) {
-  var params = {
-    'X-google.message_id': 'google.rpc1',
-    'device': 4343470343591528399,
-    'sender': 191410808405,
-    'app_ver': 706,
-    'gcm_ver': 7097038,
-    'app': 'com.snapchat.android',
-    'iat': (new Date()).getTime(),
-    'cert': '49f6badb81d89a9e38d65de76f09355071bd67e7'
-  }
-
-  var headers = {
-    'Accept-Language': 'en',
-    'Accept-Locale': 'en_US',
-    'app': 'com.snapchat.android',
-    'Authorization': 'AidLogin 4343470343591528399: 5885638743641649694',
-    'Gcm-ver': '7097038',
-    'Accept-Encoding': 'gzip'
-  }
-
-  headers[constants.headers.userAgent] = 'Android-GCM/1.5 (A116 _Quad KOT49H)'
-
   Request.postRaw({
     url: 'https://android.clients.google.com/c2dm/register3',
-    form: params,
-    headers: headers
+    form: {
+      'X-google.message_id': 'google.rpc1',
+      'device': 4343470343591528399,
+      'sender': 191410808405,
+      'app_ver': 706,
+      'gcm_ver': 7097038,
+      'app': 'com.snapchat.android',
+      'iat': (new Date()).getTime(),
+      'cert': '49f6badb81d89a9e38d65de76f09355071bd67e7'
+    },
+    headers: {
+      'Accept-Language': 'en',
+      'Accept-Locale': 'en_US',
+      'app': 'com.snapchat.android',
+      'Authorization': 'AidLogin 4343470343591528399: 5885638743641649694',
+      'Gcm-ver': '7097038',
+      'Accept-Encoding': 'gzip',
+      'User-Agent': 'Android-GCM/1.5 (A116 _Quad KOT49H)'
+    }
   }, function (err, response, body) {
     if (err) {
       return cb(err)
