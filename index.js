@@ -620,17 +620,23 @@ Snapchat.prototype._getGoogleAuthToken = function (gmailEmail, gmailPassword, cb
 
   headers[constants.headers.userAgent] = 'GoogleAuth/1.4 (mako JDQ39)'
 
-  request.post({
+  Request.postRaw({
     url: 'https://android.clients.google.com/auth',
     form: params,
     headers: headers
   }, function (err, body) {
     if (err) {
       debug('_getGoogleAuthToken error %s', err)
-      cb(err)
-    } else {
-      cb(null, StringUtils.matchGroup(body, /Auth=([\w\.-]+)/i, 1))
+      return cb(err)
+    } else if (body) {
+      var auth = StringUtils.matchGroup(body, /Auth=([\w\.-]+)/i, 1)
+
+      if (auth) {
+        return cb(null, auth)
+      }
     }
+
+    cb('Snapchat._getGoogleAuthToken unknown error')
   })
 }
 

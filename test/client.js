@@ -1,3 +1,7 @@
+#!/usr/bin/env node
+
+require('dotenv').load()
+
 var test = require('tape')
 var Snapchat = require('../')
 
