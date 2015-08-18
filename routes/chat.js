@@ -323,6 +323,7 @@ Chat.prototype.sendMessageToUsers = function (message, usernames, cb) {
 
     if (!messages.length) {
       debug('Chat.sendMessageToUsers error retrieving conversations')
+      cb('Chat.sendMessageToUsers error retrieving conversations')
     } else {
       self.client.post(constants.endpoints.chat.sendMessage, {
         'auth_token': self.client.authToken,
