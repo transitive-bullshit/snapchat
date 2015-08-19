@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Snapchat Source: models/story.js</title>
+
+	<!--[if lt IE 9]>
+	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
+
+	<link type="text/css" rel="stylesheet" href="styles/site.simplex.css">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top navbar-inverse">
+<div class="container">
+	<div class="navbar-header">
+		<a class="navbar-brand" href="index.html">Snapchat</a>
+	</div>
+	<div class="navbar-collapse">
+		<ul class="nav navbar-nav">
+			
+			<li class="dropdown">
+				<a href="namespaces.list.html" class="dropdown-toggle" data-toggle="dropdown">Namespaces<b class="caret"></b></a>
+				<ul class="dropdown-menu inline">
+					<li><a href="BufferUtils.html">BufferUtils</a></li><li><a href="constants.html">constants</a></li><li><a href="StringUtils.html">StringUtils</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
+				<ul class="dropdown-menu inline">
+					<li><a href="Account.html">Account</a></li><li><a href="CashTransaction.html">CashTransaction</a></li><li><a href="Chat.html">Chat</a></li><li><a href="Conversation.html">Conversation</a></li><li><a href="Device.html">Device</a></li><li><a href="Filter.html">Filter</a></li><li><a href="FoundFriend.html">FoundFriend</a></li><li><a href="Friends.html">Friends</a></li><li><a href="Message.html">Message</a></li><li><a href="NearbyUser.html">NearbyUser</a></li><li><a href="Request.html">Request</a></li><li><a href="Session.html">Session</a></li><li><a href="SharedStoryDescription.html">SharedStoryDescription</a></li><li><a href="SKBlob.html">SKBlob</a></li><li><a href="SKLocation.html">SKLocation</a></li><li><a href="Snap.html">Snap</a></li><li><a href="Snapchat.html">Snapchat</a></li><li><a href="SnapOptions.html">SnapOptions</a></li><li><a href="Snaps.html">Snaps</a></li><li><a href="Stories.html">Stories</a></li><li><a href="Story.html">Story</a></li><li><a href="StoryCollection.html">StoryCollection</a></li><li><a href="StoryNote.html">StoryNote</a></li><li><a href="StoryOptions.html">StoryOptions</a></li><li><a href="StoryUpdater.html">StoryUpdater</a></li><li><a href="Transaction.html">Transaction</a></li><li><a href="User.html">User</a></li><li><a href="UserStory.html">UserStory</a></li>
+				</ul>
+			</li>
+			
+		</ul>
+	</div>
+</div>
+</div>
+
+
+<div class="container">
+<div class="row">
+
+	
+	<div class="col-md-12">
+	
+		<div id="main">
+    		<h1 class="page-title">Source: models/story.js</h1>
+			
+
+		<h1 class="page-title">Source: models/story.js</h1>
+    
+<section>
+	<article>
+		<pre
+			class="sunlight-highlight-javascript ">module.exports = Story
+
+var BufferUtils = require('../lib/buffer-utils')
+var Snapchat = require('../')
+
+/**
+ * Snapchat Story
+ *
+ * @class
+ * @param {Snapchat} client
+ * @param {Object} params
+ */
+function Story (client, params) {
+  var self = this
+  if (!(self instanceof Story)) return new Story(client, params)
+  if (!(client instanceof Snapchat)) throw new Error('invalid client')
+
+  self.client = client
+
+  // null until you call load
+  self.blob = null
+
+  // null until you call loadThumbnail
+  self.thumbnailBlob = null
+
+  self.author = params['username']
+  self.viewed = !!params['viewed']
+  self.shared = !!params['is_shared']
+  self.zipped = !!params['zipped']
+  self.matureContent = !!params['mature_content']
+  self.needsAuth = !!params['needs_auth']
+
+  self.duration = params['time'] | 0
+
+  self.identifier = params['id']
+  self.text = params['caption_text_display']
+  self.clientIdentifier = params['client_id']
+
+  self.storyFilterIdentifier = params['story_filter_id']
+  self.adCanFollow = !!params['ad_can_follow']
+
+  self.mediaIdentifier = params['media_id']
+  self.mediaIV = params['media_iv']
+  self.mediaKey = params['media_key']
+  self.mediaKind = params['media_type'] | 0
+  self.mediaURL = params['media_url']
+
+  self.thumbIV = params['thumbnail_iv']
+  self.thumbURL = params['thumbnail_url']
+
+  self.timeLeft = params['time_left'] | 0
+  self.created = new Date(+params['timestamp'])
+}
+
+/**
+ * The underlying data for the image or video.
+ *
+ * @name Story#suggestedFilename
+ * @property {string}
+ */
+Object.defineProperty(Story.prototype, 'suggestedFilename', {
+  get: function () {
+    var self = this
+
+    if (!self.blob) {
+      return null
+    } else if (self.blob.isImage || self.blob.isVideo) {
+      return self.identifier + BufferUtils.getFileExtension(self.blob.data)
+    } else {
+      return self.identifier
+    }
+  }
+})
+
+/**
+ * Loads the blob for the story. If successful, the \c blob property of the original \c Story object will contain the story's blob data.
+ */
+Story.prototype.load = function (cb) {
+  var self = this
+  self.client.stories.loadStoryBlob(self, function (err, blob) {
+    if (!err) {
+      self.blob = blob
+    }
+
+    return cb(err)
+  })
+}
+
+/**
+ * Loads the blob for the story thumbnail. If successful, the \c thumbnailBlob property of the original \c Story object will contain the story's thumbnail blob data.
+ */
+Story.prototype.loadThumbnail = function (cb) {
+  var self = this
+  self.client.stories.loadStoryThumbnailBlob(self, function (err, blob) {
+    if (!err) {
+      self.thumbnailBlob = blob
+    }
+
+    return cb(err)
+  })
+}
+</pre>
+	</article>
+</section>
+
+
+
+
+
+		</div>
+	</div>
+
+	<div class="clearfix"></div>
+
+	
+
+</div>
+</div>
+
+
+<footer>
+
+
+	<span class="copyright">
+	Copyright Travis Fischer © 2015.
+	</span>
+	<br />
+
+<span class="jsdoc-message">
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.2</a>
+	on Wed Aug 19th 2015 using the <a
+	href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
+</span>
+</footer>
+
+<!--<script src="scripts/sunlight.js"></script>-->
+<script src="scripts/docstrap.lib.js"></script>
+<script src="scripts/bootstrap-dropdown.js"></script>
+<script src="scripts/toc.js"></script>
+
+<script>
+$( function () {
+	$( "[id*='$']" ).each( function () {
+		var $this = $( this );
+
+		$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
+	} );
+
+	$( "#toc" ).toc( {
+		anchorName  : function ( i, heading, prefix ) {
+			return $( heading ).attr( "id" ) || ( prefix + i );
+		},
+		selectors   : "h1,h2,h3,h4",
+		showAndHide : false,
+		scrollTo    : "100px"
+	} );
+
+	$( "#toc>ul" ).addClass( "nav nav-pills nav-stacked" );
+	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
+	$( '.dropdown-toggle' ).dropdown();
+	//			$( ".tutorial-section pre, .readme-section pre" ).addClass( "sunlight-highlight-javascript" ).addClass( "linenums" );
+
+	$( ".tutorial-section pre, .readme-section pre" ).each( function () {
+		var $this = $( this );
+
+		var example = $this.find( "code" );
+		exampleText = example.html();
+		var lang = /{@lang (.*?)}/.exec( exampleText );
+		if ( lang && lang[1] ) {
+			exampleText = exampleText.replace( lang[0], "" );
+			example.html( exampleText );
+			lang = lang[1];
+		} else {
+			lang = "javascript";
+		}
+
+		if ( lang ) {
+
+			$this
+			.addClass( "sunlight-highlight-" + lang )
+			.addClass( "linenums" )
+			.html( example.html() );
+
+		}
+	} );
+
+	Sunlight.highlightAll( {
+		lineNumbers : false,
+		showMenu : true,
+		enableDoclinks : true
+	} );
+} );
+</script>
+
+
+
+<!--Navigation and Symbol Display-->
+
+<script>
+	$( function () {
+		$( '#main' ).localScroll( {
+			offset : { top : 60 } //offset by the height of your header (give or take a few px, see what works for you)
+		} );
+		$( "dt.name" ).each( function () {
+			var $this = $( this ).find("h4");
+			var icon = $( "<i/>" ).addClass( "icon-plus-sign" ).addClass( "pull-right" ).addClass( "icon-white" );
+			var dt = $(this);
+			var children = dt.next( "dd" );
+
+			dt.prepend( icon ).css( {cursor : "pointer"} );
+			dt.addClass( "member-collapsed" ).addClass( "member" );
+
+
+			children.hide();
+
+			dt.children().on( "click", function () {
+				children = dt.next( "dd" );
+				children.slideToggle( "fast", function () {
+
+					if ( children.is( ":visible" ) ) {
+						icon.addClass( "icon-minus-sign" ).removeClass( "icon-plus-sign" ).removeClass( "icon-white" );
+						dt.addClass( "member-open" ).animate( "member-collapsed" );
+					} else {
+						icon.addClass( "icon-plus-sign" ).removeClass( "icon-minus-sign" ).addClass( "icon-white" );
+						dt.addClass( "member-collapsed" ).removeClass( "member-open" );
+					}
+				} );
+			} );
+
+		} );
+	} );
+</script>
+
+
+<!--Google Analytics-->
+
+
+</body>
+</html>

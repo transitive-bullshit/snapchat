@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Snapchat Source: lib/buffer-utils.js</title>
+
+	<!--[if lt IE 9]>
+	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
+
+	<link type="text/css" rel="stylesheet" href="styles/site.simplex.css">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top navbar-inverse">
+<div class="container">
+	<div class="navbar-header">
+		<a class="navbar-brand" href="index.html">Snapchat</a>
+	</div>
+	<div class="navbar-collapse">
+		<ul class="nav navbar-nav">
+			
+			<li class="dropdown">
+				<a href="namespaces.list.html" class="dropdown-toggle" data-toggle="dropdown">Namespaces<b class="caret"></b></a>
+				<ul class="dropdown-menu inline">
+					<li><a href="BufferUtils.html">BufferUtils</a></li><li><a href="constants.html">constants</a></li><li><a href="StringUtils.html">StringUtils</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
+				<ul class="dropdown-menu inline">
+					<li><a href="Account.html">Account</a></li><li><a href="CashTransaction.html">CashTransaction</a></li><li><a href="Chat.html">Chat</a></li><li><a href="Conversation.html">Conversation</a></li><li><a href="Device.html">Device</a></li><li><a href="Filter.html">Filter</a></li><li><a href="FoundFriend.html">FoundFriend</a></li><li><a href="Friends.html">Friends</a></li><li><a href="Message.html">Message</a></li><li><a href="NearbyUser.html">NearbyUser</a></li><li><a href="Request.html">Request</a></li><li><a href="Session.html">Session</a></li><li><a href="SharedStoryDescription.html">SharedStoryDescription</a></li><li><a href="SKBlob.html">SKBlob</a></li><li><a href="SKLocation.html">SKLocation</a></li><li><a href="Snap.html">Snap</a></li><li><a href="Snapchat.html">Snapchat</a></li><li><a href="SnapOptions.html">SnapOptions</a></li><li><a href="Snaps.html">Snaps</a></li><li><a href="Stories.html">Stories</a></li><li><a href="Story.html">Story</a></li><li><a href="StoryCollection.html">StoryCollection</a></li><li><a href="StoryNote.html">StoryNote</a></li><li><a href="StoryOptions.html">StoryOptions</a></li><li><a href="StoryUpdater.html">StoryUpdater</a></li><li><a href="Transaction.html">Transaction</a></li><li><a href="User.html">User</a></li><li><a href="UserStory.html">UserStory</a></li>
+				</ul>
+			</li>
+			
+		</ul>
+	</div>
+</div>
+</div>
+
+
+<div class="container">
+<div class="row">
+
+	
+	<div class="col-md-12">
+	
+		<div id="main">
+    		<h1 class="page-title">Source: lib/buffer-utils.js</h1>
+			
+
+		<h1 class="page-title">Source: lib/buffer-utils.js</h1>
+    
+<section>
+	<article>
+		<pre
+			class="sunlight-highlight-javascript ">module.exports = BufferUtils
+
+var crypto = require('crypto')
+var constants = require('./constants')
+
+/**
+ * @namespace
+ * @static
+ */
+function BufferUtils () {
+  // static class
+}
+
+/**
+ * @param {Buffer} data
+ * @return {boolean}
+ */
+BufferUtils.isJPEG = function (data) {
+  var h = BufferUtils._getHeader(data)
+
+  return h &amp;&amp; h.a === 0xFF &amp;&amp; h.b === 0xD8 &amp;&amp; h.c === 0xFF &amp;&amp; (h.d === 0xE0 || h.d === 0xE1 || h.d === 0xE8)
+}
+
+/**
+ * @param {Buffer} data
+ * @return {boolean}
+ */
+BufferUtils.isPNG = function (data) {
+  var h = BufferUtils._getHeader(data)
+
+  return h &amp;&amp; h.a === 0x89 &amp;&amp; h.b === 0x50 &amp;&amp; h.c === 0x4E &amp;&amp; h.d === 0x47
+}
+
+/**
+ * @param {Buffer} data
+ * @return {boolean}
+ */
+BufferUtils.isImage = function (data) {
+  return BufferUtils.isJPEG(data) || BufferUtils.isPNG(data)
+}
+
+/**
+ * @param {Buffer} data
+ * @return {boolean}
+ */
+BufferUtils.isMPEG4 = function (data) {
+  var h = BufferUtils._getHeader(data)
+
+  return h &amp;&amp; h.a === 0x00 &amp;&amp; h.b === 0x00 &amp;&amp; h.c === 0x00 &amp;&amp; (h.d === 0x14 || h.d === 0x18 || h.d === 0x1C)
+}
+
+/**
+ * @param {Buffer} data
+ * @return {boolean}
+ */
+BufferUtils.isMedia = function (data) {
+  return BufferUtils.isImage(data) || BufferUtils.isMPEG4(data)
+}
+
+/**
+ * @param {Buffer} data
+ * @return {boolean}
+ */
+BufferUtils.isCompressed = function (data) {
+  var h = BufferUtils._getHeader(data)
+
+  return h &amp;&amp; h.a === 0x50 &amp;&amp; h.b === 0x4B &amp;&amp; h.c === 0x03 &amp;&amp; h.d === 0x04
+}
+
+/**
+ * @param {Buffer} data
+ * @return {Object}
+ */
+BufferUtils._getHeader = function (data) {
+  if (!data || data.length &lt; 4) {
+    return null
+  } else {
+    return {
+      a: data.readUInt8(0),
+      b: data.readUInt8(1),
+      c: data.readUInt8(2),
+      d: data.readUInt8(3)
+    }
+  }
+}
+
+/**
+ * @param {Buffer} data
+ * @return {string}
+ */
+BufferUtils.getFileExtension = function (data) {
+  if (BufferUtils.isJPEG(data)) return '.jpg'
+  if (BufferUtils.isPNG(data)) return '.png'
+  if (BufferUtils.isMPEG4(data)) return '.mp4'
+  if (BufferUtils.isCompressed(data)) return '.zip'
+  return '.dat'
+}
+
+/**
+ * @param {Buffer} data
+ * @return {string}
+ */
+BufferUtils.sha256HashToBase64 = function (data) {
+  return crypto.createHash('sha256').update(data).digest('base64')
+}
+
+/**
+ * @param {Buffer} data
+ * @return {string}
+ */
+BufferUtils.sha256HashToHex = function (data) {
+  return crypto.createHash('sha256').update(data).digest('hex')
+}
+
+/**
+ * @param {Buffer} a
+ * @param {Buffer} b
+ * @return {string}
+ */
+BufferUtils.hashSC = function (a, b) {
+  var secret = new Buffer(constants.core.secret)
+
+  var firstData = Buffer.concat([ secret, a ])
+  var secondData = Buffer.concat([ b, secret ])
+
+  var first = BufferUtils.sha256HashToHex(firstData)
+  var second = BufferUtils.sha256HashToHex(secondData)
+
+  var pattern = constants.core.hashPattern
+  var hash = ''
+
+  for (var i = 0; i &lt; pattern.length; ++i) {
+    if (pattern.charAt(i) === '0') {
+      hash += first.charAt(i)
+    } else {
+      hash += second.charAt(i)
+    }
+  }
+
+  return hash
+}
+
+/**
+ * Decrypts Buffer data for stories.
+ *
+ * @param {Buffer} data
+ * @param {string} key (base64)
+ * @param {string} iv (base64)
+ * @return {Buffer}
+ */
+BufferUtils.decryptStory = function (data, key, iv) {
+  var keyBuffer = new Buffer(key, 'base64')
+  var ivBuffer = new Buffer(iv, 'base64')
+
+  return BufferUtils.AES128DecryptedData(data, keyBuffer, ivBuffer)
+}
+
+/**
+ * Decrypts Buffer data for stories.
+ *
+ * @param {Buffer} data
+ * @param {Buffer} key
+ * @param {Buffer} iv
+ * @return {Buffer}
+ */
+BufferUtils.AES128DecryptedData = function (data, key, iv) {
+  var cipher = crypto.createDecipheriv('aes-128-cbc', key, iv)
+
+  // TODO: not 100% sure these options are correct
+  return Buffer.concat([
+    cipher.update(data, 'utf8', 'base64'),
+    cipher.final('base64')
+  ])
+}
+</pre>
+	</article>
+</section>
+
+
+
+
+
+		</div>
+	</div>
+
+	<div class="clearfix"></div>
+
+	
+
+</div>
+</div>
+
+
+<footer>
+
+
+	<span class="copyright">
+	Copyright Travis Fischer © 2015.
+	</span>
+	<br />
+
+<span class="jsdoc-message">
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.2</a>
+	on Wed Aug 19th 2015 using the <a
+	href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
+</span>
+</footer>
+
+<!--<script src="scripts/sunlight.js"></script>-->
+<script src="scripts/docstrap.lib.js"></script>
+<script src="scripts/bootstrap-dropdown.js"></script>
+<script src="scripts/toc.js"></script>
+
+<script>
+$( function () {
+	$( "[id*='$']" ).each( function () {
+		var $this = $( this );
+
+		$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
+	} );
+
+	$( "#toc" ).toc( {
+		anchorName  : function ( i, heading, prefix ) {
+			return $( heading ).attr( "id" ) || ( prefix + i );
+		},
+		selectors   : "h1,h2,h3,h4",
+		showAndHide : false,
+		scrollTo    : "100px"
+	} );
+
+	$( "#toc>ul" ).addClass( "nav nav-pills nav-stacked" );
+	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
+	$( '.dropdown-toggle' ).dropdown();
+	//			$( ".tutorial-section pre, .readme-section pre" ).addClass( "sunlight-highlight-javascript" ).addClass( "linenums" );
+
+	$( ".tutorial-section pre, .readme-section pre" ).each( function () {
+		var $this = $( this );
+
+		var example = $this.find( "code" );
+		exampleText = example.html();
+		var lang = /{@lang (.*?)}/.exec( exampleText );
+		if ( lang && lang[1] ) {
+			exampleText = exampleText.replace( lang[0], "" );
+			example.html( exampleText );
+			lang = lang[1];
+		} else {
+			lang = "javascript";
+		}
+
+		if ( lang ) {
+
+			$this
+			.addClass( "sunlight-highlight-" + lang )
+			.addClass( "linenums" )
+			.html( example.html() );
+
+		}
+	} );
+
+	Sunlight.highlightAll( {
+		lineNumbers : false,
+		showMenu : true,
+		enableDoclinks : true
+	} );
+} );
+</script>
+
+
+
+<!--Navigation and Symbol Display-->
+
+<script>
+	$( function () {
+		$( '#main' ).localScroll( {
+			offset : { top : 60 } //offset by the height of your header (give or take a few px, see what works for you)
+		} );
+		$( "dt.name" ).each( function () {
+			var $this = $( this ).find("h4");
+			var icon = $( "<i/>" ).addClass( "icon-plus-sign" ).addClass( "pull-right" ).addClass( "icon-white" );
+			var dt = $(this);
+			var children = dt.next( "dd" );
+
+			dt.prepend( icon ).css( {cursor : "pointer"} );
+			dt.addClass( "member-collapsed" ).addClass( "member" );
+
+
+			children.hide();
+
+			dt.children().on( "click", function () {
+				children = dt.next( "dd" );
+				children.slideToggle( "fast", function () {
+
+					if ( children.is( ":visible" ) ) {
+						icon.addClass( "icon-minus-sign" ).removeClass( "icon-plus-sign" ).removeClass( "icon-white" );
+						dt.addClass( "member-open" ).animate( "member-collapsed" );
+					} else {
+						icon.addClass( "icon-plus-sign" ).removeClass( "icon-minus-sign" ).addClass( "icon-white" );
+						dt.addClass( "member-collapsed" ).removeClass( "member-open" );
+					}
+				} );
+			} );
+
+		} );
+	} );
+</script>
+
+
+<!--Google Analytics-->
+
+
+</body>
+</html>

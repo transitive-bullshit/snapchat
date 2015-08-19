@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Snapchat Source: lib/request.js</title>
+
+	<!--[if lt IE 9]>
+	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
+
+	<link type="text/css" rel="stylesheet" href="styles/site.simplex.css">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top navbar-inverse">
+<div class="container">
+	<div class="navbar-header">
+		<a class="navbar-brand" href="index.html">Snapchat</a>
+	</div>
+	<div class="navbar-collapse">
+		<ul class="nav navbar-nav">
+			
+			<li class="dropdown">
+				<a href="namespaces.list.html" class="dropdown-toggle" data-toggle="dropdown">Namespaces<b class="caret"></b></a>
+				<ul class="dropdown-menu inline">
+					<li><a href="BufferUtils.html">BufferUtils</a></li><li><a href="constants.html">constants</a></li><li><a href="StringUtils.html">StringUtils</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
+				<ul class="dropdown-menu inline">
+					<li><a href="Account.html">Account</a></li><li><a href="CashTransaction.html">CashTransaction</a></li><li><a href="Chat.html">Chat</a></li><li><a href="Conversation.html">Conversation</a></li><li><a href="Device.html">Device</a></li><li><a href="Filter.html">Filter</a></li><li><a href="FoundFriend.html">FoundFriend</a></li><li><a href="Friends.html">Friends</a></li><li><a href="Message.html">Message</a></li><li><a href="NearbyUser.html">NearbyUser</a></li><li><a href="Request.html">Request</a></li><li><a href="Session.html">Session</a></li><li><a href="SharedStoryDescription.html">SharedStoryDescription</a></li><li><a href="SKBlob.html">SKBlob</a></li><li><a href="SKLocation.html">SKLocation</a></li><li><a href="Snap.html">Snap</a></li><li><a href="Snapchat.html">Snapchat</a></li><li><a href="SnapOptions.html">SnapOptions</a></li><li><a href="Snaps.html">Snaps</a></li><li><a href="Stories.html">Stories</a></li><li><a href="Story.html">Story</a></li><li><a href="StoryCollection.html">StoryCollection</a></li><li><a href="StoryNote.html">StoryNote</a></li><li><a href="StoryOptions.html">StoryOptions</a></li><li><a href="StoryUpdater.html">StoryUpdater</a></li><li><a href="Transaction.html">Transaction</a></li><li><a href="User.html">User</a></li><li><a href="UserStory.html">UserStory</a></li>
+				</ul>
+			</li>
+			
+		</ul>
+	</div>
+</div>
+</div>
+
+
+<div class="container">
+<div class="row">
+
+	
+	<div class="col-md-12">
+	
+		<div id="main">
+    		<h1 class="page-title">Source: lib/request.js</h1>
+			
+
+		<h1 class="page-title">Source: lib/request.js</h1>
+    
+<section>
+	<article>
+		<pre
+			class="sunlight-highlight-javascript ">module.exports = Request
+
+var debug = require('debug')('snapchat:request')
+var request = require('request')
+var urljoin = require('url-join')
+var extend = require('xtend')
+var zlib = require('zlib')
+
+var StringUtils = require('./string-utils')
+var constants = require('./constants')
+
+/**
+ * Snapchat wrapper for HTTP requests
+ *
+ * @class
+ * @param {Object} opts
+ */
+function Request (opts) {
+  var self = this
+  if (!(self instanceof Request)) return new Request(opts)
+  if (!opts) opts = {}
+
+  self.HTTPMethod = opts.method
+  self.HTTPHeaders = {}
+
+  if (opts.method === 'POST') {
+    if (opts.endpoint) {
+      self._initPOST(opts)
+    } else if (opts.url) {
+      self._initPOSTURL(opts)
+    } else {
+      throw new Error('invalid request')
+    }
+  } else if (opts.method === 'GET') {
+    self._initGET(opts)
+  } else {
+    throw new Error('invalid request')
+  }
+}
+
+Request.prototype._initHeaderFields = function (headers) {
+  var self = this
+
+  self.HTTPHeaders[constants.headers.contentType] = 'application/x-www-form-urlencoded'
+  self.HTTPHeaders[constants.headers.userAgent] = constants.core.userAgent
+  self.HTTPHeaders[constants.headers.acceptLanguage] = constants.headers.values.language
+  self.HTTPHeaders[constants.headers.acceptLocale] = constants.headers.values.locale
+
+  if (headers) {
+    self.HTTPHeaders = extend(self.HTTPHeaders, headers)
+  }
+}
+
+/**
+ * Automatically adds query parameters:
+ * - timestamp
+ * - req_token
+ * Automatically adds HTTP header fields:
+ * - User-Agent
+ * - Accept-Language
+ * - Accept-Locale
+ * - Content-Type
+ */
+Request.prototype._initPOST = function (opts) {
+  var self = this
+
+  Request._applyHeaderOverrides(opts)
+  opts.token = opts.token || constants.core.staticToken
+
+  self._initHeaderFields(opts.headers)
+  Request._applyOverrides(opts)
+
+  self.URL = urljoin(constants.core.baseURL, opts.endpoint)
+
+  if (!opts.timestamp) {
+    opts.timestamp = StringUtils.timestamp()
+  }
+
+  var reqToken = 'req_token'
+  if (!opts.params[reqToken]) {
+    opts.params[reqToken] = StringUtils.hashSCString(opts.token, opts.timestamp)
+  }
+
+  if (!opts.params.timestamp) {
+    opts.params.timestamp = +opts.timestamp
+  }
+
+  // special-case for uploading snaps
+  if (opts.endpoint === constants.endpoints.snaps.upload) {
+    // TODO: this is tricky
+    throw new Error('not yet implemented')
+
+    /*
+    NSMutableData *body = [NSMutableData data];
+
+    for (NSString *key in json.allKeys) {
+      if ([key isEqualToString:@'data']) {
+        [body appendData:[NSData boundaryWithKey:key forDataValue:json[key]]];
+      } else {
+        [body appendData:[NSData boundaryWithKey:key forStringValue:(NSString *)json[key]]];
+      }
+    }
+
+    [body appendData:[[NSString stringWithFormat:@'\r\n--%@--\r\n', SKConsts.boundary] dataUsingEncoding:NSUTF8StringEncoding]];
+
+    self.HTTPBody = body;
+    */
+  } else {
+    self.HTTPBody = opts.params
+  }
+
+  if (opts.endpoint === constants.endpoints.snaps.loadBlob || opts.endpoint === constants.endpoints.chat.media) {
+    self.HTTPHeaders[constants.headers.timestamp] = opts.timestamp
+  }
+}
+
+Request.prototype._initPOSTURL = function (opts) {
+  var self = this
+
+  self.URL = opts.url
+  self.HTTPBody = opts.eventData
+}
+
+/**
+ * Automatically adds HTTP header fields:
+ * - User-Agent
+ * - Accept-Language
+ * - Accept-Locale
+ * - Content-Type
+ */
+Request.prototype._initGET = function (opts) {
+  var self = this
+
+  Request._applyHeaderOverrides(opts)
+  self._initHeaderFields(opts.headers)
+
+  self.URL = urljoin(constants.core.baseURL, opts.endpoint)
+}
+
+/**
+ * Initiates the underlying HTTP request \c Request.httpRequest.
+ *
+ * @param {function} cb
+ */
+Request.prototype.start = function (cb) {
+  var self = this
+
+  function wrapcb (err, response, body) {
+    if (err) {
+      return cb(err, body)
+    } else if (!err &amp;&amp; response &amp;&amp; (response.statusCode &lt; 200 || response.statusCode >= 300)) {
+      // catch snapchat API error codes
+      debug('Snapchat Request Error: %d (%s) \nrequest: %s',
+            response.statusCode,
+            response.statusMessage,
+            response.request.body.toString('utf-8'))
+
+      // console.log(response)
+      // console.log(response.request.body.toString('base64'))
+      // console.log(response.request.body.toString('utf-8'))
+
+      return cb('Snapchat API error ' + response.statusCode + ' (' + response.statusMessage + ')', body)
+    } else {
+      var contentType = response.headers['content-type']
+      var result = body
+
+      // attempt to parse the body as JSON if appropriate
+      if (contentType.indexOf('application/json') >= 0) {
+        result = StringUtils.tryParseJSON(body)
+
+        if (!result) {
+          debug('Snapchat Request JSON Parse Error: \nresponse: "%s"', body)
+          //return cb('JSON parse error', body)
+        }
+      }
+
+      return cb(null, result)
+    }
+  }
+
+  if (self.HTTPMethod === 'POST') {
+    self.httpRequest = request.post({
+      url: self.URL,
+      headers: self.HTTPHeaders,
+      form: self.HTTPBody
+    }, wrapcb)
+
+    // debug('%s Request %s (headers %j) (body \'%s\')', self.HTTPMethod, self.URL, self.HTTPHeaders,
+    //       self.httpRequest.body.toString('utf-8'))
+  } else {
+    self.httpRequest = request({
+      url: self.URL,
+      headers: self.HTTPHeaders
+    }, wrapcb)
+
+    debug('%s Request %s (headers %j)', self.HTTPMethod, self.URL, self.HTTPHeaders)
+  }
+}
+
+// -----------------------------------------------------------------------------
+// static utility methods
+// -----------------------------------------------------------------------------
+
+/**
+ * @static
+ * @param {string=} endpoint Optional endpoint of the request relative to the base URL.
+ * @param {Object=} params Optional parameters for the request.
+ * @param {string=} gauth Optional parameter set to the X-Snapchat-Client-Auth-Token header field.
+ * @param {string=} token Optional snapchat auth token returned from logging in.
+ * @param {Object=} opts Optional custom options.
+ * @param {function} cb
+ * @return {Request} new Request wrapping this HTTP POST request.
+ */
+Request.post = function (endpoint, params, gauth, token, opts, cb) {
+  // handle optional parameters
+  if (typeof params === 'function') {
+    cb = params
+    params = { }
+    gauth = token = opts = null
+  } else if (typeof gauth === 'function') {
+    cb = gauth
+    gauth = token = opts = null
+  } else if (typeof token === 'function') {
+    cb = token
+    token = opts = null
+  } else if (typeof opts === 'function') {
+    cb = opts
+    opts = null
+  }
+
+  var headers = { }
+  headers[constants.headers.clientAuthToken] = 'Bearer ' + (gauth || '')
+
+  return Request.postCustom(endpoint, params, headers, token, opts, cb)
+}
+
+/**
+ * @static
+ * @param {string} endpoint endpoint of the request relative to the base URL.
+ * @param {Object} params parameters for the request.
+ * @param {Object} headers Custom HTTP headers for this request.
+ * @param {string} token snapchat auth token returned from logging in.
+ * @param {Object=} opts Optional custom options.
+ * @param {function} cb
+ * @return {Request} new Request wrapping this HTTP POST request.
+ */
+Request.postCustom = function (endpoint, params, headers, token, opts, cb) {
+  // handle optional parameters
+  if (typeof opts === 'function') {
+    cb = opts
+    opts = null
+  }
+
+  opts = opts || { }
+
+  var request = new Request(extend({
+    method: 'POST',
+    endpoint: endpoint,
+    token: token,
+    params: params,
+    headers: headers
+  }, opts))
+
+  request.start(cb)
+  return request
+}
+
+/**
+ * @static
+ * @param {string} endpoint The endpoint of the request relative to the base URL.
+ * @param {function} cb
+ * @return {Request} new Request wrapping this HTTP GET request
+ */
+Request.get = function (endpoint, cb) {
+  var request = new Request({
+    method: 'GET',
+    endpoint: endpoint
+  })
+
+  request.start(cb)
+  return request
+}
+
+/**
+ * @static
+ * @param {Object} eventData
+ * @param {function} cb
+ * @return {Request} new Request wrapping this events HTTP POST request
+ */
+Request.sendEvents = function (eventData, cb) {
+  var request = new Request({
+    method: 'POST',
+    url: constants.core.eventsURL,
+    eventData: eventData
+  })
+
+  request.start(cb)
+  return request
+}
+
+Request.postRaw = function (params, cb) {
+  request.post(extend(params, {
+    encoding: null
+  }), function (err, response, body) {
+    if (err) {
+      return cb(err, response, body)
+    }
+
+    var contentType = response.headers['content-type']
+    var encoding = response.headers['content-encoding']
+
+    function contentTypeWrapper (err, body) {
+      if (err) {
+        return cb(err, response, body)
+      } else if (contentType.indexOf('application/json') >= 0) {
+        return cb(err, response, StringUtils.tryParseJSON(body.toString()))
+      } else if (contentType.indexOf('text/plain') >= 0) {
+        return cb(err, response, body.toString())
+      } else {
+        return cb(err, response, body)
+      }
+    }
+
+    if (encoding === 'gzip') {
+      zlib.gunzip(body, function (err, dezipped) {
+        contentTypeWrapper(err, dezipped &amp;&amp; dezipped.toString())
+      })
+    } else if (encoding === 'deflate') {
+      zlib.inflate(body, function (err, decoded) {
+        contentTypeWrapper(err, decoded &amp;&amp; decoded.toString())
+      })
+    } else {
+      contentTypeWrapper(err, body)
+    }
+  })
+}
+
+// -----------------------------------------------------------------------------
+// override handling
+// -----------------------------------------------------------------------------
+
+Request.overrideHeaderValuesGlobally = function (headers) {
+  globalHeaderOverrides = headers
+}
+
+Request.overrideHeaderValues = function (headers, endpoint) {
+  scopeHeaderOverrides[endpoint] = headers
+}
+
+Request.overrideValues = function (params, endpoint) {
+  scopeParamOverrides[endpoint] = params
+}
+
+Request.overrideValuesGlobally = function (params) {
+  globalParamOverrides = params
+}
+
+Request.overrideEndpoints = function (endpoints) {
+  endpointOverrides = endpoints
+}
+
+Request._applyOverrides = function (opts) {
+  if (opts.params) {
+    opts.params = extend(opts.params, globalParamOverrides)
+    opts.params = extend(opts.params, scopeParamOverrides[opts.endpoint] || { })
+  }
+
+  if (opts.endpoint) {
+    opts.endpoint = endpointOverrides[opts.endpoint] || opts.endpoint
+  }
+}
+
+Request._applyHeaderOverrides = function (opts) {
+  if (!opts.headers) return
+
+  opts.headers = extend(opts.headers, globalHeaderOverrides)
+  opts.headers = extend(opts.headers, scopeHeaderOverrides[opts.endpoint] || { })
+}
+
+var globalHeaderOverrides = { }
+var globalParamOverrides = { }
+var scopeParamOverrides = { }
+var scopeHeaderOverrides = { }
+var endpointOverrides = { }
+</pre>
+	</article>
+</section>
+
+
+
+
+
+		</div>
+	</div>
+
+	<div class="clearfix"></div>
+
+	
+
+</div>
+</div>
+
+
+<footer>
+
+
+	<span class="copyright">
+	Copyright Travis Fischer © 2015.
+	</span>
+	<br />
+
+<span class="jsdoc-message">
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.2</a>
+	on Wed Aug 19th 2015 using the <a
+	href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
+</span>
+</footer>
+
+<!--<script src="scripts/sunlight.js"></script>-->
+<script src="scripts/docstrap.lib.js"></script>
+<script src="scripts/bootstrap-dropdown.js"></script>
+<script src="scripts/toc.js"></script>
+
+<script>
+$( function () {
+	$( "[id*='$']" ).each( function () {
+		var $this = $( this );
+
+		$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
+	} );
+
+	$( "#toc" ).toc( {
+		anchorName  : function ( i, heading, prefix ) {
+			return $( heading ).attr( "id" ) || ( prefix + i );
+		},
+		selectors   : "h1,h2,h3,h4",
+		showAndHide : false,
+		scrollTo    : "100px"
+	} );
+
+	$( "#toc>ul" ).addClass( "nav nav-pills nav-stacked" );
+	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
+	$( '.dropdown-toggle' ).dropdown();
+	//			$( ".tutorial-section pre, .readme-section pre" ).addClass( "sunlight-highlight-javascript" ).addClass( "linenums" );
+
+	$( ".tutorial-section pre, .readme-section pre" ).each( function () {
+		var $this = $( this );
+
+		var example = $this.find( "code" );
+		exampleText = example.html();
+		var lang = /{@lang (.*?)}/.exec( exampleText );
+		if ( lang && lang[1] ) {
+			exampleText = exampleText.replace( lang[0], "" );
+			example.html( exampleText );
+			lang = lang[1];
+		} else {
+			lang = "javascript";
+		}
+
+		if ( lang ) {
+
+			$this
+			.addClass( "sunlight-highlight-" + lang )
+			.addClass( "linenums" )
+			.html( example.html() );
+
+		}
+	} );
+
+	Sunlight.highlightAll( {
+		lineNumbers : false,
+		showMenu : true,
+		enableDoclinks : true
+	} );
+} );
+</script>
+
+
+
+<!--Navigation and Symbol Display-->
+
+<script>
+	$( function () {
+		$( '#main' ).localScroll( {
+			offset : { top : 60 } //offset by the height of your header (give or take a few px, see what works for you)
+		} );
+		$( "dt.name" ).each( function () {
+			var $this = $( this ).find("h4");
+			var icon = $( "<i/>" ).addClass( "icon-plus-sign" ).addClass( "pull-right" ).addClass( "icon-white" );
+			var dt = $(this);
+			var children = dt.next( "dd" );
+
+			dt.prepend( icon ).css( {cursor : "pointer"} );
+			dt.addClass( "member-collapsed" ).addClass( "member" );
+
+
+			children.hide();
+
+			dt.children().on( "click", function () {
+				children = dt.next( "dd" );
+				children.slideToggle( "fast", function () {
+
+					if ( children.is( ":visible" ) ) {
+						icon.addClass( "icon-minus-sign" ).removeClass( "icon-plus-sign" ).removeClass( "icon-white" );
+						dt.addClass( "member-open" ).animate( "member-collapsed" );
+					} else {
+						icon.addClass( "icon-plus-sign" ).removeClass( "icon-minus-sign" ).addClass( "icon-white" );
+						dt.addClass( "member-collapsed" ).removeClass( "member-open" );
+					}
+				} );
+			} );
+
+		} );
+	} );
+</script>
+
+
+<!--Google Analytics-->
+
+
+</body>
+</html>

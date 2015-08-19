@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Snapchat Index</title>
+
+	<!--[if lt IE 9]>
+	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
+
+	<link type="text/css" rel="stylesheet" href="styles/site.simplex.css">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top navbar-inverse">
+<div class="container">
+	<div class="navbar-header">
+		<a class="navbar-brand" href="index.html">Snapchat</a>
+	</div>
+	<div class="navbar-collapse">
+		<ul class="nav navbar-nav">
+			
+			<li class="dropdown">
+				<a href="namespaces.list.html" class="dropdown-toggle" data-toggle="dropdown">Namespaces<b class="caret"></b></a>
+				<ul class="dropdown-menu inline">
+					<li><a href="BufferUtils.html">BufferUtils</a></li><li><a href="constants.html">constants</a></li><li><a href="StringUtils.html">StringUtils</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
+				<ul class="dropdown-menu inline">
+					<li><a href="Account.html">Account</a></li><li><a href="CashTransaction.html">CashTransaction</a></li><li><a href="Chat.html">Chat</a></li><li><a href="Conversation.html">Conversation</a></li><li><a href="Device.html">Device</a></li><li><a href="Filter.html">Filter</a></li><li><a href="FoundFriend.html">FoundFriend</a></li><li><a href="Friends.html">Friends</a></li><li><a href="Message.html">Message</a></li><li><a href="NearbyUser.html">NearbyUser</a></li><li><a href="Request.html">Request</a></li><li><a href="Session.html">Session</a></li><li><a href="SharedStoryDescription.html">SharedStoryDescription</a></li><li><a href="SKBlob.html">SKBlob</a></li><li><a href="SKLocation.html">SKLocation</a></li><li><a href="Snap.html">Snap</a></li><li><a href="Snapchat.html">Snapchat</a></li><li><a href="SnapOptions.html">SnapOptions</a></li><li><a href="Snaps.html">Snaps</a></li><li><a href="Stories.html">Stories</a></li><li><a href="Story.html">Story</a></li><li><a href="StoryCollection.html">StoryCollection</a></li><li><a href="StoryNote.html">StoryNote</a></li><li><a href="StoryOptions.html">StoryOptions</a></li><li><a href="StoryUpdater.html">StoryUpdater</a></li><li><a href="Transaction.html">Transaction</a></li><li><a href="User.html">User</a></li><li><a href="UserStory.html">UserStory</a></li>
+				</ul>
+			</li>
+			
+		</ul>
+	</div>
+</div>
+</div>
+
+
+<div class="container">
+<div class="row">
+
+	
+	<div class="col-md-8">
+	
+		<div id="main">
+    		<h1 class="page-title">Index</h1>
+			
+
+	
+	<span class="page-title">Index</span>
+	
+	
+
+
+
+
+
+
+
+
+
+
+
+	
+	
+
+
+
+
+
+    <section class="readme-section">
+        <article><h1>Snapchat</h1><h3>Nodejs client for the unofficial Snapchat API</h3><p>This project is a node.js port of the excellent Objective-C <a href="https://github.com/ThePantsThief/SnapchatKit">SnapchatKit</a> library by Tanner Bennett (<a href="https://github.com/ThePantsThief">ThePantsThief</a>).</p>
+<p>It provides an easy-to-use client interface to Snapchat's unofficial API, allowing Javascript developers to script Snapchat!</p>
+<p><strong>NOTE</strong> This project is a pre-release alpha, and I would not recommend using it for production projects until it is more stable. PRs welcome :)</p>
+<h3>Status</h3><p>Login and request authentication are working and up-to-date with the latest version of Snapchat. Most of the REST API routes are untested.</p>
+<h3>Install</h3><pre class="prettyprint source lang-bash"><code>npm install snapchat</code></pre><h3>Usage</h3><p>Snapchat defaults to using required signin credentials stored in environment variables:</p>
+<ul>
+<li><code>SNAPCHAT_USERNAME</code> The Snapchat username to sign in with.</li>
+<li><code>SNAPCHAT_PASSWORD</code> The password to the Snapchat account to sign in with.</li>
+<li><code>SNAPCHAT_GMAIL_EMAIL</code> A valid GMail address.</li>
+<li><code>SNAPCHAT_GMAIL_PASSWORD</code> The password for the GMail address.</li>
+</ul>
+<pre class="prettyprint source lang-javascript"><code>var Snapchat = require('snapchat')
+
+var client = new Snapchat()
+// note the signIn will default to credentials stored in environment variables
+client.signIn(function (err, session) {
+  if (!err) {
+    console.log('signed in', client.username)
+  }
+})</code></pre><p>Or with explicit credentials:</p>
+<pre class="prettyprint source lang-javascript"><code>var Snapchat = require('snapchat')
+
+var client = new Snapchat()
+client.signIn('myusername', 'mypassword', 'mygmailaddress@gmail.com', 'mygmailpassword', function (err, session) {
+  if (!err) {
+    console.log('signed in', client.username)
+  }
+})</code></pre><p><strong>NOTE</strong> Only Snapchat accounts created via an Android client should be used with this library. iOS accounts are handled separately by Snapchat, and your account will most likely be flagged / disabled as suspicious if you try to use a Snapchat account created on iOS.</p>
+<p><strong>NOTE</strong> Any valid gmail address and password may be used; it does not have to be the one the Snapchat user was created with.</p>
+<h3>Contribute</h3><p><a href="https://github.com/feross/standard"><img src="https://cdn.rawgit.com/feross/standard/master/badge.svg" alt="js-standard-style"></a></p>
+<p>See <a href="https://github.com/fisch0920/snapchat/blob/master/CONTRIBUTING.md">CONTRIBUTING</a>.</p>
+<h4>Debugging</h4><p>You can enable <a href="https://www.npmjs.com/package/debug">debug</a> logs by setting the <code>DEBUG</code> environment variable:</p>
+<pre class="prettyprint source lang-bash"><code>DEBUG=snapchat; # debug core snapchat</code></pre><p>OR</p>
+<pre class="prettyprint source lang-bash"><code>DEBUG=snapchat,snapchat:*; # debug all snapchat submodules</code></pre><h3>Third party resources</h3><ul>
+<li>https://github.com/ThePantsThief/SnapchatKit</li>
+<li>https://gibsonsec.org/snapchat/fulldisclosure/</li>
+<li>https://github.com/mgp25/SC-API/wiki/API-v2-Research/</li>
+<li>https://github.com/mgp25/SC-API/</li>
+<li>https://github.com/liamcottle/AttestationServlet</li>
+</ul>
+<h3>Credits</h3><ul>
+<li>Tanner Bennett (<a href="https://github.com/ThePantsThief">ThePantsThief</a>), the auther of the Objective-C library SnapchatKit, which this version is <strong>heavily</strong> based on.</li>
+<li>Everyone who built and maintains the PHP implementation.</li>
+</ul>
+<h3>Author</h3><table><tbody>
+<tr><th align="left">Travis Fischer</th><td><a href="https://github.com/fisch0920">GitHub/fisch0920</a></td><td><a href="http://twitter.com/fisch0920">Twitter/@fisch0920</a></td></tr>
+</tbody></table>
+
+<h3>Todo</h3><ul>
+<li>MORE TESTS</li>
+<li>documentation<ul>
+<li>simplex / spacelab</li>
+</ul>
+</li>
+<li>check logged status in Request.start response handler</li>
+<li>handle request encoding properly for blobs and non-text requests</li>
+<li>verify ts/timestamps milliseconds or seconds</li>
+<li>JSON.stringify internal params or nah?</li>
+<li>sendEvents inconsistent between <code>Array[event]</code> and <code>event</code></li>
+<li>encrypt gmail password</li>
+<li>cleanup headers initialization contentType etc.</li>
+</ul>
+<h3>License</h3><p>MIT. Copyright (c) <a href="https://makesnaps.com">Travis Fischer</a>.</p>
+<h3>Legal</h3><p>I believe it's 100% legal to use a &quot;private&quot; REST API and that there are no laws explicitly prohibiting the use of &quot;private&quot; REST APIs. However, this does not mean that the makers of these private APIs can't try to sue you under something overly-broad, such as the CFAA. I don't think Snapchat will, personally; in my experience they've only gone after developers for copyright disputes.</p>
+<p>Disclaimer: The name &quot;Snapchat&quot; is a copyright of Snapchat™, Inc. This project is in no way affiliated with, sponsored, or endorsed by Snapchat™, Inc. I, the project owner and creator, am not responsible for any legalities that may arise in the use of this project. Use at your own risk.</p></article>
+    </section>
+
+
+
+
+
+
+
+		</div>
+	</div>
+
+	<div class="clearfix"></div>
+
+	
+		<div class="col-md-3">
+			<div id="toc" class="col-md-3"></div>
+		</div>
+	
+
+</div>
+</div>
+
+
+<footer>
+
+
+	<span class="copyright">
+	Copyright Travis Fischer © 2015.
+	</span>
+	<br />
+
+<span class="jsdoc-message">
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.2</a>
+	on Wed Aug 19th 2015 using the <a
+	href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
+</span>
+</footer>
+
+<!--<script src="scripts/sunlight.js"></script>-->
+<script src="scripts/docstrap.lib.js"></script>
+<script src="scripts/bootstrap-dropdown.js"></script>
+<script src="scripts/toc.js"></script>
+
+<script>
+$( function () {
+	$( "[id*='$']" ).each( function () {
+		var $this = $( this );
+
+		$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
+	} );
+
+	$( "#toc" ).toc( {
+		anchorName  : function ( i, heading, prefix ) {
+			return $( heading ).attr( "id" ) || ( prefix + i );
+		},
+		selectors   : "h1,h2,h3,h4",
+		showAndHide : false,
+		scrollTo    : "100px"
+	} );
+
+	$( "#toc>ul" ).addClass( "nav nav-pills nav-stacked" );
+	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
+	$( '.dropdown-toggle' ).dropdown();
+	//			$( ".tutorial-section pre, .readme-section pre" ).addClass( "sunlight-highlight-javascript" ).addClass( "linenums" );
+
+	$( ".tutorial-section pre, .readme-section pre" ).each( function () {
+		var $this = $( this );
+
+		var example = $this.find( "code" );
+		exampleText = example.html();
+		var lang = /{@lang (.*?)}/.exec( exampleText );
+		if ( lang && lang[1] ) {
+			exampleText = exampleText.replace( lang[0], "" );
+			example.html( exampleText );
+			lang = lang[1];
+		} else {
+			lang = "javascript";
+		}
+
+		if ( lang ) {
+
+			$this
+			.addClass( "sunlight-highlight-" + lang )
+			.addClass( "linenums" )
+			.html( example.html() );
+
+		}
+	} );
+
+	Sunlight.highlightAll( {
+		lineNumbers : false,
+		showMenu : true,
+		enableDoclinks : true
+	} );
+} );
+</script>
+
+
+
+<!--Navigation and Symbol Display-->
+
+<script>
+	$( function () {
+		$( '#main' ).localScroll( {
+			offset : { top : 60 } //offset by the height of your header (give or take a few px, see what works for you)
+		} );
+		$( "dt.name" ).each( function () {
+			var $this = $( this ).find("h4");
+			var icon = $( "<i/>" ).addClass( "icon-plus-sign" ).addClass( "pull-right" ).addClass( "icon-white" );
+			var dt = $(this);
+			var children = dt.next( "dd" );
+
+			dt.prepend( icon ).css( {cursor : "pointer"} );
+			dt.addClass( "member-collapsed" ).addClass( "member" );
+
+
+			children.hide();
+
+			dt.children().on( "click", function () {
+				children = dt.next( "dd" );
+				children.slideToggle( "fast", function () {
+
+					if ( children.is( ":visible" ) ) {
+						icon.addClass( "icon-minus-sign" ).removeClass( "icon-plus-sign" ).removeClass( "icon-white" );
+						dt.addClass( "member-open" ).animate( "member-collapsed" );
+					} else {
+						icon.addClass( "icon-plus-sign" ).removeClass( "icon-minus-sign" ).addClass( "icon-white" );
+						dt.addClass( "member-collapsed" ).removeClass( "member-open" );
+					}
+				} );
+			} );
+
+		} );
+	} );
+</script>
+
+
+<!--Google Analytics-->
+
+
+</body>
+</html>
