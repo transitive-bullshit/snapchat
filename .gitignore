@@ -9,5 +9,6 @@
 log/*
 node_modules
 .bower-*
+.publish
 npm-debug.log
 docs
