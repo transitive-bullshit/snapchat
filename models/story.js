@@ -7,7 +7,6 @@ var Snapchat = require('../')
  * Snapchat Story
  *
  * @class
- *
  * @param {Snapchat} client
  * @param {Object} params
  */

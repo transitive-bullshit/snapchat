@@ -4,7 +4,6 @@ module.exports = CashTransaction
  * Snapchat CashTransaction
  *
  * @class
- *
  * @param {Object} params
  */
 function CashTransaction (params) {

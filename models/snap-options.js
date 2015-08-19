@@ -4,7 +4,6 @@ module.exports = SnapOptions
  * Snapchat SnapOptions
  *
  * @class
- *
  * @param {Array<string>} recipients An array of username strings.
  * @param {string} text The text sent in the snap.
  * @param {number=} timer Optional length of the snap. Defaults to 3

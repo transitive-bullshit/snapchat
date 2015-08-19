@@ -25,7 +25,6 @@ var Session = require('./models/session')
  * Snapchat Client
  *
  * @class
- *
  * @param {Object} opts (currently unused)
  */
 function Snapchat (opts) {

@@ -7,7 +7,6 @@ var Story = require('./story')
  * Snapchat StoryCollection
  *
  * @class
- *
  * @param {Snapchat} client
  * @param {Object} params
  */

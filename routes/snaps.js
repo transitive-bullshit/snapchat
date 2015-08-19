@@ -14,7 +14,6 @@ var SKLocation = require('../models/location')
  * Snapchat wrapper for friends-related API calls.
  *
  * @class
- *
  * @param {Object} opts
  */
 function Snaps (client, opts) {

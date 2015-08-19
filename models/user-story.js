@@ -6,7 +6,6 @@ var StoryNote = require('./story-note')
  * Snapchat UserStory
  *
  * @class
- *
  * @param {Object} params
  */
 function UserStory (params) {

@@ -6,7 +6,6 @@ var Filter = require('./filter')
  * Snapchat location-specific data
  *
  * @class
- *
  * @param {Object} params
  */
 function SKLocation (params) {

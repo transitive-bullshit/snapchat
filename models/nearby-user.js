@@ -4,7 +4,6 @@ module.exports = NearbyUser
  * Snapchat NearbyUser
  *
  * @class
- *
  * @param {string} username
  * @param {string} identifier
  */

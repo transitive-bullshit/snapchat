@@ -4,7 +4,6 @@ module.exports = Filter
  * Snapchat Filter
  *
  * @class
- *
  * @param {Object} params
  */
 function Filter (params) {

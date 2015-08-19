@@ -4,7 +4,6 @@ module.exports = FoundFriend
  * Snapchat FoundFriend
  *
  * @class
- *
  * @param {Object} params
  */
 function FoundFriend (params) {
