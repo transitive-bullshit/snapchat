@@ -64,7 +64,7 @@ client.signIn('myusername', 'mypassword', 'mygmailaddress@gmail.com', 'mygmailpa
 
 See [CONTRIBUTING](https://github.com/fisch0920/snapchat/blob/master/CONTRIBUTING.md).
 
-#### Debugging
+### Debugging
 
 You can enable [debug](https://www.npmjs.com/package/debug) logs by setting the `DEBUG` environment variable:
 
