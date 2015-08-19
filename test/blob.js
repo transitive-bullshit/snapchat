@@ -12,7 +12,7 @@ var BufferUtils = require('../lib/buffer-utils')
 
 var client = new Snapchat()
 
-// example public story from teamsnapchat
+// example public story from teamsnapchat (mp4 video)
 var story = new Story(client, {
   "id": "teamsnapchat~10",
   "username": "teamsnapchat",
