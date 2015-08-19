@@ -20,7 +20,8 @@ function SKBlob (data) {
 
   self._data = data
   self._isImage = BufferUtils.isImage(data)
-  self._isVideo = BufferUtils.isMPEG4(data)
+  self._isMPEG4 = BufferUtils.isMPEG4(data)
+  self._isVideo = self._isMPEG4
   self._isMedia = BufferUtils.isMedia(data)
 
   // TODO
@@ -65,6 +66,16 @@ Object.defineProperty(SKBlob.prototype, 'isImage', {
  */
 Object.defineProperty(SKBlob.prototype, 'isVideo', {
   get: function () { return this._isVideo }
+})
+
+/**
+ * Whether or not this blob represents an MPEG4 video.
+ *
+ * @name SKBlob#isMPEG4
+ * @property {boolean}
+ */
+Object.defineProperty(SKBlob.prototype, 'isMPEG4', {
+  get: function () { return this._isMPEG4 }
 })
 
 /**
