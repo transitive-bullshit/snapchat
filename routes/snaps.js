@@ -180,12 +180,12 @@ Snaps.prototype.loadFiltersForLocation = function (location, cb) {
       return cb(null, new SKLocation(result))
     }
 
-    cb('Snaps.loadFiltersForLocation parse error')
+    return cb('Snaps.loadFiltersForLocation parse error')
   })
 }
 
 /**
- * @internal
+ * @private
  */
 Snaps.prototype._loadSnapWithIdentifier = function (identifier, cb) {
   var self = this
@@ -203,7 +203,7 @@ Snaps.prototype._loadSnapWithIdentifier = function (identifier, cb) {
 }
 
 /**
- * @internal
+ * @private
  */
 Snaps.prototype._uploadSnap = function (blob, cb) {
   var self = this
@@ -227,7 +227,7 @@ Snaps.prototype._uploadSnap = function (blob, cb) {
       return cb(err)
     } else {
       // TODO: return Snap object
-      cb(null, uuid)
+      return cb(null, uuid)
     }
   })
 }

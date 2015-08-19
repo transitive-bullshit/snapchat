@@ -80,7 +80,7 @@ Story.prototype.load = function (cb) {
       self.blob = blob
     }
 
-    cb(err)
+    return cb(err)
   })
 }
 
@@ -94,6 +94,6 @@ Story.prototype.loadThumbnail = function (cb) {
       self.thumbnailBlob = blob
     }
 
-    cb(err)
+    return cb(err)
   })
 }

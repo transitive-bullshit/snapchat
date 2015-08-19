@@ -56,7 +56,7 @@ client.signIn(function (err) {
     })
   })
 
-  test('Snapchat.chat.sendMessage', function (t) {
+  /*test('Snapchat.chat.sendMessage', function (t) {
     client.chat.sendMessage('holla', TEST_USERNAME, function (err, result) {
       t.notOk(err)
       t.ok(result)
@@ -64,7 +64,7 @@ client.signIn(function (err) {
       t.ok(result.identifier)
       t.end()
     })
-  })
+  })*/
 
   test('Snapchat.chat.loadAllConversations', function (t) {
     client.chat.loadAllConversations(function (err) {

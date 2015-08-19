@@ -91,7 +91,7 @@ SKBlob.initWithData = function (data, cb) {
     SKBlob.decompress(data, cb)
   } else {
     var blob = new SKBlob(data)
-    cb(blob.isMedia ? null : 'unknown blob format', blob)
+    return cb(blob.isMedia ? null : 'unknown blob format', blob)
   }
 }
 
@@ -125,11 +125,11 @@ SKBlob.initWithStoryData = function (data, story, cb) {
 SKBlob.decompress = function (data, cb) {
   zlib.gunzip(data, function (err, decompressed) {
     if (err) {
-      cb(err)
+      return cb(err)
     } else {
       var blob = new SKBlob(decompressed)
 
-      cb(blob.isMedia ? null : 'unknown blob format', blob)
+      return cb(blob.isMedia ? null : 'unknown blob format', blob)
     }
   })
 }
@@ -150,6 +150,6 @@ SKBlob.decrypt = function (data, story, cb) {
   } else {
     var blob = new SKBlob(data)
 
-    cb(blob.isMedia ? null : 'unknown blob format', blob)
+    return cb(blob.isMedia ? null : 'unknown blob format', blob)
   }
 }

@@ -67,7 +67,7 @@ Friends.prototype.addFriend = function (username, cb) {
 /**
  * Use this to add back a user who has added you as a friend. Sort of like accepting a friend request.
  *
- * @discussion This only affects the "added by" string the other user will see.
+ * This only affects the "added by" string the other user will see.
  * @param {string} username The username of the user user to add back.
  * @param {function} cb
  */
@@ -103,14 +103,14 @@ Friends.prototype.unfriend = function (username, cb) {
     }
 
     self._removeFriendsFromSession([ { username: username } ])
-    cb(null)
+    return cb(null)
   })
 }
 
 /**
  * Finds friends given phone numbers and names.
  *
- * @discussion \c friends is a number->name map, where "name" is the desired screen name of that friend and "number" is their phone number.
+ * \c friends is a number->name map, where "name" is the desired screen name of that friend and "number" is their phone number.
  * The names given will be used as display names for any usernames found.
  * @param {Object} friends a dictionary with phone number strings as the keys and name strings as the values.
  * @param {function} cb
@@ -137,7 +137,7 @@ Friends.prototype.findFriends = function (friends, cb) {
       }))
     }
 
-    cb('Friends.findFriends parse error')
+    return cb('Friends.findFriends parse error')
   })
 }
 
@@ -171,7 +171,7 @@ Friends.prototype.findFriendsNear = function (location, accuracy, milliseconds, 
       }))
     }
 
-    cb('Friends.findFriendNear parse error')
+    return cb('Friends.findFriendNear parse error')
   })
 }
 
@@ -208,7 +208,7 @@ Friends.prototype.userExists = function (username, cb) {
       return cb(null, !!result.exists)
     }
 
-    cb('Friends.userExists parse error')
+    return cb('Friends.userExists parse error')
   })
 }
 
@@ -240,7 +240,7 @@ Friends.prototype.updateDisplayNameForUser = function (friend, displayName, cb) 
       return cb(null, updated)
     }
 
-    cb('Friends.updateDisplayNameForUser parse error')
+    return cb('Friends.updateDisplayNameForUser parse error')
   })
 }
 
@@ -295,12 +295,12 @@ Friends.prototype.seenSuggestedFriends = function (usernames, seen, cb) {
       return cb(null, !!result.logged)
     }
 
-    cb('Friends.seenSuggestedFriends parse error')
+    return cb('Friends.seenSuggestedFriends parse error')
   })
 }
 
 /**
- * @internal
+ * @private
  *
  * @param {Array[User]} friends
  */
@@ -318,7 +318,7 @@ Friends.prototype._removeFriendsFromSession = function (friends) {
 }
 
 /**
- * @internal
+ * @private
  *
  * @param {Array[User]} friends
  */
@@ -328,7 +328,7 @@ Friends.prototype._addFriendsToSession = function (friends) {
 }
 
 /**
- * @internal
+ * @private
  *
  * @param {string} username
  * @param {boolean} blocked

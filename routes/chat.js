@@ -95,7 +95,7 @@ Chat.prototype.conversationAuth = function (username, cb) {
         return cb(null, result)
       }
 
-      cb('Chat.conversationAuth parse error')
+      return cb('Chat.conversationAuth parse error')
     }
   })
 }
@@ -112,9 +112,9 @@ Chat.prototype.conversationWithUser = function (username, cb) {
 
   self.conversationsWithUsers([ username ], function (err, results) {
     if (err) {
-      cb(err)
+      return cb(err)
     } else {
-      cb(null, results.conversations[0])
+      return cb(null, results.conversations[0])
     }
   })
 }
@@ -142,7 +142,7 @@ Chat.prototype.conversationsWithUsers = function (usernames, cb) {
       if (err) {
         results.failed.push(username)
         results.errors.push(err)
-        cb(err)
+        return cb(err)
       } else {
         var identifier = StringUtils.uniqueIdentifer()
         var header = {
@@ -185,7 +185,7 @@ Chat.prototype.conversationsWithUsers = function (usernames, cb) {
 
         messages.push(first)
         messages.push(second)
-        cb(null)
+        return cb(null)
       }
     })
   }, function () {
@@ -208,7 +208,7 @@ Chat.prototype.conversationsWithUsers = function (usernames, cb) {
         }
       }
 
-      cb('Chat.conversationsWithUsers parse error')
+      return cb('Chat.conversationsWithUsers parse error')
     })
   })
 }
@@ -256,11 +256,11 @@ Chat.prototype.sendMessage = function (message, username, cb) {
 
   self.sendMessageToUsers(message, [ username ], function (err, results) {
     if (err) {
-      cb(err)
+      return cb(err)
     } else if (!results.conversations.length) {
-      cb('Chat.conversationWithUser error')
+      return cb('Chat.conversationWithUser error')
     } else {
-      cb(null, results.conversations[0])
+      return cb(null, results.conversations[0])
     }
   })
 }
@@ -323,7 +323,7 @@ Chat.prototype.sendMessageToUsers = function (message, usernames, cb) {
 
     if (!messages.length) {
       debug('Chat.sendMessageToUsers error retrieving conversations')
-      cb('Chat.sendMessageToUsers error retrieving conversations')
+      return cb('Chat.sendMessageToUsers error retrieving conversations')
     } else {
       self.client.post(constants.endpoints.chat.sendMessage, {
         'auth_token': self.client.authToken,
@@ -344,7 +344,7 @@ Chat.prototype.sendMessageToUsers = function (message, usernames, cb) {
           }
         }
 
-        cb('Chat.sendMessageToUsers parse error')
+        return cb('Chat.sendMessageToUsers parse error')
       })
     }
   })
@@ -353,7 +353,7 @@ Chat.prototype.sendMessageToUsers = function (message, usernames, cb) {
 /**
  * Loads another page of conversations in the feed after the given conversation.
  *
- * @discussion This method will update \c client.currentSession.conversations accordingly.
+ * This method will update \c client.currentSession.conversations accordingly.
  *
  * @param {Conversation} conversation The conversation after which to load more conversations.
  * @param {function} cb
@@ -387,7 +387,7 @@ Chat.prototype.loadConversationsAfter = function (conversation, cb) {
         return cb(null, conversations)
       }
 
-      cb('Chat.loadConversationsAfter parse error')
+      return cb('Chat.loadConversationsAfter parse error')
     }
   })
 }
@@ -395,7 +395,7 @@ Chat.prototype.loadConversationsAfter = function (conversation, cb) {
 /**
  * Loads all conversations into the current session.
  *
- * @discussion This method will update \c client.currentSession.conversations accordingly.
+ * This method will update \c client.currentSession.conversations accordingly.
  * @param {function} cb
  */
 Chat.prototype.loadAllConversations = function (cb) {
@@ -413,7 +413,7 @@ Chat.prototype.loadAllConversations = function (cb) {
     function loadPage () {
       self.loadConversationsAfter(last, function (err, convos) {
         if (err) {
-          cb(err, conversations)
+          return cb(err, conversations)
         } else if (convos.length > 0) {
           conversations = conversations.concat(convos)
           last = convos[convos.length - 1]
@@ -423,7 +423,7 @@ Chat.prototype.loadAllConversations = function (cb) {
             self.client.currentSession.conversations.push(convo)
           })
 
-          cb(null, conversations)
+          return cb(null, conversations)
         }
       })
     }
@@ -463,7 +463,7 @@ Chat.prototype.loadMessagesAfterPagination = function (messageOrTransaction, cb)
       return cb(null, new Conversation(result.conversation))
     }
 
-    cb('Chat.loadConversationsAfter parse error')
+    return cb('Chat.loadConversationsAfter parse error')
   })
 }
 
@@ -482,13 +482,13 @@ Chat.prototype.loadFullConversation = function (conversation, cb) {
   function loadPage () {
     self.loadMessagesAfterPagination(last, function (err, convo) {
       if (err) {
-        cb(err)
+        return cb(err)
       } else if (convo) {
         last = convo.messages[convo.messages.length - 1]
         conversation.addMessagesFromConversation(convo)
         loadPage()
       } else {
-        cb(null)
+        return cb(null)
       }
     })
   }
@@ -497,7 +497,7 @@ Chat.prototype.loadFullConversation = function (conversation, cb) {
 }
 
 /**
- * @internal
+ * @private
  */
 Chat.prototype._sendTyping = function (recipients, cb) {
   var self = this

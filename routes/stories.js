@@ -61,7 +61,7 @@ Stories.prototype.postStory = function (blob, opts, cb) {
         return cb(null, result)
       }
 
-      cb('Snapchat.Stories.postStory parse error')
+      return cb('Snapchat.Stories.postStory parse error')
     })
   })
 }
@@ -139,10 +139,10 @@ Stories.prototype.loadStories = function (stories, cb) {
         results.loaded.push(story)
       }
 
-      cb(err)
+      return cb(err)
     })
   }, function (err) {
-    cb(err, results)
+    return cb(err, results)
   })
 }
 
@@ -167,7 +167,7 @@ Stories.prototype.deleteStory = function (story, cb) {
       }
     }
 
-    cb(err)
+    return cb(err)
   })
 }
 
@@ -268,14 +268,14 @@ Stories.prototype.getSharedDescriptionForStory = function (sharedStory, cb) {
       return cb(null, new SharedStoryDescription(result))
     }
 
-    cb('Snapchat.Stories.getSharedDescriptionForStory parse error')
+    return cb('Snapchat.Stories.getSharedDescriptionForStory parse error')
   })
 }
 
 /**
  * Uploads a new story associated with the given blob.
  *
- * @internal
+ * @private
  * @param {SKBlob} blob
  * @param {function} cb
  */

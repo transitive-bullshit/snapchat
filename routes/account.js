@@ -43,7 +43,7 @@ Account.prototype.updateBestFriendsCount = function (number, cb) {
       return cb(null)
     }
 
-    cb('Snapchat.Account.updateBestFriendsCount parse error')
+    return cb('Snapchat.Account.updateBestFriendsCount parse error')
   })
 }
 
@@ -149,7 +149,7 @@ Account.prototype.updateNotificationSoundSetting = function (enableSound, cb) {
 /**
  * Updates your display name.
  *
- * @discussion Your 'display name' is what your contact name defaults to when someone new adds you, not your username.
+ * Your 'display name' is what your contact name defaults to when someone new adds you, not your username.
  * @param {string} displayName Your new display name.
  * @param {function} cb
  */
@@ -163,7 +163,7 @@ Account.prototype.updateDisplayName = function (displayName, cb) {
 /**
  * Updates your account's feature settings.
  *
- * @discussion See \c constants.Feature for valid keys. Invalid keys will be silently ignored.
+ * See \c constants.Feature for valid keys. Invalid keys will be silently ignored.
  * @warning Raises an exception if \e settings contains more than 8 key-value pairs.
  *
  * @param Object settings A dictionary of string-boolean pairs. Missing keys-value pairs default to the current values. Behavior is undefined for values other than booleans.
@@ -204,7 +204,7 @@ Account.prototype.downloadSnaptag = function (cb) {
     'username': self.client.username
   }, function (err, body) {
     if (err) {
-      cb(err)
+      return cb(err)
     } else {
       // TODO: this returns application/json but it's actually an XML doc:
       // '<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n<svg height="320" version="1.1" viewBox="0 0 320 320" width="320" xmlns="http://www.w3.org/2000/svg">\n  <path d="M162.31,52.4......74" fill="#FFFC00"/>\n</svg>\n'
@@ -244,7 +244,7 @@ Account.prototype.downloadAvatar = function (username, cb) {
     'size': 'MEDIUM'
   }, function (err, body) {
     if (err) {
-      cb(err)
+      return cb(err)
     } else {
       SKBlob.initWithData(body, cb)
     }

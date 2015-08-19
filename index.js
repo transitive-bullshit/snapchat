@@ -282,7 +282,7 @@ Snapchat.prototype.signIn = function (username, password, gmailEmail, gmailPassw
               return cb(null, self.currentSession)
             }
 
-            cb('Snapchat.signIn parse error', result)
+            return cb('Snapchat.signIn parse error', result)
           })
         })
       })
@@ -339,7 +339,7 @@ Snapchat.prototype.signOut = function (cb) {
       return cb(null)
     }
 
-    cb('Snapchat.signOut parse error')
+    return cb('Snapchat.signOut parse error')
   })
 }
 
@@ -372,7 +372,7 @@ Snapchat.prototype.updateSession = function (cb) {
       return cb(null, self.currentSession)
     }
 
-    cb('updateSession error')
+    return cb('updateSession error')
   })
 }
 
@@ -406,7 +406,7 @@ Snapchat.prototype.registerEmail = function (email, password, birthday, cb) {
       return cb(null, result)
     }
 
-    cb('registerEmail parse error')
+    return cb('registerEmail parse error')
   })
 }
 
@@ -444,7 +444,7 @@ Snapchat.prototype.registerUsername = function (username, registeredEmail, gmail
         return cb(null)
       }
 
-      cb('registerUsername parse error')
+      return cb('registerUsername parse error')
     })
   })
 }
@@ -514,7 +514,7 @@ Snapchat.prototype.verifyPhoneNumber = function (code, cb) {
     }
 
     debug('verifyPhoneNumber result %j', result)
-    cb(null, result)
+    return cb(null, result)
   })
 }
 
@@ -546,7 +546,7 @@ Snapchat.prototype.getCaptcha = function (cb) {
         }
 
         // TODO
-        cb(new Error('Snapchat.getCaptcha TODO'))
+        return cb(new Error('Snapchat.getCaptcha TODO'))
       })
     }
   })
@@ -610,7 +610,7 @@ Snapchat.prototype.sendEvents = function (events, snapInfo, cb) {
       return cb(err)
     } else {
       debug('sendEvents result %j', result)
-      cb(null, result)
+      return cb(null, result)
     }
   })
 }
@@ -657,7 +657,7 @@ Snapchat.prototype._getGoogleAuthToken = function (gmailEmail, gmailPassword, cb
       }
     }
 
-    cb('Snapchat._getGoogleAuthToken unknown error')
+    return cb('Snapchat._getGoogleAuthToken unknown error')
   })
 }
 
@@ -678,7 +678,7 @@ Snapchat.prototype._getDeviceTokens = function (cb) {
     result[constants.core.deviceToken1i] = dt1i
     result[constants.core.deviceToken1v] = dt1v
 
-    cb(null, result)
+    return cb(null, result)
   }
 
   if (dt1i && dt1v) {
@@ -701,7 +701,7 @@ Snapchat.prototype._getDeviceTokens = function (cb) {
       }
 
       debug('Snapchat._getDeviceTokens parse error %j', result)
-      cb('Snapchat._getDeviceTokens parse error')
+      return cb('Snapchat._getDeviceTokens parse error')
     })
   }
 }
@@ -750,7 +750,7 @@ Snapchat.prototype._getGoogleCloudMessagingIdentifier = function (cb) {
     }
 
     debug('_getGoogleCloudMessagingIdentifier parse error %s', body)
-    cb('_getGoogleCloudMessagingIdentifier error')
+    return cb('_getGoogleCloudMessagingIdentifier error')
   })
 }
 
