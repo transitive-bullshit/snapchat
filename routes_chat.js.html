@@ -252,7 +252,7 @@ Chat.prototype.conversationsWithUsers = function (usernames, cb) {
   }, function () {
     self.client.post(constants.endpoints.chat.sendMessage, {
       'auth_token': self.client.authToken,
-      'messages': messages,
+      'messages': JSON.stringify(messages),
       'username': self.client.username
     }, function (err, result) {
       if (err) {
@@ -353,13 +353,12 @@ Chat.prototype.sendMessageToUsers = function (message, usernames, cb) {
     results.failed = convoResults.failed
     results.errors = convoResults.errors
 
-    console.log('failed', results.failed)
-    console.log('errors', results.errors)
-    console.log('results', convoResults.conversations)
-
     var messages = convoResults.conversations.map(function (convo) {
       var identifier = StringUtils.uniqueIdentifer()
-      var sequenceNum = ((convo.state['conversation_state']['user_sequences'][self.client.username]) || 0) | 0
+      var sequenceNum = convo.state['conversation_state']
+      sequenceNum = sequenceNum &amp;&amp; sequenceNum['user_sequences']
+      sequenceNum = sequenceNum &amp;&amp; sequenceNum[self.client.username]
+      sequenceNum = sequenceNum | 0
 
       var header = {
         'auth': convo.messagingAuth,
@@ -388,13 +387,13 @@ Chat.prototype.sendMessageToUsers = function (message, usernames, cb) {
     } else {
       self.client.post(constants.endpoints.chat.sendMessage, {
         'auth_token': self.client.authToken,
-        'messages': messages,
+        'messages': JSON.stringify(messages),
         'username': self.client.username
       }, function (err, result) {
         if (err) {
           return cb(err)
         } else if (result) {
-          if (result.conversations &amp;&amp; result.conversations.length) {
+          if (result.conversations &amp;&amp; result.conversations) {
             results.conversations = result.conversations.map(function (convo) {
               return new Conversation(convo)
             })
@@ -414,7 +413,7 @@ Chat.prototype.sendMessageToUsers = function (message, usernames, cb) {
 /**
  * Loads another page of conversations in the feed after the given conversation.
  *
- * This method will update client.currentSession.conversations accordingly.
+ * This method will update client.session.conversations accordingly.
  *
  * @param {Conversation} conversation The conversation after which to load more conversations.
  * @param {function} cb
@@ -423,7 +422,7 @@ Chat.prototype.loadConversationsAfter = function (conversation, cb) {
   var self = this
   debug('Chat.loadConversationsAfter')
 
-  if (!conversation.pagination.length) {
+  if (!conversation || !conversation.pagination || !conversation.pagination.length) {
     return cb(null, [ ])
   }
 
@@ -441,7 +440,7 @@ Chat.prototype.loadConversationsAfter = function (conversation, cb) {
         var conversations = result.map(function (result) {
           var convo = new Conversation(result)
 
-          self.client.currentSession.conversations.push(convo)
+          self.client.session.conversations.push(convo)
           return convo
         })
 
@@ -456,7 +455,7 @@ Chat.prototype.loadConversationsAfter = function (conversation, cb) {
 /**
  * Loads all conversations into the current session.
  *
- * This method will update client.currentSession.conversations accordingly.
+ * This method will update client.session.conversations accordingly.
  * @param {function} cb
  */
 Chat.prototype.loadAllConversations = function (cb) {
@@ -469,7 +468,7 @@ Chat.prototype.loadAllConversations = function (cb) {
     }
 
     var conversations = [ ]
-    var last = self.client.currentSession.conversations[self.client.currentSession.conversations.length - 1]
+    var last = self.client.session.conversations[self.client.session.conversations.length - 1]
 
     function loadPage () {
       self.loadConversationsAfter(last, function (err, convos) {
@@ -481,7 +480,7 @@ Chat.prototype.loadAllConversations = function (cb) {
           loadPage()
         } else {
           conversations.forEach(function (convo) {
-            self.client.currentSession.conversations.push(convo)
+            self.client.session.conversations.push(convo)
           })
 
           return cb(null, conversations)

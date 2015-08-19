@@ -106,7 +106,7 @@ client.signIn('myusername', 'mypassword', 'mygmailaddress@gmail.com', 'mygmailpa
 <p><strong>NOTE</strong> Any valid gmail address and password may be used; it does not have to be the one the Snapchat user was created with.</p>
 <h3>Contribute</h3><p><a href="https://github.com/feross/standard"><img src="https://cdn.rawgit.com/feross/standard/master/badge.svg" alt="js-standard-style"></a></p>
 <p>See <a href="https://github.com/fisch0920/snapchat/blob/master/CONTRIBUTING.md">CONTRIBUTING</a>.</p>
-<h4>Debugging</h4><p>You can enable <a href="https://www.npmjs.com/package/debug">debug</a> logs by setting the <code>DEBUG</code> environment variable:</p>
+<h3>Debugging</h3><p>You can enable <a href="https://www.npmjs.com/package/debug">debug</a> logs by setting the <code>DEBUG</code> environment variable:</p>
 <pre class="prettyprint source lang-bash"><code>DEBUG=snapchat; # debug core snapchat</code></pre><p>OR</p>
 <pre class="prettyprint source lang-bash"><code>DEBUG=snapchat,snapchat:*; # debug all snapchat submodules</code></pre><h3>Third party resources</h3><ul>
 <li>https://github.com/ThePantsThief/SnapchatKit</li>
@@ -125,13 +125,11 @@ client.signIn('myusername', 'mypassword', 'mygmailaddress@gmail.com', 'mygmailpa
 
 <h3>Todo</h3><ul>
 <li>MORE TESTS</li>
+<li>rate limiting (currently test suite is failing with 401 errors because of rate limiting issues)</li>
 <li>check logged status in Request.start response handler</li>
 <li>handle request encoding properly for blobs and non-text requests</li>
-<li>verify ts/timestamps milliseconds or seconds</li>
-<li>JSON.stringify internal params or nah?</li>
 <li>sendEvents inconsistent between <code>Array[event]</code> and <code>event</code></li>
-<li>encrypt gmail password</li>
-<li>cleanup headers initialization contentType etc.</li>
+<li>encrypt gmail password (php reference)</li>
 </ul>
 <h3>License</h3><p>MIT. Copyright (c) <a href="https://makesnaps.com">Travis Fischer</a>.</p>
 <h3>Legal</h3><p>I believe it's 100% legal to use a &quot;private&quot; REST API and that there are no laws explicitly prohibiting the use of &quot;private&quot; REST APIs. However, this does not mean that the makers of these private APIs can't try to sue you under something overly-broad, such as the CFAA. I don't think Snapchat will, personally; in my experience they've only gone after developers for copyright disputes.</p>

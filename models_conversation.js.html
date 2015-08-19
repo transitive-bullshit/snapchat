@@ -77,11 +77,11 @@ function Conversation (params) {
   var self = this
   if (!(self instanceof Conversation)) return new Conversation(params)
 
-  var convoMessages = params['conversation_messages']
+  var convoMessages = params['conversation_messages'] || { }
   var lastChatActions = params['last_chat_actions']
   var lastTransaction = params['last_cash_transaction']
-  var pendingRecievedSnaps = params['pending_received_snaps']
-  var messages = convoMessages['messages']
+  var pendingRecievedSnaps = params['pending_received_snaps'] || []
+  var messages = convoMessages['messages'] || []
   var lastSnap = params['last_snap']
   var lastInteraction = +params['last_interaction_ts']
 

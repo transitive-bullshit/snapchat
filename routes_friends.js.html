@@ -83,7 +83,7 @@ function Friends (client, opts) {
 }
 
 /**
- * Adds the users in \e toAdd as friends, and unfriends the users in \e toUnfriend.
+ * Adds the users in toAdd as friends, and unfriends the users in toUnfriend.
  *
  * @param {Array&lt;string>} toAdd An array of username strings of users to add. Doesn't matter if they're already in your friends.
  * @param {Array&lt;string>} toUnfriend An array of username strings of users to un-friend. Doesn't matter if they're not already in your friends.
@@ -100,8 +100,8 @@ Friends.prototype.addFriends = function (toAdd, toUnfriend, cb) {
     'username': self.client.username,
     'action': 'multiadddelete',
     'friend': {
-      friendsToAdd: toAdd,
-      friendsToDelete: toUnfriend
+      friendsToAdd: JSON.stringify(toAdd),
+      friendsToDelete: JSON.stringify(toUnfriend)
     },
     'added_by': 'ADDED_BY_USERNAME'
   }, cb)
@@ -129,7 +129,7 @@ Friends.prototype.addFriend = function (username, cb) {
  * Use this to add back a user who has added you as a friend. Sort of like accepting a friend request.
  *
  * This only affects the "added by" string the other user will see.
- * @param {string} username The username of the user user to add back.
+ * @param {string} username The username of the user to add back.
  * @param {function} cb
  */
 Friends.prototype.addFriendBack = function (username, cb) {
@@ -173,6 +173,7 @@ Friends.prototype.unfriend = function (username, cb) {
  *
  * friends is a number->name map, where "name" is the desired screen name of that friend and "number" is their phone number.
  * The names given will be used as display names for any usernames found.
+ *
  * @param {Object} friends a dictionary with phone number strings as the keys and name strings as the values.
  * @param {function} cb
  */
@@ -180,15 +181,15 @@ Friends.prototype.findFriends = function (friends, cb) {
   var self = this
   debug('Friends.findFriends (%j)', friends)
 
-  if (self.client.currentSession.shouldTextToVerifyNumber ||
-      self.client.curentSession.shouldCallToVerifyNumber) {
+  if (self.client.session.shouldTextToVerifyNumber ||
+      self.client.session.shouldCallToVerifyNumber) {
     return cb('Friends.findFriends error client needs to verify phone first')
   }
 
   self.client.post(constants.endpoints.friends.find, {
     'username': self.client.username,
-    'countryCode': self.client.currentSession.countryCode,
-    'numbers': friends
+    'countryCode': self.client.session.countryCode,
+    'numbers': JSON.stringify(friends)
   }, function (err, result) {
     if (err) {
       return cb(err)
@@ -212,7 +213,7 @@ Friends.prototype.findFriends = function (friends, cb) {
  */
 Friends.prototype.findFriendsNear = function (location, accuracy, milliseconds, cb) {
   var self = this
-  debug('Friends.findFriendsNear')
+  debug('Friends.findFriendsNear (%j)', location)
 
   if (accuracy &lt;= 0) accuracy = 10
 
@@ -259,7 +260,7 @@ Friends.prototype.userExists = function (username, cb) {
   var self = this
   debug('Friends.userExists (%s)', username)
 
-  self.client.post(constants.endpoints.friends.search, {
+  self.client.post(constants.endpoints.friends.exists, {
     'request_username': username,
     'username': self.client.username
   }, function (err, result) {
@@ -282,7 +283,7 @@ Friends.prototype.userExists = function (username, cb) {
  */
 Friends.prototype.updateDisplayNameForUser = function (friend, displayName, cb) {
   var self = this
-  debug('Friends.updateDisplayNameForUser (%s, %s)', friend, displayName)
+  debug('Friends.updateDisplayNameForUser (%s, "%s")', friend, displayName)
 
   self.client.post(constants.endpoints.friends.friend, {
     'action': 'display',
@@ -299,6 +300,8 @@ Friends.prototype.updateDisplayNameForUser = function (friend, displayName, cb) 
       self._removeFriendsFromSession([ updated ])
       self._addFriendsToSession([ updated ])
       return cb(null, updated)
+    } else {
+      debug('Friends.updateDisplayNameForUser parse error %j', result)
     }
 
     return cb('Friends.updateDisplayNameForUser parse error')
@@ -347,7 +350,7 @@ Friends.prototype.seenSuggestedFriends = function (usernames, seen, cb) {
   self.client.post(constants.endpoints.misc.suggestFriend, {
     'action': 'update',
     'seen': !!seen,
-    'seen_suggested_friend_list': usernames,
+    'seen_suggested_friend_list': JSON.stringify(usernames),
     'username': self.client.username
   }, function (err, result) {
     if (err) {
@@ -373,7 +376,7 @@ Friends.prototype._removeFriendsFromSession = function (friends) {
     friendsMap[friend.username] = true
   })
 
-  self.client.currentSession.friends = self.client.currentSession.friends.filter(function (friend) {
+  self.client.session.friends = self.client.session.friends.filter(function (friend) {
     return !(friend.username in friendsMap)
   })
 }
@@ -385,7 +388,7 @@ Friends.prototype._removeFriendsFromSession = function (friends) {
  */
 Friends.prototype._addFriendsToSession = function (friends) {
   var self = this
-  self.client.currentSession.friends = self.client.currentSession.friends.concat(friends)
+  self.client.session.friends = self.client.session.friends.concat(friends)
 }
 
 /**
