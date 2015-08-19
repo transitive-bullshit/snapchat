@@ -37,7 +37,7 @@ client.signIn(function (err) {
         t.end()
       })
     })
-  })*/
+  })
 
   test('Snapchat.friends.findFriends', function (t) {
     client.friends.findFriends({
@@ -49,7 +49,21 @@ client.signIn(function (err) {
       t.equal(results[0].username, 'lovealways_cma')
       t.end()
     })
-  })
+  })*/
+
+  // TODO: this is currently failing with a 400 Bad Request
+  /*test('Snapchat.friends.findFriendsNear', function (t) {
+    client.friends.findFriendsNear({
+      // new york city
+      lat: '40.7127',
+      lng: '74.0059'
+    }, 1000, 0, function (err, results) {
+      t.notOk(err)
+      console.log(results)
+      t.ok(results)
+      t.end()
+    })
+  })*/
 
   // TODO:
   // Snapchat.friends.addFriends
