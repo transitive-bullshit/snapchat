@@ -29,16 +29,16 @@ function Session (client, params) {
   var discover = params['discover']
   var messagingGate = params['messaging_gateway_info']
 
-  var friendStories = storiesResponse['friend_stories']
-  var myStories = storiesResponse['my_stories']
-  // var groupStories = storiesResponse['my_group_stories']
+  var friendStories = storiesResponse['friend_stories'] || []
+  var myStories = storiesResponse['my_stories'] || []
+  // var groupStories = storiesResponse['my_group_stories'] || []
 
-  var friends = friendsResponse['friends']
-  var added = friendsResponse['added_friends']
-  var conversations = params['conversations_response']
+  var friends = friendsResponse['friends'] || []
+  var addedFriends = friendsResponse['added_friends'] || []
+  var conversations = params['conversations_response'] || []
 
   self.backgroundFetchSecret = params['background_fetch_secret_key']
-  self.bestFriendUsernames = friendsResponse['bests']
+  self.bestFriendUsernames = friendsResponse['bests'] || []
 
   self.storiesDelta = !!storiesResponse['friend_stories_delta']
   self.emailVerified = !!identity['is_email_verified']
@@ -59,27 +59,27 @@ function Session (client, params) {
   self.discoverVideoCatalog = discover['video_catalog']
 
   // Friends
-  self.friends = (friends || []).map(function (friend) {
+  self.friends = friends.map(function (friend) {
     return new User(friend)
   })
 
   // Added friends
-  self.addedFriends = (added || []).map(function (friend) {
+  self.addedFriends = addedFriends.map(function (friend) {
     return new User(friend)
   })
 
   // Conversations
-  self.conversations = (conversations || []).map(function (conversation) {
+  self.conversations = conversations.map(function (conversation) {
     return new Conversation(conversation)
   })
 
   // Story collections
-  self.stories = (friendStories || []).map(function (collection) {
+  self.stories = friendStories.map(function (collection) {
     return new StoryCollection(self.client, collection)
   })
 
   // User stories
-  self.userStories = (myStories || []).map(function (story) {
+  self.userStories = myStories.map(function (story) {
     return new UserStory(story)
   })
 
@@ -103,8 +103,8 @@ function Session (client, params) {
   self.recieved = updatesResponse['recieved'] | 0
   self.sent = updatesResponse['sent'] | 0
   self.score = updatesResponse['score'] | 0
-  self.recents = updatesResponse['recents']
-  self.requests = updatesResponse['requests']
+  self.recents = updatesResponse['recents'] || []
+  self.requests = updatesResponse['requests'] || []
 
   // Account information
   self.addedFriendsTimestamp = new Date(updatesResponse['added_friends_timestamp'])

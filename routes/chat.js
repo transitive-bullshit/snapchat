@@ -299,7 +299,10 @@ Chat.prototype.sendMessageToUsers = function (message, usernames, cb) {
 
     var messages = convoResults.conversations.map(function (convo) {
       var identifier = StringUtils.uniqueIdentifer()
-      var sequenceNum = ((convo.state['conversation_state']['user_sequences'][self.client.username]) || 0) | 0
+      var sequenceNum = convo.state['conversation_state']
+      sequenceNum = sequenceNum && sequenceNum['user_sequences']
+      sequenceNum = sequenceNum && sequenceNum[self.client.username]
+      sequenceNum = sequenceNum | 0
 
       var header = {
         'auth': convo.messagingAuth,

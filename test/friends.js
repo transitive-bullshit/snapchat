@@ -50,8 +50,9 @@ client.signIn(function (err) {
     })
   })
 
+  /*
   // TODO: currently failing with a 400 Bad Request
-  /*test('Snapchat.friends.findFriendsNear', function (t) {
+  test('Snapchat.friends.findFriendsNear', function (t) {
     client.friends.findFriendsNear({
       // new york city
       lat: '40.7127',
@@ -85,8 +86,9 @@ client.signIn(function (err) {
     })
   })
 
+  /*
   // TODO: currently failing with parse error {"message":"Something went wrong.","logged":false}
-  /*test('Snapchat.friends.updateDisplayNameForUser', function (t) {
+  test('Snapchat.friends.updateDisplayNameForUser', function (t) {
     var username = client.session.friends[0].username
     var testDisplayName = 'nala sandwich'
 
@@ -118,7 +120,6 @@ client.signIn(function (err) {
   // TODO:
   // Snapchat.friends.addFriends
   // Snapchat.friends.addFriendBack
-  // Snapchat.friends.findFriendsNear
   // Snapchat.friends.searchFriend
   // Snapchat.friends.seenSuggestedFriends
 })

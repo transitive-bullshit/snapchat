@@ -3,7 +3,6 @@
 require('dotenv').load()
 
 var test = require('tape')
-
 var Snapchat = require('../')
 var Session = require('../models/session')
 var StringUtils = require('../lib/string-utils')

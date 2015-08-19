@@ -3,7 +3,6 @@
 require('dotenv').load()
 
 var test = require('tape')
-
 var constants = require('../lib/constants')
 var Request = require('../lib/request')
 

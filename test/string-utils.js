@@ -3,7 +3,6 @@
 require('dotenv').load()
 
 var test = require('tape')
-
 var StringUtils = require('../lib/string-utils')
 
 test('timestamp', function (t) {

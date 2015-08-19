@@ -785,8 +785,8 @@ Snapchat.prototype._getGoogleCloudMessagingIdentifier = function (cb) {
 
   // TODO: cloud messaging identifier always returns 'Error=AUTHENTICATION_FAILED'
   // skipping this for now to speedup testing
-  return
 
+  /*
   Request.postRaw({
     url: 'https://android.clients.google.com/c2dm/register3',
     form: {
@@ -818,7 +818,7 @@ Snapchat.prototype._getGoogleCloudMessagingIdentifier = function (cb) {
       if (token) {
         return cb(null, token)
       } else {
-        //debug('_getGoogleCloudMessagingIdentifier using default token %s', body)
+        // debug('_getGoogleCloudMessagingIdentifier using default token %s', body)
 
         // default token
         return cb(null, DEFAULT_TOKEN)
@@ -827,7 +827,7 @@ Snapchat.prototype._getGoogleCloudMessagingIdentifier = function (cb) {
 
     debug('_getGoogleCloudMessagingIdentifier parse error %s', body)
     return cb('_getGoogleCloudMessagingIdentifier error')
-  })
+  })*/
 }
 
 /**

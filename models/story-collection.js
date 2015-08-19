@@ -45,7 +45,7 @@ function StoryCollection (client, params) {
   }
 
   // An array of Story objects.
-  self.stories = (params.stories || [ ]).map(function (story) {
+  self.stories = (params['stories'] || []).map(function (story) {
     return new Story(self.client, story)
   })
 }

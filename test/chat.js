@@ -2,13 +2,13 @@
 
 require('dotenv').load()
 
-var test = require('tape')
+var TEST_USERNAME = 'teamsnapchat'
 
+var test = require('tape')
 var Snapchat = require('../')
 var Conversation = require('../models/conversation')
 
 var client = new Snapchat()
-var TEST_USERNAME = 'teamsnapchat'
 
 client.signIn(function (err) {
   if (err) throw new Error('signIn error', err)
@@ -40,7 +40,7 @@ client.signIn(function (err) {
   test('Snapchat.chat.conversationWithUser', function (t) {
     client.chat.conversationWithUser(TEST_USERNAME, function (err, result) {
       t.notOk(err)
-      t.notOk(result) // should be an empty conversation
+      assertValidConversation(t, result)
       t.end()
     })
   })
@@ -52,15 +52,13 @@ client.signIn(function (err) {
     })
   })
 
-  /*test('Snapchat.chat.sendMessage', function (t) {
+  test('Snapchat.chat.sendMessage', function (t) {
     client.chat.sendMessage('holla', TEST_USERNAME, function (err, result) {
       t.notOk(err)
-      t.ok(result)
-      t.ok(result instanceof Conversation)
-      t.ok(result.identifier)
+      assertValidConversation(t, result)
       t.end()
     })
-  })*/
+  })
 
   test('Snapchat.chat.loadAllConversations', function (t) {
     client.chat.loadAllConversations(function (err) {
@@ -68,6 +66,12 @@ client.signIn(function (err) {
       t.end()
     })
   })
+
+  function assertValidConversation (t, convo) {
+    t.ok(convo)
+    t.ok(convo instanceof Conversation)
+    t.ok(convo.identifier)
+  }
 
   // TODO:
   // Snapchat.chat.markRead
