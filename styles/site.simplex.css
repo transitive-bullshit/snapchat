@@ -6691,7 +6691,7 @@ label {
 }
 #toc .toc-active {
   background-color: transparent;
-  color: #ffffff;
+  color: #000;
   border-top-right-radius: 3px;
   border-bottom-right-radius: 3px;
   border-bottom-left-radius: 3px;
@@ -6702,7 +6702,7 @@ label {
 #toc .toc-active a:active,
 #toc .toc-active a:visited {
   background-color: transparent;
-  color: #ffffff;
+  color: #000;
 }
 #toc .toc-h1 {
   margin-left: 2px;

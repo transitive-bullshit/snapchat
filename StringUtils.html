@@ -51,10 +51,8 @@
 	<div class="col-md-8">
 	
 		<div id="main">
-    		<h1 class="page-title">Namespace: StringUtils</h1>
 			
 
-	<h1 class="page-title">Namespace: StringUtils</h1>
 <section>
 
 <header>
@@ -142,6 +140,7 @@
 
         <dl>
             
+<hr>
 <dt>
     <h4 class="name" id=".getSCPreHashString"><span class="type-signature">&lt;static> </span>getSCPreHashString<span class="signature">(username, password, timestamp, endpoint)</span><span class="type-signature"> &rarr; {string}</span></h4>
     
@@ -365,6 +364,7 @@
 
         
             
+<hr>
 <dt>
     <h4 class="name" id=".hashHMacToBase64"><span class="type-signature">&lt;static> </span>hashHMacToBase64<span class="signature">(str, key)</span><span class="type-signature"> &rarr; {string}</span></h4>
     
@@ -538,6 +538,7 @@
 
         
             
+<hr>
 <dt>
     <h4 class="name" id=".hashSCString"><span class="type-signature">&lt;static> </span>hashSCString<span class="signature">(first, second)</span><span class="type-signature"> &rarr; {string}</span></h4>
     
@@ -711,6 +712,7 @@
 
         
             
+<hr>
 <dt>
     <h4 class="name" id=".md5HashToHex"><span class="type-signature">&lt;static> </span>md5HashToHex<span class="signature">(str)</span><span class="type-signature"> &rarr; {string}</span></h4>
     
@@ -861,6 +863,7 @@
 
         
             
+<hr>
 <dt>
     <h4 class="name" id=".mediaIdentifer"><span class="type-signature">&lt;static> </span>mediaIdentifer<span class="signature">(sender)</span><span class="type-signature"> &rarr; {string}</span></h4>
     
@@ -1011,6 +1014,7 @@
 
         
             
+<hr>
 <dt>
     <h4 class="name" id=".SCIdentifier"><span class="type-signature">&lt;static> </span>SCIdentifier<span class="signature">(first, second)</span><span class="type-signature"> &rarr; {string}</span></h4>
     
@@ -1184,6 +1188,7 @@
 
         
             
+<hr>
 <dt>
     <h4 class="name" id=".sha256HashToBase64"><span class="type-signature">&lt;static> </span>sha256HashToBase64<span class="signature">(str)</span><span class="type-signature"> &rarr; {string}</span></h4>
     
@@ -1334,6 +1339,7 @@
 
         
             
+<hr>
 <dt>
     <h4 class="name" id=".sha256HashToHex"><span class="type-signature">&lt;static> </span>sha256HashToHex<span class="signature">(str)</span><span class="type-signature"> &rarr; {string}</span></h4>
     
@@ -1484,6 +1490,7 @@
 
         
             
+<hr>
 <dt>
     <h4 class="name" id=".timestamp"><span class="type-signature">&lt;static> </span>timestamp<span class="signature">()</span><span class="type-signature"> &rarr; {string}</span></h4>
     
@@ -1589,6 +1596,7 @@
 
         
             
+<hr>
 <dt>
     <h4 class="name" id=".timestampFrom"><span class="type-signature">&lt;static> </span>timestampFrom<span class="signature">(date)</span><span class="type-signature"> &rarr; {string}</span></h4>
     
@@ -1743,6 +1751,7 @@
 
         
             
+<hr>
 <dt>
     <h4 class="name" id=".tryParseJSON"><span class="type-signature">&lt;static> </span>tryParseJSON<span class="signature">(input)</span><span class="type-signature"> &rarr; {Object}</span></h4>
     
@@ -1897,6 +1906,7 @@
 
         
             
+<hr>
 <dt>
     <h4 class="name" id=".uniqueIdentifer"><span class="type-signature">&lt;static> </span>uniqueIdentifer<span class="signature">()</span><span class="type-signature"> &rarr; {string}</span></h4>
     
@@ -2054,7 +2064,8 @@ $( function () {
 
 	$( "#toc" ).toc( {
 		anchorName  : function ( i, heading, prefix ) {
-			return $( heading ).attr( "id" ) || ( prefix + i );
+			var id = $( heading ).attr( "id" );
+			return id && id.replace(/\~/g, '-inner-').replace(/\./g, '-static-') || ( prefix + i );
 		},
 		selectors   : "h1,h2,h3,h4",
 		showAndHide : false,

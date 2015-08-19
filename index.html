@@ -51,12 +51,9 @@
 	<div class="col-md-8">
 	
 		<div id="main">
-    		<h1 class="page-title">Index</h1>
 			
 
-	
-	<span class="page-title">Index</span>
-	
+    
 	
 
 
@@ -69,7 +66,7 @@
 
 
 
-	
+    
 	
 
 
@@ -81,7 +78,8 @@
 <p>It provides an easy-to-use client interface to Snapchat's unofficial API, allowing Javascript developers to script Snapchat!</p>
 <p><strong>NOTE</strong> This project is a pre-release alpha, and I would not recommend using it for production projects until it is more stable. PRs welcome :)</p>
 <h3>Status</h3><p>Login and request authentication are working and up-to-date with the latest version of Snapchat. Most of the REST API routes are untested.</p>
-<h3>Install</h3><pre class="prettyprint source lang-bash"><code>npm install snapchat</code></pre><h3>Usage</h3><p>Snapchat defaults to using required signin credentials stored in environment variables:</p>
+<h3>Install</h3><pre class="prettyprint source lang-bash"><code>npm install snapchat</code></pre><h3>Usage</h3><p>The main entrypoint is the <a href="http://fisch0920.github.io/snapchat/Snapchat.html">Snapchat</a> class. See the auto-generated <a href="http://fisch0920.github.io/snapchat">documentation</a> for a detailed API reference.</p>
+<p>Snapchat defaults to using required signin credentials stored in environment variables:</p>
 <ul>
 <li><code>SNAPCHAT_USERNAME</code> The Snapchat username to sign in with.</li>
 <li><code>SNAPCHAT_PASSWORD</code> The password to the Snapchat account to sign in with.</li>
@@ -127,10 +125,6 @@ client.signIn('myusername', 'mypassword', 'mygmailaddress@gmail.com', 'mygmailpa
 
 <h3>Todo</h3><ul>
 <li>MORE TESTS</li>
-<li>documentation<ul>
-<li>simplex / spacelab</li>
-</ul>
-</li>
 <li>check logged status in Request.start response handler</li>
 <li>handle request encoding properly for blobs and non-text requests</li>
 <li>verify ts/timestamps milliseconds or seconds</li>
@@ -195,7 +189,8 @@ $( function () {
 
 	$( "#toc" ).toc( {
 		anchorName  : function ( i, heading, prefix ) {
-			return $( heading ).attr( "id" ) || ( prefix + i );
+			var id = $( heading ).attr( "id" );
+			return id && id.replace(/\~/g, '-inner-').replace(/\./g, '-static-') || ( prefix + i );
 		},
 		selectors   : "h1,h2,h3,h4",
 		showAndHide : false,

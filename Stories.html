@@ -51,10 +51,8 @@
 	<div class="col-md-8">
 	
 		<div id="main">
-    		<h1 class="page-title">Class: Stories</h1>
 			
 
-	<h1 class="page-title">Class: Stories</h1>
 <section>
 
 <header>
@@ -71,6 +69,7 @@
     <div class="container-overview">
     
         
+<hr>
 <dt>
     <h4 class="name" id="Stories"><span class="type-signature"></span>new Stories<span class="signature">(opts)</span><span class="type-signature"></span></h4>
     
@@ -224,6 +223,7 @@
 
         <dl>
             
+<hr>
 <dt>
     <h4 class="name" id="deleteStory"><span class="type-signature"></span>deleteStory<span class="signature">(story, cb)</span><span class="type-signature"></span></h4>
     
@@ -382,6 +382,7 @@
 
         
             
+<hr>
 <dt>
     <h4 class="name" id="getSharedDescriptionForStory"><span class="type-signature"></span>getSharedDescriptionForStory<span class="signature">(sharedStory, cb)</span><span class="type-signature"></span></h4>
     
@@ -535,6 +536,7 @@
 
         
             
+<hr>
 <dt>
     <h4 class="name" id="hideSharedStory"><span class="type-signature"></span>hideSharedStory<span class="signature">(cb)</span><span class="type-signature"></span></h4>
     
@@ -670,6 +672,7 @@
 
         
             
+<hr>
 <dt>
     <h4 class="name" id="loadStories"><span class="type-signature"></span>loadStories<span class="signature">(stories, cb)</span><span class="type-signature"></span></h4>
     
@@ -828,6 +831,7 @@
 
         
             
+<hr>
 <dt>
     <h4 class="name" id="loadStoryBlob"><span class="type-signature"></span>loadStoryBlob<span class="signature">(story, cb)</span><span class="type-signature"></span></h4>
     
@@ -986,6 +990,7 @@
 
         
             
+<hr>
 <dt>
     <h4 class="name" id="loadStoryThumbnailBlob"><span class="type-signature"></span>loadStoryThumbnailBlob<span class="signature">(story, cb)</span><span class="type-signature"></span></h4>
     
@@ -1139,6 +1144,7 @@
 
         
             
+<hr>
 <dt>
     <h4 class="name" id="markStoriesViewed"><span class="type-signature"></span>markStoriesViewed<span class="signature">(stories, cb)</span><span class="type-signature"></span></h4>
     
@@ -1297,6 +1303,7 @@
 
         
             
+<hr>
 <dt>
     <h4 class="name" id="markStoryViewed"><span class="type-signature"></span>markStoryViewed<span class="signature">(story, sscount, cb)</span><span class="type-signature"></span></h4>
     
@@ -1479,6 +1486,7 @@ To batch mark stories viewed, use \c markStoriesViewed</p>
 
         
             
+<hr>
 <dt>
     <h4 class="name" id="postStory"><span class="type-signature"></span>postStory<span class="signature">(blob, opts, cb)</span><span class="type-signature"></span></h4>
     
@@ -1660,6 +1668,7 @@ To batch mark stories viewed, use \c markStoriesViewed</p>
 
         
             
+<hr>
 <dt>
     <h4 class="name" id="provideSharedDescription"><span class="type-signature"></span>provideSharedDescription<span class="signature">(sharedStory, cb)</span><span class="type-signature"></span></h4>
     
@@ -1874,7 +1883,8 @@ $( function () {
 
 	$( "#toc" ).toc( {
 		anchorName  : function ( i, heading, prefix ) {
-			return $( heading ).attr( "id" ) || ( prefix + i );
+			var id = $( heading ).attr( "id" );
+			return id && id.replace(/\~/g, '-inner-').replace(/\./g, '-static-') || ( prefix + i );
 		},
 		selectors   : "h1,h2,h3,h4",
 		showAndHide : false,

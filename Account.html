@@ -51,10 +51,8 @@
 	<div class="col-md-8">
 	
 		<div id="main">
-    		<h1 class="page-title">Class: Account</h1>
 			
 
-	<h1 class="page-title">Class: Account</h1>
 <section>
 
 <header>
@@ -71,6 +69,7 @@
     <div class="container-overview">
     
         
+<hr>
 <dt>
     <h4 class="name" id="Account"><span class="type-signature"></span>new Account<span class="signature">(opts)</span><span class="type-signature"></span></h4>
     
@@ -224,6 +223,7 @@
 
         <dl>
             
+<hr>
 <dt>
     <h4 class="name" id="downloadAvatar"><span class="type-signature"></span>downloadAvatar<span class="signature">(username, cb)</span><span class="type-signature"></span></h4>
     
@@ -382,6 +382,7 @@
 
         
             
+<hr>
 <dt>
     <h4 class="name" id="downloadSnaptag"><span class="type-signature"></span>downloadSnaptag<span class="signature">(cb)</span><span class="type-signature"></span></h4>
     
@@ -517,6 +518,7 @@
 
         
             
+<hr>
 <dt>
     <h4 class="name" id="updateBestFriendsCount"><span class="type-signature"></span>updateBestFriendsCount<span class="signature">(number, cb)</span><span class="type-signature"></span></h4>
     
@@ -675,6 +677,7 @@
 
         
             
+<hr>
 <dt>
     <h4 class="name" id="updateDisplayName"><span class="type-signature"></span>updateDisplayName<span class="signature">(displayName, cb)</span><span class="type-signature"></span></h4>
     
@@ -834,6 +837,7 @@
 
         
             
+<hr>
 <dt>
     <h4 class="name" id="updateEmail"><span class="type-signature"></span>updateEmail<span class="signature">(address, cb)</span><span class="type-signature"></span></h4>
     
@@ -992,6 +996,7 @@
 
         
             
+<hr>
 <dt>
     <h4 class="name" id="updateFeatureSettings"><span class="type-signature"></span>updateFeatureSettings<span class="signature">(Object, cb)</span><span class="type-signature"></span></h4>
     
@@ -1146,6 +1151,7 @@
 
         
             
+<hr>
 <dt>
     <h4 class="name" id="updateNotificationSoundSetting"><span class="type-signature"></span>updateNotificationSoundSetting<span class="signature">(enableSound, cb)</span><span class="type-signature"></span></h4>
     
@@ -1304,6 +1310,7 @@
 
         
             
+<hr>
 <dt>
     <h4 class="name" id="updateSearchableByNumber"><span class="type-signature"></span>updateSearchableByNumber<span class="signature">(searchable, cb)</span><span class="type-signature"></span></h4>
     
@@ -1462,6 +1469,7 @@
 
         
             
+<hr>
 <dt>
     <h4 class="name" id="updateSnapPrivacy"><span class="type-signature"></span>updateSnapPrivacy<span class="signature">(privacy, cb)</span><span class="type-signature"></span></h4>
     
@@ -1615,6 +1623,7 @@
 
         
             
+<hr>
 <dt>
     <h4 class="name" id="updateStoryPrivacy"><span class="type-signature"></span>updateStoryPrivacy<span class="signature">(privacy, <span class="optional">friends</span>, cb)</span><span class="type-signature"></span></h4>
     
@@ -1824,6 +1833,7 @@
 
         
             
+<hr>
 <dt>
     <h4 class="name" id="updateTOSAgreementStatus"><span class="type-signature"></span>updateTOSAgreementStatus<span class="signature">(snapcash, snapcashV2, square, cb)</span><span class="type-signature"></span></h4>
     
@@ -2028,6 +2038,7 @@
 
         
             
+<hr>
 <dt>
     <h4 class="name" id="uploadAvatar"><span class="type-signature"></span>uploadAvatar<span class="signature">(images, cb)</span><span class="type-signature"></span></h4>
     
@@ -2242,7 +2253,8 @@ $( function () {
 
 	$( "#toc" ).toc( {
 		anchorName  : function ( i, heading, prefix ) {
-			return $( heading ).attr( "id" ) || ( prefix + i );
+			var id = $( heading ).attr( "id" );
+			return id && id.replace(/\~/g, '-inner-').replace(/\./g, '-static-') || ( prefix + i );
 		},
 		selectors   : "h1,h2,h3,h4",
 		showAndHide : false,

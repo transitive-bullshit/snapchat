@@ -51,10 +51,8 @@
 	<div class="col-md-8">
 	
 		<div id="main">
-    		<h1 class="page-title">Class: Chat</h1>
 			
 
-	<h1 class="page-title">Class: Chat</h1>
 <section>
 
 <header>
@@ -71,6 +69,7 @@
     <div class="container-overview">
     
         
+<hr>
 <dt>
     <h4 class="name" id="Chat"><span class="type-signature"></span>new Chat<span class="signature">(opts)</span><span class="type-signature"></span></h4>
     
@@ -224,6 +223,7 @@
 
         <dl>
             
+<hr>
 <dt>
     <h4 class="name" id="clearConversationWithIdentifier"><span class="type-signature"></span>clearConversationWithIdentifier<span class="signature">(identifier, cb)</span><span class="type-signature"></span></h4>
     
@@ -382,6 +382,7 @@
 
         
             
+<hr>
 <dt>
     <h4 class="name" id="clearFeed"><span class="type-signature"></span>clearFeed<span class="signature">(cb)</span><span class="type-signature"></span></h4>
     
@@ -517,6 +518,7 @@
 
         
             
+<hr>
 <dt>
     <h4 class="name" id="conversationAuth"><span class="type-signature"></span>conversationAuth<span class="signature">(username, cb)</span><span class="type-signature"></span></h4>
     
@@ -675,6 +677,7 @@
 
         
             
+<hr>
 <dt>
     <h4 class="name" id="conversationsWithUsers"><span class="type-signature"></span>conversationsWithUsers<span class="signature">(usernames, cb)</span><span class="type-signature"></span></h4>
     
@@ -833,6 +836,7 @@
 
         
             
+<hr>
 <dt>
     <h4 class="name" id="conversationWithUser"><span class="type-signature"></span>conversationWithUser<span class="signature">(username, cb)</span><span class="type-signature"></span></h4>
     
@@ -991,6 +995,7 @@
 
         
             
+<hr>
 <dt>
     <h4 class="name" id="loadAllConversations"><span class="type-signature"></span>loadAllConversations<span class="signature">(cb)</span><span class="type-signature"></span></h4>
     
@@ -1127,6 +1132,7 @@
 
         
             
+<hr>
 <dt>
     <h4 class="name" id="loadConversationsAfter"><span class="type-signature"></span>loadConversationsAfter<span class="signature">(conversation, cb)</span><span class="type-signature"></span></h4>
     
@@ -1286,6 +1292,7 @@
 
         
             
+<hr>
 <dt>
     <h4 class="name" id="loadFullConversation"><span class="type-signature"></span>loadFullConversation<span class="signature">(conversation, cb)</span><span class="type-signature"></span></h4>
     
@@ -1444,6 +1451,7 @@
 
         
             
+<hr>
 <dt>
     <h4 class="name" id="loadMessagesAfterPagination"><span class="type-signature"></span>loadMessagesAfterPagination<span class="signature">(messageOrTransaction, cb)</span><span class="type-signature"></span></h4>
     
@@ -1605,6 +1613,7 @@
 
         
             
+<hr>
 <dt>
     <h4 class="name" id="markRead"><span class="type-signature"></span>markRead<span class="signature">(conversation, cb)</span><span class="type-signature"></span></h4>
     
@@ -1770,6 +1779,7 @@
 
         
             
+<hr>
 <dt>
     <h4 class="name" id="sendMessage"><span class="type-signature"></span>sendMessage<span class="signature">(message, username, cb)</span><span class="type-signature"></span></h4>
     
@@ -1951,6 +1961,7 @@
 
         
             
+<hr>
 <dt>
     <h4 class="name" id="sendMessageToUsers"><span class="type-signature"></span>sendMessageToUsers<span class="signature">(message, usernames, cb)</span><span class="type-signature"></span></h4>
     
@@ -2132,6 +2143,7 @@
 
         
             
+<hr>
 <dt>
     <h4 class="name" id="sendTypingToUser"><span class="type-signature"></span>sendTypingToUser<span class="signature">(username, cb)</span><span class="type-signature"></span></h4>
     
@@ -2290,6 +2302,7 @@
 
         
             
+<hr>
 <dt>
     <h4 class="name" id="sendTypingToUsers"><span class="type-signature"></span>sendTypingToUsers<span class="signature">(recipients, cb)</span><span class="type-signature"></span></h4>
     
@@ -2504,7 +2517,8 @@ $( function () {
 
 	$( "#toc" ).toc( {
 		anchorName  : function ( i, heading, prefix ) {
-			return $( heading ).attr( "id" ) || ( prefix + i );
+			var id = $( heading ).attr( "id" );
+			return id && id.replace(/\~/g, '-inner-').replace(/\./g, '-static-') || ( prefix + i );
 		},
 		selectors   : "h1,h2,h3,h4",
 		showAndHide : false,

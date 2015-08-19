@@ -51,10 +51,8 @@
 	<div class="col-md-8">
 	
 		<div id="main">
-    		<h1 class="page-title">Class: Snaps</h1>
 			
 
-	<h1 class="page-title">Class: Snaps</h1>
 <section>
 
 <header>
@@ -71,6 +69,7 @@
     <div class="container-overview">
     
         
+<hr>
 <dt>
     <h4 class="name" id="Snaps"><span class="type-signature"></span>new Snaps<span class="signature">(opts)</span><span class="type-signature"></span></h4>
     
@@ -224,6 +223,7 @@
 
         <dl>
             
+<hr>
 <dt>
     <h4 class="name" id="loadFiltersForLocation"><span class="type-signature"></span>loadFiltersForLocation<span class="signature">(location, cb)</span><span class="type-signature"></span></h4>
     
@@ -382,6 +382,7 @@
 
         
             
+<hr>
 <dt>
     <h4 class="name" id="loadSnap"><span class="type-signature"></span>loadSnap<span class="signature">(snap, cb)</span><span class="type-signature"></span></h4>
     
@@ -540,6 +541,7 @@
 
         
             
+<hr>
 <dt>
     <h4 class="name" id="markSnapScreenshot"><span class="type-signature"></span>markSnapScreenshot<span class="signature">(secondsViewed, cb)</span><span class="type-signature"></span></h4>
     
@@ -698,6 +700,7 @@
 
         
             
+<hr>
 <dt>
     <h4 class="name" id="markSnapsViewed"><span class="type-signature"></span>markSnapsViewed<span class="signature">(snaps, times, secondsViewed, cb)</span><span class="type-signature"></span></h4>
     
@@ -902,6 +905,7 @@
 
         
             
+<hr>
 <dt>
     <h4 class="name" id="markSnapViewed"><span class="type-signature"></span>markSnapViewed<span class="signature">(secondsViewed, cb)</span><span class="type-signature"></span></h4>
     
@@ -1060,6 +1064,7 @@
 
         
             
+<hr>
 <dt>
     <h4 class="name" id="sendSnap"><span class="type-signature"></span>sendSnap<span class="signature">(blob, recipients, text, duration, cb)</span><span class="type-signature"></span></h4>
     
@@ -1287,6 +1292,7 @@
 
         
             
+<hr>
 <dt>
     <h4 class="name" id="sendSnapCustom"><span class="type-signature"></span>sendSnapCustom<span class="signature">(blob, opts, cb)</span><span class="type-signature"></span></h4>
     
@@ -1524,7 +1530,8 @@ $( function () {
 
 	$( "#toc" ).toc( {
 		anchorName  : function ( i, heading, prefix ) {
-			return $( heading ).attr( "id" ) || ( prefix + i );
+			var id = $( heading ).attr( "id" );
+			return id && id.replace(/\~/g, '-inner-').replace(/\./g, '-static-') || ( prefix + i );
 		},
 		selectors   : "h1,h2,h3,h4",
 		showAndHide : false,

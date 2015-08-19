@@ -51,10 +51,8 @@
 	<div class="col-md-8">
 	
 		<div id="main">
-    		<h1 class="page-title">Class: SKBlob</h1>
 			
 
-	<h1 class="page-title">Class: SKBlob</h1>
 <section>
 
 <header>
@@ -71,6 +69,7 @@
     <div class="container-overview">
     
         
+<hr>
 <dt>
     <h4 class="name" id="SKBlob"><span class="type-signature"></span>new SKBlob<span class="signature">(data)</span><span class="type-signature"></span></h4>
     
@@ -222,6 +221,7 @@
 
         <dl>
             
+<hr>
 <dt class="name" id="data">
     <h4><span class="type-signature"></span>data<span class="type-signature"></span></h4>
 
@@ -338,6 +338,7 @@
 
         
             
+<hr>
 <dt class="name" id="isImage">
     <h4><span class="type-signature"></span>isImage<span class="type-signature"></span></h4>
 
@@ -454,6 +455,7 @@
 
         
             
+<hr>
 <dt class="name" id="isMedia">
     <h4><span class="type-signature"></span>isMedia<span class="type-signature"></span></h4>
 
@@ -570,6 +572,7 @@
 
         
             
+<hr>
 <dt class="name" id="isVideo">
     <h4><span class="type-signature"></span>isVideo<span class="type-signature"></span></h4>
 
@@ -686,6 +689,7 @@
 
         
             
+<hr>
 <dt class="name" id="overlay">
     <h4><span class="type-signature"></span>overlay<span class="type-signature"></span></h4>
 
@@ -808,6 +812,7 @@
 
         <dl>
             
+<hr>
 <dt>
     <h4 class="name" id=".decompress"><span class="type-signature">&lt;static> </span>decompress<span class="signature">(data, cb)</span><span class="type-signature"></span></h4>
     
@@ -966,6 +971,7 @@
 
         
             
+<hr>
 <dt>
     <h4 class="name" id=".decrypt"><span class="type-signature">&lt;static> </span>decrypt<span class="signature">(data, story, cb)</span><span class="type-signature"></span></h4>
     
@@ -1143,6 +1149,7 @@
 
         
             
+<hr>
 <dt>
     <h4 class="name" id=".initWithData"><span class="type-signature">&lt;static> </span>initWithData<span class="signature">(data, cb)</span><span class="type-signature"></span></h4>
     
@@ -1302,6 +1309,7 @@ Does not handle encrypted data.</p>
 
         
             
+<hr>
 <dt>
     <h4 class="name" id=".initWithStoryData"><span class="type-signature">&lt;static> </span>initWithStoryData<span class="signature">(data, story, cb)</span><span class="type-signature"></span></h4>
     
@@ -1539,7 +1547,8 @@ $( function () {
 
 	$( "#toc" ).toc( {
 		anchorName  : function ( i, heading, prefix ) {
-			return $( heading ).attr( "id" ) || ( prefix + i );
+			var id = $( heading ).attr( "id" );
+			return id && id.replace(/\~/g, '-inner-').replace(/\./g, '-static-') || ( prefix + i );
 		},
 		selectors   : "h1,h2,h3,h4",
 		showAndHide : false,

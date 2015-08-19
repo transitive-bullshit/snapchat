@@ -51,10 +51,8 @@
 	<div class="col-md-8">
 	
 		<div id="main">
-    		<h1 class="page-title">Class: StoryCollection</h1>
 			
 
-	<h1 class="page-title">Class: StoryCollection</h1>
 <section>
 
 <header>
@@ -71,6 +69,7 @@
     <div class="container-overview">
     
         
+<hr>
 <dt>
     <h4 class="name" id="StoryCollection"><span class="type-signature"></span>new StoryCollection<span class="signature">(client, params)</span><span class="type-signature"></span></h4>
     
@@ -245,6 +244,7 @@
 
         <dl>
             
+<hr>
 <dt class="name" id="isSharedStory">
     <h4><span class="type-signature"></span>isSharedStory<span class="type-signature"></span></h4>
 
@@ -419,7 +419,8 @@ $( function () {
 
 	$( "#toc" ).toc( {
 		anchorName  : function ( i, heading, prefix ) {
-			return $( heading ).attr( "id" ) || ( prefix + i );
+			var id = $( heading ).attr( "id" );
+			return id && id.replace(/\~/g, '-inner-').replace(/\./g, '-static-') || ( prefix + i );
 		},
 		selectors   : "h1,h2,h3,h4",
 		showAndHide : false,
