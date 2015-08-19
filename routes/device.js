@@ -36,7 +36,7 @@ Device.prototype.sendDidOpenAppEvent = function (cb) {
     var uuid = StringUtils.uniqueIdentifer()
     var friendCount = -1
 
-    self.client.currentSession.friends.forEach(function (friend) {
+    self.client.session.friends.forEach(function (friend) {
       if (friend.privacy === constants.SnapPrivacy.Friends) {
         ++friendCount
       }

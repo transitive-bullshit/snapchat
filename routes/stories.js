@@ -162,9 +162,9 @@ Stories.prototype.deleteStory = function (story, cb) {
     'username': self.client.username
   }, function (err) {
     if (!err) {
-      var index = self.client.currentSession.userStories.indexOf(story)
+      var index = self.client.session.userStories.indexOf(story)
       if (index >= 0) {
-        self.client.currentSession.userStories.splice(index, 1)
+        self.client.session.userStories.splice(index, 1)
       }
     }
 

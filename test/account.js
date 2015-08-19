@@ -56,7 +56,7 @@ client.signIn(function (err) {
     })
   })
 
-  /* TODO: this is currently broken
+  /* TODO: this is currently broken; need to parse the SVG
   test('Snapchat.account.downloadSnaptag', function (t) {
     client.account.downloadSnaptag(function (err, blob) {
       t.notOk(err)

@@ -15,8 +15,6 @@ client.signIn(function (err) {
     throw new Error('signIn error', err)
   }
 
-  // TODO: causes 500 errors; need to figure out why before reenabling otherwise
-  // our test accounts might be flagged by snapchat as suspicious.
   test('Snapchat.chat.sendTypingToUsers', function (t) {
     client.chat.sendTypingToUsers([ TEST_USERNAME ], function (err) {
       t.notOk(err)

@@ -23,7 +23,7 @@ function Friends (client, opts) {
 }
 
 /**
- * Adds the users in \e toAdd as friends, and unfriends the users in \e toUnfriend.
+ * Adds the users in toAdd as friends, and unfriends the users in toUnfriend.
  *
  * @param {Array<string>} toAdd An array of username strings of users to add. Doesn't matter if they're already in your friends.
  * @param {Array<string>} toUnfriend An array of username strings of users to un-friend. Doesn't matter if they're not already in your friends.
@@ -69,7 +69,7 @@ Friends.prototype.addFriend = function (username, cb) {
  * Use this to add back a user who has added you as a friend. Sort of like accepting a friend request.
  *
  * This only affects the "added by" string the other user will see.
- * @param {string} username The username of the user user to add back.
+ * @param {string} username The username of the user to add back.
  * @param {function} cb
  */
 Friends.prototype.addFriendBack = function (username, cb) {
@@ -113,6 +113,7 @@ Friends.prototype.unfriend = function (username, cb) {
  *
  * friends is a number->name map, where "name" is the desired screen name of that friend and "number" is their phone number.
  * The names given will be used as display names for any usernames found.
+ *
  * @param {Object} friends a dictionary with phone number strings as the keys and name strings as the values.
  * @param {function} cb
  */
@@ -120,14 +121,14 @@ Friends.prototype.findFriends = function (friends, cb) {
   var self = this
   debug('Friends.findFriends (%j)', friends)
 
-  if (self.client.currentSession.shouldTextToVerifyNumber ||
-      self.client.curentSession.shouldCallToVerifyNumber) {
+  if (self.client.session.shouldTextToVerifyNumber ||
+      self.client.session.shouldCallToVerifyNumber) {
     return cb('Friends.findFriends error client needs to verify phone first')
   }
 
   self.client.post(constants.endpoints.friends.find, {
     'username': self.client.username,
-    'countryCode': self.client.currentSession.countryCode,
+    'countryCode': self.client.session.countryCode,
     'numbers': friends
   }, function (err, result) {
     if (err) {
@@ -313,7 +314,7 @@ Friends.prototype._removeFriendsFromSession = function (friends) {
     friendsMap[friend.username] = true
   })
 
-  self.client.currentSession.friends = self.client.currentSession.friends.filter(function (friend) {
+  self.client.session.friends = self.client.session.friends.filter(function (friend) {
     return !(friend.username in friendsMap)
   })
 }
@@ -325,7 +326,7 @@ Friends.prototype._removeFriendsFromSession = function (friends) {
  */
 Friends.prototype._addFriendsToSession = function (friends) {
   var self = this
-  self.client.currentSession.friends = self.client.currentSession.friends.concat(friends)
+  self.client.session.friends = self.client.session.friends.concat(friends)
 }
 
 /**

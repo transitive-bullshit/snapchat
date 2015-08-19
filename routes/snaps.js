@@ -11,7 +11,7 @@ var SKBlob = require('../models/blob')
 var SKLocation = require('../models/location')
 
 /**
- * Snapchat wrapper for friends-related API calls.
+ * Snapchat wrapper for Snap-related API calls.
  *
  * @class
  * @param {Object} opts
@@ -58,7 +58,7 @@ Snaps.prototype.sendSnapCustom = function (blob, opts, cb) {
 
     self.client.post(constants.endpoints.snaps.send, {
       'camera_front_facing': !!opts.cameraFrontFacing,
-      'country_code': self.client.currentSession.countryCode,
+      'country_code': self.client.session.countryCode,
       'media_id': mediaID,
       'recipients': opts.recipients,
       'recipient_ids': opts.recipients,
@@ -109,7 +109,7 @@ Snaps.prototype.markSnapsViewed = function (snaps, times, secondsViewed, cb) {
   })
 
   self.client.post(constants.endpoints.update.snaps, {
-    'added_friends_timestamp': StringUtils.timestampFrom(self.currentSession.addedFriendsTimestamp),
+    'added_friends_timestamp': StringUtils.timestampFrom(self.session.addedFriendsTimestamp),
     'username': self.client.username,
     'json': json
   }, cb)

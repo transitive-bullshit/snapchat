@@ -354,7 +354,7 @@ Chat.prototype.sendMessageToUsers = function (message, usernames, cb) {
 /**
  * Loads another page of conversations in the feed after the given conversation.
  *
- * This method will update client.currentSession.conversations accordingly.
+ * This method will update client.session.conversations accordingly.
  *
  * @param {Conversation} conversation The conversation after which to load more conversations.
  * @param {function} cb
@@ -381,7 +381,7 @@ Chat.prototype.loadConversationsAfter = function (conversation, cb) {
         var conversations = result.map(function (result) {
           var convo = new Conversation(result)
 
-          self.client.currentSession.conversations.push(convo)
+          self.client.session.conversations.push(convo)
           return convo
         })
 
@@ -396,7 +396,7 @@ Chat.prototype.loadConversationsAfter = function (conversation, cb) {
 /**
  * Loads all conversations into the current session.
  *
- * This method will update client.currentSession.conversations accordingly.
+ * This method will update client.session.conversations accordingly.
  * @param {function} cb
  */
 Chat.prototype.loadAllConversations = function (cb) {
@@ -409,7 +409,7 @@ Chat.prototype.loadAllConversations = function (cb) {
     }
 
     var conversations = [ ]
-    var last = self.client.currentSession.conversations[self.client.currentSession.conversations.length - 1]
+    var last = self.client.session.conversations[self.client.session.conversations.length - 1]
 
     function loadPage () {
       self.loadConversationsAfter(last, function (err, convos) {
@@ -421,7 +421,7 @@ Chat.prototype.loadAllConversations = function (cb) {
           loadPage()
         } else {
           conversations.forEach(function (convo) {
-            self.client.currentSession.conversations.push(convo)
+            self.client.session.conversations.push(convo)
           })
 
           return cb(null, conversations)

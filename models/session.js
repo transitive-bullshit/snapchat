@@ -150,3 +150,21 @@ function Session (client, params) {
   self.enableVisualFilters = !!features[constants.featureSettings.visualFilters]
   self.enableTravelMode = !!features[constants.featureSettings.travelMode]
 }
+
+/**
+ * @param {string} username
+ * @return {User|null}
+ */
+Session.prototype.getFriend = function (username) {
+  var self = this
+
+  for (var i = 0; i < self.friends.length; ++i) {
+    var friend = self.friends[i]
+
+    if (friend.username === username) {
+      return friend
+    }
+  }
+
+  return null
+}

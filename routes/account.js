@@ -40,7 +40,7 @@ Account.prototype.updateBestFriendsCount = function (number, cb) {
     if (err) {
       return cb(err)
     } else if (result) {
-      self.client.currentSession.bestFriendUsernames = result['best_friends']
+      self.client.session.bestFriendUsernames = result['best_friends']
       return cb(null)
     }
 
@@ -175,14 +175,14 @@ Account.prototype.updateFeatureSettings = function (settings, cb) {
   debug('Account.updateFeatureSettings')
 
   var features = { }
-  features[constants.featureSettings.frontFacingFlash] = settings[constants.featureSettings.frontFacingFlash] || self.client.currentSession.enableFrontFacingFlash
-  features[constants.featureSettings.replaySnaps] = settings[constants.featureSettings.replaySnaps] || self.client.currentSession.enableReplaySnaps
-  features[constants.featureSettings.smartFilters] = settings[constants.featureSettings.smartFilters] || self.client.currentSession.enableSmartFilters
-  features[constants.featureSettings.visualFilters] = settings[constants.featureSettings.visualFilters] || self.client.currentSession.enableVisualFilters
-  features[constants.featureSettings.powerSaveMode] = settings[constants.featureSettings.powerSaveMode] || self.client.currentSession.enablePowerSaveMode
-  features[constants.featureSettings.specialText] = settings[constants.featureSettings.specialText] || self.client.currentSession.enableSpecialText
-  features[constants.featureSettings.swipeCashMode] = settings[constants.featureSettings.swipeCashMode] || self.client.currentSession.enableSwipeCashMode
-  features[constants.featureSettings.travelMode] = settings[constants.featureSettings.travelMode] || self.client.currentSession.enableTravelMode
+  features[constants.featureSettings.frontFacingFlash] = settings[constants.featureSettings.frontFacingFlash] || self.client.session.enableFrontFacingFlash
+  features[constants.featureSettings.replaySnaps] = settings[constants.featureSettings.replaySnaps] || self.client.session.enableReplaySnaps
+  features[constants.featureSettings.smartFilters] = settings[constants.featureSettings.smartFilters] || self.client.session.enableSmartFilters
+  features[constants.featureSettings.visualFilters] = settings[constants.featureSettings.visualFilters] || self.client.session.enableVisualFilters
+  features[constants.featureSettings.powerSaveMode] = settings[constants.featureSettings.powerSaveMode] || self.client.session.enablePowerSaveMode
+  features[constants.featureSettings.specialText] = settings[constants.featureSettings.specialText] || self.client.session.enableSpecialText
+  features[constants.featureSettings.swipeCashMode] = settings[constants.featureSettings.swipeCashMode] || self.client.session.enableSwipeCashMode
+  features[constants.featureSettings.travelMode] = settings[constants.featureSettings.travelMode] || self.client.session.enableTravelMode
 
   self.client.post(constants.endpoints.update.featureSettings, {
     'settings': features,
@@ -200,7 +200,7 @@ Account.prototype.downloadSnaptag = function (cb) {
   debug('Account.downloadSnaptag')
 
   self.client.post(constants.endpoints.account.snaptag, {
-    'image': self.client.currentSession.QRPath,
+    'image': self.client.session.QRPath,
     'type': 'SVG',
     'username': self.client.username
   }, function (err, body) {

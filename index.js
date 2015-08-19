@@ -115,22 +115,22 @@ Object.defineProperty(Snapchat.prototype, 'username', {
  * The username of the currently signed in (or not yet singed in) user.
  * @note Always lowercase.
  *
- * @name Snapchat#currentSession
+ * @name Snapchat#session
  * @property {Session}
  */
-Object.defineProperty(Snapchat.prototype, 'currentSession', {
+Object.defineProperty(Snapchat.prototype, 'session', {
   get: function () {
     var self = this
-    return self._currentSession
+    return self._session
   },
 
-  set: function (currentSession) {
+  set: function (session) {
     var self = this
-    self._currentSession = currentSession
+    self._session = session
 
-    if (currentSession) {
-      self._username = currentSession.username
-      self._authToken = currentSession.authToken
+    if (session) {
+      self._username = session.username
+      self._authToken = session.authToken
     } else {
       self._username = null
       self._authToken = null
@@ -344,8 +344,8 @@ Snapchat.prototype.signIn = function (username, password, gmailEmail, gmailPassw
               debug('Snapchat.signIn error %s', err)
               return cb(err)
             } else if (result) {
-              self.currentSession = new Session(self, result)
-              return cb(null, self.currentSession)
+              self.session = new Session(self, result)
+              return cb(null, self.session)
             }
 
             return cb('Snapchat.signIn parse error', result)
@@ -395,7 +395,7 @@ Snapchat.prototype.signOut = function (cb) {
       debug('Snapchat.signOut error %s', err)
       return cb(err)
     } else if (result && result.length === 0) {
-      self._currentSession = null
+      self._session = null
       self._username = null
       self._authToken = null
       self._googleAuthToken = null
@@ -410,7 +410,7 @@ Snapchat.prototype.signOut = function (cb) {
 }
 
 /**
- * Updates all information in the currentSession property.
+ * Updates all information in the session property.
  *
  * @param {function} cb
  */
@@ -434,8 +434,8 @@ Snapchat.prototype.updateSession = function (cb) {
       debug('updateSession error %s', err)
       return cb(err)
     } else if (result) {
-      self.currentSession = new Session(self, result)
-      return cb(null, self.currentSession)
+      self.session = new Session(self, result)
+      return cb(null, self.session)
     }
 
     return cb('updateSession error')
@@ -505,7 +505,7 @@ Snapchat.prototype.registerUsername = function (username, registeredEmail, gmail
         debug('registerUsername error %s', err)
         return cb(err)
       } else if (result) {
-        self.currentSession = new Session(self, result)
+        self.session = new Session(self, result)
         self._googleAuthToken = gauth
         return cb(null)
       }
