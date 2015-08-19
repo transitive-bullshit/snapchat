@@ -11,9 +11,7 @@ var client = new Snapchat()
 var TEST_USERNAME = 'teamsnapchat'
 
 client.signIn(function (err) {
-  if (err) {
-    throw new Error('signIn error', err)
-  }
+  if (err) throw new Error('signIn error', err)
 
   test('Snapchat.chat.sendTypingToUsers', function (t) {
     client.chat.sendTypingToUsers([ TEST_USERNAME ], function (err) {

@@ -3,6 +3,7 @@
 require('dotenv').load()
 
 var TEST_USERNAME = 'teamsnapchat'
+var TEST_BLOCK_USERNAME = 'sam'
 
 var test = require('tape')
 var Snapchat = require('../')
@@ -10,11 +11,9 @@ var Snapchat = require('../')
 var client = new Snapchat()
 
 client.signIn(function (err) {
-  if (err) {
-    throw new Error('signIn error', err)
-  }
+  if (err) throw new Error('signIn error', err)
 
-  /*test('Snapchat.friends.unfriend', function (t) {
+  test('Snapchat.friends.unfriend', function (t) {
     client.friends.unfriend(TEST_USERNAME, function (err) {
       t.notOk(err)
 
@@ -49,9 +48,9 @@ client.signIn(function (err) {
       t.equal(results[0].username, 'lovealways_cma')
       t.end()
     })
-  })*/
+  })
 
-  // TODO: this is currently failing with a 400 Bad Request
+  // TODO: currently failing with a 400 Bad Request
   /*test('Snapchat.friends.findFriendsNear', function (t) {
     client.friends.findFriendsNear({
       // new york city
@@ -65,8 +64,61 @@ client.signIn(function (err) {
     })
   })*/
 
+  test('Snapchat.friends.userExists => true', function (t) {
+    client.friends.userExists(TEST_USERNAME, function (err, exists) {
+      t.notOk(err)
+      t.ok(exists)
+
+      client.friends.userExists('fisch0920', function (err, exists) {
+        t.notOk(err)
+        t.ok(exists)
+        t.end()
+      })
+    })
+  })
+
+  test('Snapchat.friends.userExists => false', function (t) {
+    client.friends.userExists('_02a3lkj3o2i32l3inl', function (err, exists) {
+      t.notOk(err)
+      t.notOk(exists)
+      t.end()
+    })
+  })
+
+  // TODO: currently failing with parse error {"message":"Something went wrong.","logged":false}
+  /*test('Snapchat.friends.updateDisplayNameForUser', function (t) {
+    var username = client.session.friends[0].username
+    var testDisplayName = 'nala sandwich'
+
+    client.friends.updateDisplayNameForUser(username, testDisplayName, function (err) {
+      t.notOk(err)
+      client.updateSession(function (err) {
+        t.notOk(err)
+        // ensure friend's display name has been updated
+        t.equal(client.session.getFriend(username).displayname, testDisplayName)
+        t.end()
+      })
+    })
+  })*/
+
+  test('Snapchat.friends.blockUser', function (t) {
+    client.friends.blockUser(TEST_BLOCK_USERNAME, function (err) {
+      t.notOk(err)
+      t.end()
+    })
+  })
+
+  test('Snapchat.friends.unblockUser', function (t) {
+    client.friends.unblockUser(TEST_BLOCK_USERNAME, function (err) {
+      t.notOk(err)
+      t.end()
+    })
+  })
+
   // TODO:
   // Snapchat.friends.addFriends
   // Snapchat.friends.addFriendBack
   // Snapchat.friends.findFriendsNear
+  // Snapchat.friends.searchFriend
+  // Snapchat.friends.seenSuggestedFriends
 })

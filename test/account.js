@@ -10,9 +10,7 @@ var Snapchat = require('../')
 var client = new Snapchat()
 
 client.signIn(function (err) {
-  if (err) {
-    throw new Error('signIn error', err)
-  }
+  if (err) throw new Error('signIn error', err)
 
   test('Snapchat.account.updateBestFriendsCount', function (t) {
     client.account.updateBestFriendsCount(4, function (err) {

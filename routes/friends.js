@@ -153,7 +153,7 @@ Friends.prototype.findFriends = function (friends, cb) {
  */
 Friends.prototype.findFriendsNear = function (location, accuracy, milliseconds, cb) {
   var self = this
-  debug('Friends.findFriendsNear')
+  debug('Friends.findFriendsNear (%j)', location)
 
   if (accuracy <= 0) accuracy = 10
 
@@ -200,7 +200,7 @@ Friends.prototype.userExists = function (username, cb) {
   var self = this
   debug('Friends.userExists (%s)', username)
 
-  self.client.post(constants.endpoints.friends.search, {
+  self.client.post(constants.endpoints.friends.exists, {
     'request_username': username,
     'username': self.client.username
   }, function (err, result) {
@@ -223,7 +223,7 @@ Friends.prototype.userExists = function (username, cb) {
  */
 Friends.prototype.updateDisplayNameForUser = function (friend, displayName, cb) {
   var self = this
-  debug('Friends.updateDisplayNameForUser (%s, %s)', friend, displayName)
+  debug('Friends.updateDisplayNameForUser (%s, "%s")', friend, displayName)
 
   self.client.post(constants.endpoints.friends.friend, {
     'action': 'display',
@@ -240,6 +240,8 @@ Friends.prototype.updateDisplayNameForUser = function (friend, displayName, cb) 
       self._removeFriendsFromSession([ updated ])
       self._addFriendsToSession([ updated ])
       return cb(null, updated)
+    } else {
+      debug('Friends.updateDisplayNameForUser parse error %j', result)
     }
 
     return cb('Friends.updateDisplayNameForUser parse error')
