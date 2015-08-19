@@ -96,6 +96,8 @@ DEBUG=snapchat,snapchat:*; # debug all snapchat submodules
 ### Todo
 
 * MORE TESTS
+* documentation
+  * simplex / spacelab
 * check logged status in Request.start response handler
 * handle request encoding properly for blobs and non-text requests
 * verify ts/timestamps milliseconds or seconds

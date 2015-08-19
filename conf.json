@@ -1,0 +1,35 @@
+{
+  "tags": {
+    "allowUnknownTags": true
+  },
+  "plugins": ["plugins/markdown"],
+  "source": {
+    "exclude": [ "test", "node_modules" ],
+    "include": [ "index.js", "lib", "models", "routes" ]
+  },
+  "templates": {
+    "cleverLinks": false,
+    "monospaceLinks": false,
+    "dateFormat": "ddd MMM Do YYYY",
+    "outputSourceFiles": true,
+    "outputSourcePath": true,
+    "systemName": "Snapchat",
+    "footer": "",
+    "copyright": "Copyright Travis Fischer © 2015.",
+    "navType": "vertical",
+    "theme": "simplex",
+    "linenums": true,
+    "collapseSymbols": false,
+    "inverseNav": true,
+    "highlightTutorialCode": true,
+    "protocol": "html://"
+  },
+  "opts": {
+    "recurse": true,
+    "destination": "./out/"
+  },
+  "markdown": {
+    "parser": "gfm",
+    "hardwrap": true
+  }
+}

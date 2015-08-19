@@ -3,6 +3,8 @@ module.exports = Snap
 /**
  * Snapchat Snap
  *
+ * @class
+ *
  * @param {Object} params
  */
 function Snap (params) {

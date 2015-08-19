@@ -6,6 +6,7 @@ var zlib = require('zlib')
 /**
  * Snapchat Blob wrapper
  *
+ * @class
  * @param {Buffer} data
  */
 function SKBlob (data) {
@@ -28,7 +29,8 @@ function SKBlob (data) {
 /**
  * The underlying data for the image or video.
  *
- * @type {Buffer}
+ * @name SKBlob#data
+ * @property {Buffer}
  */
 Object.defineProperty(SKBlob.prototype, 'data', {
   get: function () { return this._data }
@@ -37,7 +39,8 @@ Object.defineProperty(SKBlob.prototype, 'data', {
 /**
  * The overlay for the video if applicable.
  *
- * @type {Buffer}
+ * @name SKBlob#overlay
+ * @property {Buffer}
  */
 Object.defineProperty(SKBlob.prototype, 'overlay', {
   get: function () { return this._overlay }
@@ -46,7 +49,8 @@ Object.defineProperty(SKBlob.prototype, 'overlay', {
 /**
  * Whether or not this blob represents an image (PNG or JPEG).
  *
- * @type {boolean}
+ * @name SKBlob#isImage
+ * @property {boolean}
  */
 Object.defineProperty(SKBlob.prototype, 'isImage', {
   get: function () { return this._isImage }
@@ -55,7 +59,8 @@ Object.defineProperty(SKBlob.prototype, 'isImage', {
 /**
  * Whether or not this blob represents a video (MPEG4).
  *
- * @type {boolean}
+ * @name SKBlob#isVideo
+ * @property {boolean}
  */
 Object.defineProperty(SKBlob.prototype, 'isVideo', {
   get: function () { return this._isVideo }
@@ -64,7 +69,8 @@ Object.defineProperty(SKBlob.prototype, 'isVideo', {
 /**
  * Whether or not this blob represents a supported image or video format.
  *
- * @type {boolean}
+ * @name SKBlob#isMedia
+ * @property {boolean}
  */
 Object.defineProperty(SKBlob.prototype, 'isMedia', {
   get: function () { return this._isMedia }

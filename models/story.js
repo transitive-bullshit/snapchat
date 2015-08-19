@@ -6,6 +6,8 @@ var Snapchat = require('../')
 /**
  * Snapchat Story
  *
+ * @class
+ *
  * @param {Snapchat} client
  * @param {Object} params
  */
@@ -54,7 +56,8 @@ function Story (client, params) {
 /**
  * The underlying data for the image or video.
  *
- * @type {string}
+ * @name Story#suggestedFilename
+ * @property {string}
  */
 Object.defineProperty(Story.prototype, 'suggestedFilename', {
   get: function () {

@@ -9,6 +9,8 @@ var SKBlob = require('../models/blob')
 /**
  * Snapchat wrapper for account-related API calls.
  *
+ * @class
+ *
  * @param {Object} opts
  */
 function Account (client, opts) {

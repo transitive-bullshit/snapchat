@@ -24,6 +24,8 @@ var Session = require('./models/session')
 /**
  * Snapchat Client
  *
+ * @class
+ *
  * @param {Object} opts (currently unused)
  */
 function Snapchat (opts) {
@@ -33,19 +35,75 @@ function Snapchat (opts) {
 
   debug('new snapchat client')
 
-  self.account = new Account(self, opts)
-  self.chat = new Chat(self, opts)
-  self.device = new Device(self, opts)
-  self.friends = new Friends(self, opts)
-  self.snaps = new Snaps(self, opts)
-  self.stories = new Stories(self, opts)
+  self._account = new Account(self, opts)
+  self._chat = new Chat(self, opts)
+  self._device = new Device(self, opts)
+  self._friends = new Friends(self, opts)
+  self._snaps = new Snaps(self, opts)
+  self._stories = new Stories(self, opts)
 }
 
 /**
- * The username of the currently signed in (or not yet singed in) user.
- * @note Always lowercase.
+ * Account routes.
  *
- * @type {string}
+ * @name Snapchat#account
+ * @property {Account}
+ * @readonly
+ */
+Object.defineProperty(Snapchat.prototype, 'account', {
+  get: function () { return this._account }
+})
+
+/**
+ * Chat routes.
+ *
+ * @name Snapchat#chat
+ * @property {Chat}
+ * @readonly
+ */
+Object.defineProperty(Snapchat.prototype, 'chat', {
+  get: function () { return this._chat }
+})
+
+/**
+ * Device routes.
+ *
+ * @name Snapchat#device
+ * @property {Device}
+ * @readonly
+ */
+Object.defineProperty(Snapchat.prototype, 'device', {
+  get: function () { return this._device }
+})
+
+/**
+ * Friend routes.
+ *
+ * @name Snapchat#friends
+ * @property {Friends}
+ * @readonly
+ */
+Object.defineProperty(Snapchat.prototype, 'friends', {
+  get: function () { return this._friends }
+})
+
+/**
+ * Story routes.
+ *
+ * @name Snapchat#stories
+ * @property {Stories}
+ * @readonly
+ */
+Object.defineProperty(Snapchat.prototype, 'stories', {
+  get: function () { return this._stories }
+})
+
+/**
+ * The username of the currently signed in (or not yet singed in) user.
+ * (Always lowercase)
+ *
+ * @name Snapchat#username
+ * @property {string}
  */
 Object.defineProperty(Snapchat.prototype, 'username', {
   get: function () {
@@ -58,7 +116,8 @@ Object.defineProperty(Snapchat.prototype, 'username', {
  * The username of the currently signed in (or not yet singed in) user.
  * @note Always lowercase.
  *
- * @type {Session}
+ * @name Snapchat#currentSession
+ * @property {Session}
  */
 Object.defineProperty(Snapchat.prototype, 'currentSession', {
   get: function () {
@@ -83,7 +142,8 @@ Object.defineProperty(Snapchat.prototype, 'currentSession', {
 /**
  * The size of your device's screen.
  *
- * @type {Object}
+ * @name Snapchat#screenSize
+ * @property {Object}
  */
 Object.defineProperty(Snapchat.prototype, 'screenSize', {
   get: function () {
@@ -93,9 +153,10 @@ Object.defineProperty(Snapchat.prototype, 'screenSize', {
 })
 
 /**
- * The maximum size to load videos in
+ * The maximum size to load videos in.
  *
- * @type {Object}
+ * @name Snapchat#maxVideoSize
+ * @property {Object}
  */
 Object.defineProperty(Snapchat.prototype, 'maxVideoSize', {
   get: function () {
@@ -107,7 +168,8 @@ Object.defineProperty(Snapchat.prototype, 'maxVideoSize', {
 /**
  * Whether or not this client is signed in.
  *
- * @type {boolean}
+ * @name Snapchat#isSignedIn
+ * @property {boolean}
  */
 Object.defineProperty(Snapchat.prototype, 'isSignedIn', {
   get: function () {
@@ -119,7 +181,8 @@ Object.defineProperty(Snapchat.prototype, 'isSignedIn', {
 /**
  * Used internally to sign in.
  *
- * @type {string}
+ * @name Snapchat#authToken
+ * @property {string}
  */
 Object.defineProperty(Snapchat.prototype, 'authToken', {
   get: function () {
@@ -131,7 +194,8 @@ Object.defineProperty(Snapchat.prototype, 'authToken', {
 /**
  * Used internally to sign in.
  *
- * @type {string}
+ * @name Snapchat#googleAuthToken
+ * @property {string}
  */
 Object.defineProperty(Snapchat.prototype, 'googleAuthToken', {
   get: function () {
@@ -143,7 +207,8 @@ Object.defineProperty(Snapchat.prototype, 'googleAuthToken', {
 /**
  * Used internally.
  *
- * @type {string}
+ * @name Snapchat#deviceToken1i
+ * @property {string}
  */
 Object.defineProperty(Snapchat.prototype, 'deviceToken1i', {
   get: function () {
@@ -155,7 +220,8 @@ Object.defineProperty(Snapchat.prototype, 'deviceToken1i', {
 /**
  * Used internally.
  *
- * @type {string}
+ * @name Snapchat#deviceToken1v
+ * @property {string}
  */
 Object.defineProperty(Snapchat.prototype, 'deviceToken1v', {
   get: function () {
@@ -167,7 +233,8 @@ Object.defineProperty(Snapchat.prototype, 'deviceToken1v', {
 /**
  * Used internally to sign in and trick Snapchat into thinking we're using the first party client.
  *
- * @type {string}
+ * @name Snapchat#googleAttestation
+ * @property {string}
  */
 Object.defineProperty(Snapchat.prototype, 'googleAttestation', {
   get: function () {

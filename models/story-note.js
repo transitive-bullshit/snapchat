@@ -3,6 +3,8 @@ module.exports = StoryNote
 /**
  * Snapchat StoryNote
  *
+ * @class
+ *
  * @param {Object} params
  */
 function StoryNote (params) {

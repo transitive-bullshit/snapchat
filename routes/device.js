@@ -8,6 +8,8 @@ var StringUtils = require('../lib/string-utils')
 /**
  * Snapchat wrapper for chat-related API calls.
  *
+ * @class
+ *
  * @param {Object} opts
  */
 function Device (client, opts) {

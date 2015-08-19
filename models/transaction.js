@@ -3,6 +3,8 @@ module.exports = Transaction
 /**
  * Snapchat Transaction
  *
+ * @class
+ *
  * @param {Object} params
  */
 function Transaction (params) {

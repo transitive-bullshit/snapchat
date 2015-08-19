@@ -3,6 +3,8 @@ module.exports = SharedStoryDescription
 /**
  * Snapchat SharedStoryDescription
  *
+ * @class
+ *
  * @param {Object} params
  */
 function SharedStoryDescription (params) {

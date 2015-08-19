@@ -11,6 +11,8 @@ var User = require('../models/user')
 /**
  * Friends wrapper for friends-related API calls.
  *
+ * @class
+ *
  * @param {Object} opts
  */
 function Friends (client, opts) {

@@ -3,6 +3,8 @@ module.exports = StoryOptions
 /**
  * Snapchat StoryOptions
  *
+ * @class
+ *
  * @param {string} text
  * @param {number} timer
  * @param {boolean} cameraFrontFacing

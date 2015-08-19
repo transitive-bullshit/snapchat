@@ -3,6 +3,8 @@ module.exports = User
 /**
  * Snapchat User
  *
+ * @class
+ *
  * @param {Object} params
  */
 function User (params) {

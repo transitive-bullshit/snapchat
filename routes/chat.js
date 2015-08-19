@@ -12,6 +12,8 @@ var Conversation = require('../models/conversation')
 /**
  * Snapchat wrapper for chat-related API calls.
  *
+ * @class
+ *
  * @param {Object} opts
  */
 function Chat (client, opts) {

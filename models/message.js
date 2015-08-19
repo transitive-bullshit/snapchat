@@ -7,6 +7,8 @@ var constants = require('../lib/constants')
 /**
  * Snapchat Message
  *
+ * @class
+ *
  * @param {Object} params
  */
 function Message (params) {

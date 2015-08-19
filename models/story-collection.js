@@ -6,6 +6,8 @@ var Story = require('./story')
 /**
  * Snapchat StoryCollection
  *
+ * @class
+ *
  * @param {Snapchat} client
  * @param {Object} params
  */
@@ -52,7 +54,8 @@ function StoryCollection (client, params) {
 /**
  * Whether or not the stories in this collection are shared.
  *
- * @type {boolean}
+ * @name StoryCollection#isSharedStory
+ * @property {boolean}
  */
 Object.defineProperty(StoryCollection.prototype, 'isSharedStory', {
   get: function () {

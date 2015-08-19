@@ -10,6 +10,8 @@ var StoryCollection = require('./story-collection')
 /**
  * Snapchat Session
  *
+ * @class
+ *
  * @param {Snapchat} client
  * @param {Object} params
  */

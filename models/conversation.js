@@ -10,6 +10,8 @@ var Transaction = require('./transaction')
 /**
  * Snapchat Conversation
  *
+ * @class
+ *
  * @param {Object} params
  */
 function Conversation (params) {

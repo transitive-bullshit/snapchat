@@ -3,6 +3,8 @@ module.exports = StoryUpdater
 /**
  * Snapchat StoryUpdater
  *
+ * @class
+ *
  * @param {string} storyID
  * @param {string} timestamp
  * @param {number} screenshotCount

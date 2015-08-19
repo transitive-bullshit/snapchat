@@ -2,6 +2,11 @@ module.exports = NearbyUser
 
 /**
  * Snapchat NearbyUser
+ *
+ * @class
+ *
+ * @param {string} username
+ * @param {string} identifier
  */
 function NearbyUser (username, identifier) {
   var self = this

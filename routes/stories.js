@@ -14,6 +14,8 @@ var SharedStoryDescription = require('../models/shared-story-description')
 /**
  * Snapchat wrapper for story-related API calls.
  *
+ * @class
+ *
  * @param {Object} opts
  */
 function Stories (client, opts) {
