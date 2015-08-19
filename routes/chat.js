@@ -448,7 +448,9 @@ Chat.prototype.loadMessagesAfterPagination = function (messageOrTransaction, cb)
     throw new Error('Chat.loadMessagesAfterPagination invalid param')
   }
 
-  if (!messageOrTransaction.pagination.length) {
+  if (!messageOrTransaction ||
+      !messageOrTransaction.pagination ||
+      !messageOrTransaction.pagination.length) {
     return cb(null, null)
   }
 
