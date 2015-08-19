@@ -98,10 +98,11 @@ DEBUG=snapchat,snapchat:*; # debug all snapchat submodules
 ### Todo
 
 * MORE TESTS
+* rate limiting (currently test suite is failing with 401 errors because of rate limiting issues)
 * check logged status in Request.start response handler
 * handle request encoding properly for blobs and non-text requests
 * sendEvents inconsistent between `Array[event]` and `event`
-* encrypt gmail password
+* encrypt gmail password (php reference)
 
 ### License
 
