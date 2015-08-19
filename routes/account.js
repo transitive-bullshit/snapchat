@@ -70,7 +70,7 @@ Account.prototype.updateSnapPrivacy = function (privacy, cb) {
  * Updates who can see your stories. \e friends is only necessary when using \c StoryPrivacy.Custom.
  *
  * @param {number} privacy \c StoryPrivacy.Everyone, \c StoryPrivacy.Friends, \c StoryPrivacy.Custom.
- * @param {Array<string>} friends Optional list of strings of usernames to hide your stories from. Used only when \c privacy is \c StoryPrivacy.Custom.
+ * @param {Array<string>=} friends Optional list of strings of usernames to hide your stories from. Used only when \c privacy is \c StoryPrivacy.Custom.
  * @param {function} cb
  */
 Account.prototype.updateStoryPrivacy = function (privacy, friends, cb) {
