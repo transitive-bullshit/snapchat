@@ -293,10 +293,6 @@ Chat.prototype.sendMessageToUsers = function (message, usernames, cb) {
     results.failed = convoResults.failed
     results.errors = convoResults.errors
 
-    console.log('failed', results.failed)
-    console.log('errors', results.errors)
-    console.log('results', convoResults.conversations)
-
     var messages = convoResults.conversations.map(function (convo) {
       var identifier = StringUtils.uniqueIdentifer()
       var sequenceNum = convo.state['conversation_state']
@@ -337,7 +333,7 @@ Chat.prototype.sendMessageToUsers = function (message, usernames, cb) {
         if (err) {
           return cb(err)
         } else if (result) {
-          if (result.conversations && result.conversations.length) {
+          if (result.conversations && result.conversations) {
             results.conversations = result.conversations.map(function (convo) {
               return new Conversation(convo)
             })
@@ -366,7 +362,7 @@ Chat.prototype.loadConversationsAfter = function (conversation, cb) {
   var self = this
   debug('Chat.loadConversationsAfter')
 
-  if (!conversation.pagination.length) {
+  if (!conversation || !conversation.pagination || !conversation.pagination.length) {
     return cb(null, [ ])
   }
 
