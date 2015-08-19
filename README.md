@@ -98,7 +98,7 @@ DEBUG=snapchat,snapchat:*; # debug all snapchat submodules
 ### Todo
 
 * MORE TESTS
-* BufferUtils / SKBlob AES decryption not working and needs to support CBC encryption as well as decryption
+* BufferUtils / SKBlob needs to support CBC encryption as well as decryption
 * rate limiting (currently test suite is failing with 401 errors because of rate limiting issues)
 * check logged status in Request.start response handler
 * handle request encoding properly for blobs and non-text requests
