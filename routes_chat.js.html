@@ -132,7 +132,7 @@ Chat.prototype.markRead = function (conversation, cb) {
 }
 
 /**
- * Retrieves the conversation auth mac and payload for a conversation with \c username.
+ * Retrieves the conversation auth mac and payload for a conversation with username.
  *
  * @param {string} username
  * @param {function} cb
@@ -414,7 +414,7 @@ Chat.prototype.sendMessageToUsers = function (message, usernames, cb) {
 /**
  * Loads another page of conversations in the feed after the given conversation.
  *
- * This method will update \c client.currentSession.conversations accordingly.
+ * This method will update client.currentSession.conversations accordingly.
  *
  * @param {Conversation} conversation The conversation after which to load more conversations.
  * @param {function} cb
@@ -456,7 +456,7 @@ Chat.prototype.loadConversationsAfter = function (conversation, cb) {
 /**
  * Loads all conversations into the current session.
  *
- * This method will update \c client.currentSession.conversations accordingly.
+ * This method will update client.currentSession.conversations accordingly.
  * @param {function} cb
  */
 Chat.prototype.loadAllConversations = function (cb) {
@@ -497,7 +497,7 @@ Chat.prototype.loadAllConversations = function (cb) {
  * Loads more messages after the given message or cash transaction.
  *
  * @param {Transaction|Message} messageOrTransaction any object conforming to Pagination \b EXCEPT AN \C Conversation.
- * @warning Do not pass an \c Conversation object to messageOrTransaction. Doing so will throw an exception.
+ * @warning Do not pass an Conversation object to messageOrTransaction. Doing so will throw an exception.
  * @param {function} cb
  */
 Chat.prototype.loadMessagesAfterPagination = function (messageOrTransaction, cb) {

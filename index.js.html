@@ -318,7 +318,7 @@ Object.defineProperty(Snapchat.prototype, 'googleAttestation', {
  * @param {string} Optional username The Snapchat username to sign in with.
  * @param {string} Optional password The password to the Snapchat account to sign in with.
  * @param {string} Optional gmailEmail A valid GMail address.
- * @param {string} Optional gmailPassword The password associated with \c gmailEmail.
+ * @param {string} Optional gmailPassword The password associated with gmailEmail.
  * @param {function} cb
  */
 Snapchat.prototype.signIn = function (username, password, gmailEmail, gmailPassword, cb) {
@@ -420,8 +420,8 @@ Snapchat.prototype.signIn = function (username, password, gmailEmail, gmailPassw
  * Use this to restore a session that ended within the last hour. The google auth token must be re-generated every hour.
  *
  * @param {string} username Your Snapchat username.
- * @param {string} authToken Your Snapchat auth token. Can be retrieved from the \c authToken property.
- * @param {string} googleAuthToken Your Google auth token. Can be retrieved from the \c googleAuthToken property.
+ * @param {string} authToken Your Snapchat auth token. Can be retrieved from the authToken property.
+ * @param {string} googleAuthToken Your Google auth token. Can be retrieved from the googleAuthToken property.
  * @param {function} cb
  */
 Snapchat.prototype.restoreSession = function (username, authToken, googleAuthToken, cb) {
@@ -470,7 +470,7 @@ Snapchat.prototype.signOut = function (cb) {
 }
 
 /**
- * Updates all information in the \c currentSession property.
+ * Updates all information in the currentSession property.
  *
  * @param {function} cb
  */
@@ -507,9 +507,9 @@ Snapchat.prototype.updateSession = function (cb) {
  * Registers an email, password, and birthday in preparation for creating a new account.
  *
  * The result passed to cb has the following keys:
- *  - \c email: the email you registered with.
- *  - \c snapchat_phone_number: a number you can use to verify your phone number later.
- *  - \c username_suggestions: an array of available usernames for the next step.
+ *  - email: the email you registered with.
+ *  - snapchat_phone_number: a number you can use to verify your phone number later.
+ *  - username_suggestions: an array of available usernames for the next step.
  *
  * @param {string} email The email address to be associated with the account.
  * @param {string} password The password of the account to be created.
@@ -683,7 +683,7 @@ Snapchat.prototype.getCaptcha = function (cb) {
  * @warning Seems to not be working.
  * @todo: document response
  *
- * @param {string} solution The solution to the captcha as a binary string. If the first, second, and last images contain ghosts, the solution would be \c '110000001'.
+ * @param {string} solution The solution to the captcha as a binary string. If the first, second, and last images contain ghosts, the solution would be '110000001'.
  * @param {function} cb
  */
 Snapchat.prototype.solveCaptcha = function (solution, cb) {
@@ -881,7 +881,7 @@ Snapchat.prototype._getGoogleCloudMessagingIdentifier = function (cb) {
 }
 
 /**
- * Attestation, courtesy of \c casper.io
+ * Attestation, courtesy of casper.io
  * internal
  */
 Snapchat.prototype._getAttestation = function (username, password, ts, cb) {
