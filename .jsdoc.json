@@ -22,7 +22,8 @@
     "collapseSymbols": true,
     "inverseNav": true,
     "highlightTutorialCode": true,
-    "protocol": "html://"
+    "protocol": "html://",
+    "methodHeadingReturns": false
   },
   "opts": {
     "recurse": false,
