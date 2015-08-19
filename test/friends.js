@@ -45,15 +45,14 @@ client.signIn(function (err) {
     }, function (err, results) {
       t.notOk(err)
       t.ok(results)
-      t.equal(results.length, 0)
+      t.equal(results.length, 1)
+      t.equal(results[0].username, 'lovealways_cma')
       t.end()
     })
   })
 
-
   // TODO:
   // Snapchat.friends.addFriends
   // Snapchat.friends.addFriendBack
-  // Snapchat.friends.findFriends
   // Snapchat.friends.findFriendsNear
 })

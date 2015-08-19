@@ -192,7 +192,7 @@ Chat.prototype.conversationsWithUsers = function (usernames, cb) {
   }, function () {
     self.client.post(constants.endpoints.chat.sendMessage, {
       'auth_token': self.client.authToken,
-      'messages': messages,
+      'messages': JSON.stringify(messages),
       'username': self.client.username
     }, function (err, result) {
       if (err) {
@@ -328,7 +328,7 @@ Chat.prototype.sendMessageToUsers = function (message, usernames, cb) {
     } else {
       self.client.post(constants.endpoints.chat.sendMessage, {
         'auth_token': self.client.authToken,
-        'messages': messages,
+        'messages': JSON.stringify(messages),
         'username': self.client.username
       }, function (err, result) {
         if (err) {

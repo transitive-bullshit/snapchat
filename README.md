@@ -100,11 +100,8 @@ DEBUG=snapchat,snapchat:*; # debug all snapchat submodules
 * MORE TESTS
 * check logged status in Request.start response handler
 * handle request encoding properly for blobs and non-text requests
-* verify ts/timestamps milliseconds or seconds
-* JSON.stringify internal params or nah?
 * sendEvents inconsistent between `Array[event]` and `event`
 * encrypt gmail password
-* cleanup headers initialization contentType etc.
 
 ### License
 

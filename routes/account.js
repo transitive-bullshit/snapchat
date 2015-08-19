@@ -185,7 +185,7 @@ Account.prototype.updateFeatureSettings = function (settings, cb) {
   features[constants.featureSettings.travelMode] = settings[constants.featureSettings.travelMode] || self.client.session.enableTravelMode
 
   self.client.post(constants.endpoints.update.featureSettings, {
-    'settings': features,
+    'settings': JSON.stringify(features),
     'username': self.client.username
   }, cb)
 }
@@ -272,6 +272,6 @@ Account.prototype.updateTOSAgreementStatus = function (snapcash, snapcashV2, squ
 
   self.client.post(constants.endpoints.update.user, {
     'username': self.client.username,
-    'agreements': agreements
+    'agreements': JSON.stringify(agreements)
   }, cb)
 }

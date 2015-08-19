@@ -60,8 +60,8 @@ Snaps.prototype.sendSnapCustom = function (blob, opts, cb) {
       'camera_front_facing': !!opts.cameraFrontFacing,
       'country_code': self.client.session.countryCode,
       'media_id': mediaID,
-      'recipients': opts.recipients,
-      'recipient_ids': opts.recipients,
+      'recipients': JSON.stringify(opts.recipients),
+      'recipient_ids': JSON.stringify(opts.recipients),
       'reply': !!opts.isReply,
       'time': +opts.timer,
       'zipped': 0,
@@ -111,7 +111,7 @@ Snaps.prototype.markSnapsViewed = function (snaps, times, secondsViewed, cb) {
   self.client.post(constants.endpoints.update.snaps, {
     'added_friends_timestamp': StringUtils.timestampFrom(self.session.addedFriendsTimestamp),
     'username': self.client.username,
-    'json': json
+    'json': JSON.stringify(json)
   }, cb)
 }
 
@@ -215,7 +215,7 @@ Snaps.prototype._uploadSnap = function (blob, cb) {
     'type': blob.isImage ? constants.MediaKind.Image : constants.MediaKind.Video,
     'data': blob.data,
     'zipped': 0,
-    'features_map': '{ }',
+    'features_map': '{}',
     'username': self.client.username
   }
 

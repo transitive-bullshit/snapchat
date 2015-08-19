@@ -40,8 +40,8 @@ Friends.prototype.addFriends = function (toAdd, toUnfriend, cb) {
     'username': self.client.username,
     'action': 'multiadddelete',
     'friend': {
-      friendsToAdd: toAdd,
-      friendsToDelete: toUnfriend
+      friendsToAdd: JSON.stringify(toAdd),
+      friendsToDelete: JSON.stringify(toUnfriend)
     },
     'added_by': 'ADDED_BY_USERNAME'
   }, cb)
@@ -129,7 +129,7 @@ Friends.prototype.findFriends = function (friends, cb) {
   self.client.post(constants.endpoints.friends.find, {
     'username': self.client.username,
     'countryCode': self.client.session.countryCode,
-    'numbers': friends
+    'numbers': JSON.stringify(friends)
   }, function (err, result) {
     if (err) {
       return cb(err)
@@ -288,7 +288,7 @@ Friends.prototype.seenSuggestedFriends = function (usernames, seen, cb) {
   self.client.post(constants.endpoints.misc.suggestFriend, {
     'action': 'update',
     'seen': !!seen,
-    'seen_suggested_friend_list': usernames,
+    'seen_suggested_friend_list': JSON.stringify(usernames),
     'username': self.client.username
   }, function (err, result) {
     if (err) {
