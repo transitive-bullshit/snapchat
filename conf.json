@@ -16,16 +16,16 @@
     "systemName": "Snapchat",
     "footer": "",
     "copyright": "Copyright Travis Fischer © 2015.",
-    "navType": "vertical",
+    "navType": "inline",
     "theme": "simplex",
-    "linenums": true,
-    "collapseSymbols": false,
+    "linenums": false,
+    "collapseSymbols": true,
     "inverseNav": true,
     "highlightTutorialCode": true,
     "protocol": "html://"
   },
   "opts": {
-    "recurse": true,
+    "recurse": false,
     "destination": "./out/"
   },
   "markdown": {
