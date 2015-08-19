@@ -70,7 +70,7 @@ Account.prototype.updateSnapPrivacy = function (privacy, cb) {
  * Updates who can see your stories. \e friends is only necessary when using \c StoryPrivacy.Custom.
  *
  * @param {number} privacy \c StoryPrivacy.Everyone, \c StoryPrivacy.Friends, \c StoryPrivacy.Custom.
- * @param {Array[string]} friends Optional list of strings of usernames to hide your stories from. Used only when \c privacy is \c StoryPrivacy.Custom.
+ * @param {Array<string>} friends Optional list of strings of usernames to hide your stories from. Used only when \c privacy is \c StoryPrivacy.Custom.
  * @param {function} cb
  */
 Account.prototype.updateStoryPrivacy = function (privacy, friends, cb) {
@@ -217,7 +217,7 @@ Account.prototype.downloadSnaptag = function (cb) {
 /**
  * Uploads a new animated avatar. Not working yet.
  *
- * @param {Array[Buffer]} images An array of 5 image \c Buffer objects.
+ * @param {Array<Buffer>} images An array of 5 image \c Buffer objects.
  * @param {function} cb
  */
 Account.prototype.uploadAvatar = function (images, cb) {

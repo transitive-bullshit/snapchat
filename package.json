@@ -24,6 +24,7 @@
   "devDependencies": {
     "browserify": "^10.0.0",
     "dotenv": "^1.2.0",
+    "ink-docstrap": "^0.5.2",
     "standard": "^4.0.1",
     "tape": "^4.0.0",
     "uglify-js": "^2.4.15"

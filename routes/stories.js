@@ -118,7 +118,7 @@ Stories.prototype.loadStoryThumbnailBlob = function (story, cb) {
 /**
  * Batch loads media for a set of stories.
  *
- * @param {Array[Story]} stories An array of \c Story objects whose media you wish to download.
+ * @param {Array<Story>} stories An array of \c Story objects whose media you wish to download.
  * @param {function} cb
  */
 Stories.prototype.loadStories = function (stories, cb) {
@@ -174,7 +174,7 @@ Stories.prototype.deleteStory = function (story, cb) {
 /**
  * Marks a set of stories as opened.
  *
- * @param {Array[StoryUpdater]} stories An array of \c StoryUpdater objects.
+ * @param {Array<StoryUpdater>} stories An array of \c StoryUpdater objects.
  * @param {function} cb
  */
 Stories.prototype.markStoriesViewed = function (stories, cb) {

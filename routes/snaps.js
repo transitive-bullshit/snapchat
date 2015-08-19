@@ -27,7 +27,7 @@ function Snaps (client, opts) {
  * Sends a snap to everyone in \c recipients with text \c text for \c duration seconds.
  *
  * @param {SKBlob} blob The \c SKBlob object containing the image or video data to send. Can be created with any \c NSData object.
- * @param {Array[string]} recipients An array of username strings.
+ * @param {Array<string>} recipients An array of username strings.
  * @param {string} text The text to label the snap with. This text is not superimposed upon the image; you must do that yourself.
  * @param {number} duration The length of the snap. It must be greater than \c 0 or an exception will be raised.
  * @param {function} cb
@@ -85,9 +85,9 @@ Snaps.prototype.markSnapViewed = function (snap, secondsViewed, cb) {
 /**
  * Marks a set of snaps as opened for the specified length at the given times.
  *
- * @param {Array[SKSnap]} snaps An array of \c SKSnap objects.
- * @param {Array[Date]} times An array of \c Date objects.
- * @param {Array[number]} secondsViewed An array of \c numbers.
+ * @param {Array<SKSnap>} snaps An array of \c SKSnap objects.
+ * @param {Array<Date>} times An array of \c Date objects.
+ * @param {Array<number>} secondsViewed An array of \c numbers.
  * @param {function} cb
  */
 Snaps.prototype.markSnapsViewed = function (snaps, times, secondsViewed, cb) {

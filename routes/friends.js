@@ -24,8 +24,8 @@ function Friends (client, opts) {
 /**
  * Adds the users in \e toAdd as friends, and unfriends the users in \e toUnfriend.
  *
- * @param {Array[string]} toAdd An array of username strings of users to add. Doesn't matter if they're already in your friends.
- * @param {Array[string]} toUnfriend An array of username strings of users to un-friend. Doesn't matter if they're not already in your friends.
+ * @param {Array<string>} toAdd An array of username strings of users to add. Doesn't matter if they're already in your friends.
+ * @param {Array<string>} toUnfriend An array of username strings of users to un-friend. Doesn't matter if they're not already in your friends.
  * @param {function} cb
  */
 Friends.prototype.addFriends = function (toAdd, toUnfriend, cb) {
@@ -273,7 +273,7 @@ Friends.prototype.unblockUser = function (username, cb) {
 /**
  * This appears to be for an upcoming feature: suggested friends?
  *
- * @param {Array[string]} usernames.
+ * @param {Array<string>} usernames.
  * @param {boolean} seen Whether to mark as seen.
  * @param {function} cb
  */
@@ -302,7 +302,7 @@ Friends.prototype.seenSuggestedFriends = function (usernames, seen, cb) {
 /**
  * @private
  *
- * @param {Array[User]} friends
+ * @param {Array<User>} friends
  */
 Friends.prototype._removeFriendsFromSession = function (friends) {
   var self = this
@@ -320,7 +320,7 @@ Friends.prototype._removeFriendsFromSession = function (friends) {
 /**
  * @private
  *
- * @param {Array[User]} friends
+ * @param {Array<User>} friends
  */
 Friends.prototype._addFriendsToSession = function (friends) {
   var self = this

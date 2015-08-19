@@ -25,7 +25,7 @@ function Chat (client, opts) {
 /**
  * Sends the typing notification to the given users.
  *
- * @param {Array[string]} recipients An array of username strings.
+ * @param {Array<string>} recipients An array of username strings.
  * @param {function} cb
  */
 Chat.prototype.sendTypingToUsers = function (recipients, cb) {
@@ -122,7 +122,7 @@ Chat.prototype.conversationWithUser = function (username, cb) {
 /**
  * Fetches the conversations for all users in \e usernames
  *
- * @param {Array[string]} usernames
+ * @param {Array<string>} usernames
  * @param {function} cb
  */
 Chat.prototype.conversationsWithUsers = function (usernames, cb) {
@@ -247,7 +247,7 @@ Chat.prototype.clearFeed = function (cb) {
  * Sends a message \e message to \e username.
  *
  * @param {string} message The message to send.
- * @param {Array[string]} username The username of the recipient.
+ * @param {Array<string>} username The username of the recipient.
  * @param {function} cb
  */
 Chat.prototype.sendMessage = function (message, username, cb) {
@@ -271,7 +271,7 @@ Chat.prototype.sendMessage = function (message, username, cb) {
  * @TODO: what to do if message fails to send
  *
  * @param {string} message The message to send.
- * @param {Array[string]} usernames An array of username strings as recipients.
+ * @param {Array<string>} usernames An array of username strings as recipients.
  * @param {function} cb
  */
 Chat.prototype.sendMessageToUsers = function (message, usernames, cb) {
