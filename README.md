@@ -20,6 +20,8 @@ npm install snapchat
 
 ### Usage
 
+The main entrypoint is the [Snapchat](http://fisch0920.github.io/snapchat/Snapchat.html) class. See the auto-generated [documentation](http://fisch0920.github.io/snapchat) for a detailed API reference.
+
 Snapchat defaults to using required signin credentials stored in environment variables:
 
 - `SNAPCHAT_USERNAME` The Snapchat username to sign in with.
@@ -96,8 +98,6 @@ DEBUG=snapchat,snapchat:*; # debug all snapchat submodules
 ### Todo
 
 * MORE TESTS
-* documentation
-  * simplex / spacelab
 * check logged status in Request.start response handler
 * handle request encoding properly for blobs and non-text requests
 * verify ts/timestamps milliseconds or seconds
