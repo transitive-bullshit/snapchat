@@ -35,7 +35,10 @@
     "api",
     "unofficial",
     "snap",
+    "chat",
+    "sc",
     "image",
+    "video",
     "REST",
     "client"
   ],
@@ -48,6 +51,7 @@
   "scripts": {
     "build": "browserify -s Snapchat -e ./ | uglifyjs -m > snapchat.min.js",
     "build-debug": "browserify -s Snapchat -e ./ > snapchat.debug.js",
+    "docs": "node ./node_modules/jsdoc/jsdoc.js -c .jsdoc.json -R README.md",
     "size": "npm run build && cat snapchat.min.js | gzip | wc -c",
     "test": "standard && tape test/*.js",
     "test-node": "tape test/*.js"
