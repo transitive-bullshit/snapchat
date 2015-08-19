@@ -1,6 +1,7 @@
 module.exports = SKBlob
 
 var BufferUtils = require('../lib/buffer-utils')
+var Story = require('./story')
 var zlib = require('zlib')
 
 /**
@@ -110,6 +111,10 @@ SKBlob.initWithData = function (data, cb) {
  * @param {function} cb
  */
 SKBlob.initWithStoryData = function (data, story, cb) {
+  if (!(story instanceof Story)) {
+    throw new Error('SKBlob.initWithStoryData invalid story')
+  }
+
   if (data instanceof String) {
     data = new Buffer(data)
   }
@@ -147,6 +152,10 @@ SKBlob.decompress = function (data, cb) {
  * @param {function} cb
  */
 SKBlob.decrypt = function (data, story, cb) {
+  if (!(story instanceof Story)) {
+    throw new Error('SKBlob.decrypt invalid story')
+  }
+
   if (!BufferUtils.isCompressed(data) && !BufferUtils.isMedia(data) && story) {
     data = BufferUtils.decryptStory(data, story.mediaKey, story.mediaIV)
   }
