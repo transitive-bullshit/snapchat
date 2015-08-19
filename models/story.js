@@ -73,7 +73,7 @@ Object.defineProperty(Story.prototype, 'suggestedFilename', {
 })
 
 /**
- * Loads the blob for the story. If successful, the \c blob property of the original \c Story object will contain the story's blob data.
+ * Loads the blob for the story. If successful, the blob property of the original Story object will contain the story's blob data.
  */
 Story.prototype.load = function (cb) {
   var self = this
@@ -87,7 +87,7 @@ Story.prototype.load = function (cb) {
 }
 
 /**
- * Loads the blob for the story thumbnail. If successful, the \c thumbnailBlob property of the original \c Story object will contain the story's thumbnail blob data.
+ * Loads the blob for the story thumbnail. If successful, the thumbnailBlob property of the original Story object will contain the story's thumbnail blob data.
  */
 Story.prototype.loadThumbnail = function (cb) {
   var self = this

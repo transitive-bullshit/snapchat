@@ -48,7 +48,7 @@ Friends.prototype.addFriends = function (toAdd, toUnfriend, cb) {
 }
 
 /**
- * Adds \c username as a friend.
+ * Adds username as a friend.
  *
  * @param {string} username The user to add.
  * @param {function} cb
@@ -85,7 +85,7 @@ Friends.prototype.addFriendBack = function (username, cb) {
 }
 
 /**
- * Unfriends \c username.
+ * Unfriends username.
  *
  * @param {string} username The username of the user to unfriend.
  * @param {function} cb
@@ -111,7 +111,7 @@ Friends.prototype.unfriend = function (username, cb) {
 /**
  * Finds friends given phone numbers and names.
  *
- * \c friends is a number->name map, where "name" is the desired screen name of that friend and "number" is their phone number.
+ * friends is a number->name map, where "name" is the desired screen name of that friend and "number" is their phone number.
  * The names given will be used as display names for any usernames found.
  * @param {Object} friends a dictionary with phone number strings as the keys and name strings as the values.
  * @param {function} cb
@@ -146,7 +146,7 @@ Friends.prototype.findFriends = function (friends, cb) {
  * Finds nearby snapchatters who are also looking for nearby snapchatters.
  *
  * @param {Object} location The location to search from { lat, lng }.
- * @param {number} accuracy The radius in meters to find nearby snapchatters at \c location. Defaults to \c 10.
+ * @param {number} accuracy The radius in meters to find nearby snapchatters at location. Defaults to 10.
  * @param {number} milliseconds The total poll duration so far. If you're polling in a for-loop for example, pass the time in milliseconds since you started polling. This has been guess-work, but I think it's right.
  * @param {function} cb
  */
@@ -190,7 +190,7 @@ Friends.prototype.searchFriend = function (query, cb) {
 }
 
 /**
- * Checks to see whether \c username is a registered username.
+ * Checks to see whether username is a registered username.
  *
  * @param {string} username
  * @param {function} cb
@@ -246,7 +246,7 @@ Friends.prototype.updateDisplayNameForUser = function (friend, displayName, cb) 
 }
 
 /**
- * Blocks \c username.
+ * Blocks username.
  *
  * @param {string} username The username of the user to block.
  * @param {function} cb
@@ -259,7 +259,7 @@ Friends.prototype.blockUser = function (username, cb) {
 }
 
 /**
- * Unblocks \c username.
+ * Unblocks username.
  *
  * @param {string} username The username of the user to block.
  * @param {function} cb

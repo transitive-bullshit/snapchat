@@ -119,7 +119,7 @@ Stories.prototype.loadStoryThumbnailBlob = function (story, cb) {
 /**
  * Batch loads media for a set of stories.
  *
- * @param {Array<Story>} stories An array of \c Story objects whose media you wish to download.
+ * @param {Array<Story>} stories An array of Story objects whose media you wish to download.
  * @param {function} cb
  */
 Stories.prototype.loadStories = function (stories, cb) {
@@ -175,7 +175,7 @@ Stories.prototype.deleteStory = function (story, cb) {
 /**
  * Marks a set of stories as opened.
  *
- * @param {Array<StoryUpdater>} stories An array of \c StoryUpdater objects.
+ * @param {Array<StoryUpdater>} stories An array of StoryUpdater objects.
  * @param {function} cb
  */
 Stories.prototype.markStoriesViewed = function (stories, cb) {
@@ -198,7 +198,7 @@ Stories.prototype.markStoriesViewed = function (stories, cb) {
 
 /**
  * Marks a single story opened.
- * To batch mark stories viewed, use \c markStoriesViewed
+ * To batch mark stories viewed, use markStoriesViewed
  *
  * @param {Story} story The story to mark as opened.
  * @param {number} sscount The number of times the story was screenshotted.

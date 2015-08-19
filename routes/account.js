@@ -51,7 +51,7 @@ Account.prototype.updateBestFriendsCount = function (number, cb) {
 /**
  * Updates who can send you snaps.
  *
- * @param privacy \c SnapPrivacy.Friends or \c SnapPrivacy.Everyone. Defaults to \c SnapPrivacy.Friends.
+ * @param privacy SnapPrivacy.Friends or SnapPrivacy.Everyone. Defaults to SnapPrivacy.Friends.
  * @param {function} cb
  */
 Account.prototype.updateSnapPrivacy = function (privacy, cb) {
@@ -68,10 +68,10 @@ Account.prototype.updateSnapPrivacy = function (privacy, cb) {
 }
 
 /**
- * Updates who can see your stories. \e friends is only necessary when using \c StoryPrivacy.Custom.
+ * Updates who can see your stories. \e friends is only necessary when using StoryPrivacy.Custom.
  *
- * @param {number} privacy \c StoryPrivacy.Everyone, \c StoryPrivacy.Friends, \c StoryPrivacy.Custom.
- * @param {Array<string>=} friends Optional list of strings of usernames to hide your stories from. Used only when \c privacy is \c StoryPrivacy.Custom.
+ * @param {number} privacy StoryPrivacy.Everyone, StoryPrivacy.Friends, StoryPrivacy.Custom.
+ * @param {Array<string>=} friends Optional list of strings of usernames to hide your stories from. Used only when privacy is StoryPrivacy.Custom.
  * @param {function} cb
  */
 Account.prototype.updateStoryPrivacy = function (privacy, friends, cb) {
@@ -164,7 +164,7 @@ Account.prototype.updateDisplayName = function (displayName, cb) {
 /**
  * Updates your account's feature settings.
  *
- * See \c constants.Feature for valid keys. Invalid keys will be silently ignored.
+ * See constants.Feature for valid keys. Invalid keys will be silently ignored.
  * @warning Raises an exception if \e settings contains more than 8 key-value pairs.
  *
  * @param Object settings A dictionary of string-boolean pairs. Missing keys-value pairs default to the current values. Behavior is undefined for values other than booleans.
@@ -218,7 +218,7 @@ Account.prototype.downloadSnaptag = function (cb) {
 /**
  * Uploads a new animated avatar. Not working yet.
  *
- * @param {Array<Buffer>} images An array of 5 image \c Buffer objects.
+ * @param {Array<Buffer>} images An array of 5 image Buffer objects.
  * @param {function} cb
  */
 Account.prototype.uploadAvatar = function (images, cb) {
@@ -230,7 +230,7 @@ Account.prototype.uploadAvatar = function (images, cb) {
 }
 
 /**
- * Downloads the animated avatar for \c user. Currently encrypted, or something.
+ * Downloads the animated avatar for user. Currently encrypted, or something.
  *
  * @param {string} username The username tied to the avatar to download.
  * @param {function} cb
