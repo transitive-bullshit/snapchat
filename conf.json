@@ -2,7 +2,7 @@
   "tags": {
     "allowUnknownTags": true
   },
-  "plugins": ["plugins/markdown"],
+  "plugins": [ "plugins/markdown" ],
   "source": {
     "exclude": [ "test", "node_modules" ],
     "include": [ "index.js", "lib", "models", "routes" ]
@@ -26,7 +26,8 @@
   },
   "opts": {
     "recurse": false,
-    "destination": "./out/"
+    "destination": "./out/",
+    "template" : "node_modules/ink-docstrap/template"
   },
   "markdown": {
     "parser": "gfm",
