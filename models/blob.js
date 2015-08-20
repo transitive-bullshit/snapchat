@@ -33,6 +33,7 @@ function SKBlob (data) {
  *
  * @name SKBlob#data
  * @property {Buffer}
+ * @readonly
  */
 Object.defineProperty(SKBlob.prototype, 'data', {
   get: function () { return this._data }
@@ -43,6 +44,7 @@ Object.defineProperty(SKBlob.prototype, 'data', {
  *
  * @name SKBlob#overlay
  * @property {Buffer}
+ * @readonly
  */
 Object.defineProperty(SKBlob.prototype, 'overlay', {
   get: function () { return this._overlay }
@@ -53,6 +55,7 @@ Object.defineProperty(SKBlob.prototype, 'overlay', {
  *
  * @name SKBlob#isImage
  * @property {boolean}
+ * @readonly
  */
 Object.defineProperty(SKBlob.prototype, 'isImage', {
   get: function () { return this._isImage }
@@ -63,6 +66,7 @@ Object.defineProperty(SKBlob.prototype, 'isImage', {
  *
  * @name SKBlob#isVideo
  * @property {boolean}
+ * @readonly
  */
 Object.defineProperty(SKBlob.prototype, 'isVideo', {
   get: function () { return this._isVideo }
@@ -73,6 +77,7 @@ Object.defineProperty(SKBlob.prototype, 'isVideo', {
  *
  * @name SKBlob#isMPEG4
  * @property {boolean}
+ * @readonly
  */
 Object.defineProperty(SKBlob.prototype, 'isMPEG4', {
   get: function () { return this._isMPEG4 }
@@ -83,6 +88,7 @@ Object.defineProperty(SKBlob.prototype, 'isMPEG4', {
  *
  * @name SKBlob#isMedia
  * @property {boolean}
+ * @readonly
  */
 Object.defineProperty(SKBlob.prototype, 'isMedia', {
   get: function () { return this._isMedia }
