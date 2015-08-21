@@ -10,10 +10,11 @@ var Snapchat = require('../')
 var SKBlob = require('../models/blob')
 
 var client = new Snapchat()
+var opts
 
-var imageBlob0 = new SKBlob(fs.readFileSync(__dirname + '/data/out1.jpg'))
-var imageBlob1 = new SKBlob(fs.readFileSync(__dirname + '/data/out2.jpg'))
-var videoBlob = new SKBlob(fs.readFileSync(__dirname + '/data/out.mp4'))
+var imageBlob0 = new SKBlob(fs.readFileSync(__dirname + '/data/out1.jpg', opts))
+var imageBlob1 = new SKBlob(fs.readFileSync(__dirname + '/data/out2.jpg', opts))
+var videoBlob = new SKBlob(fs.readFileSync(__dirname + '/data/out.mp4', opts))
 
 client.signIn(function (err) {
   if (err) throw new Error('signIn error', err)
