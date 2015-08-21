@@ -35,7 +35,7 @@ function Snaps (client, opts) {
  */
 Snaps.prototype.sendSnap = function (blob, recipients, text, duration, cb) {
   var self = this
-  debug('Snaps.sendSnapSimple')
+  debug('Snaps.sendSnap')
 
   self.sendSnapCustom(blob, new SnapOptions(recipients, text, duration), cb)
 }
@@ -49,7 +49,7 @@ Snaps.prototype.sendSnap = function (blob, recipients, text, duration, cb) {
  */
 Snaps.prototype.sendSnapCustom = function (blob, opts, cb) {
   var self = this
-  debug('Snaps.sendSnap')
+  debug('Snaps.sendSnapCustom')
 
   self._uploadSnap(blob, function (err, mediaID) {
     if (err) {
