@@ -26,7 +26,7 @@ function Message (params) {
   self.messageKind = constants.messageKindFromString(type)
   self.created = new Date(+message['timestamp'])
 
-  if (!self.messageKind) {
+  if (self.messageKind === null) {
     debug('invalid MessageKind (%s %j)', type, params)
   } else if (self.messageKind === constants.MessageKind.Text.value) {
     self.text = body['text']
