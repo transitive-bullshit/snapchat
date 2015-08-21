@@ -14,10 +14,11 @@ function Message (params) {
   var self = this
   if (!(self instanceof Message)) return new Message(params)
 
-  var message = params['chat_message']
-  var media = message['body']['media']
+  var message = params['chat_message'] || params
   var header = message['header']
-  var type = message['body']['type']
+  var body = message['body'] || { }
+  var media = body['media']
+  var type = body['type']
 
   self.identifier = message['id']
   self.messageIdentifier = message['chat_message_id']
@@ -25,9 +26,11 @@ function Message (params) {
   self.messageKind = constants.messageKindFromString(type)
   self.created = new Date(+message['timestamp'])
 
-  if (self.messageKind === constants.MessageKind.Text) {
-    self.text = message['body']['text']
-  } else {
+  if (!self.messageKind) {
+    debug('invalid MessageKind (%s %j)', type, params)
+  } else if (self.messageKind === constants.MessageKind.Text.value) {
+    self.text = body['text']
+  } else if (media) {
     self.mediaIdentifier = media['media_id']
     self.mediaSize = {
       'width': media['width'] | 0,
@@ -42,10 +45,6 @@ function Message (params) {
     } else if (self.mediaType !== 'VIDEO') {
       debug('new message type (%s)', self.mediaType)
     }
-
-    if (self.messageKind === null) {
-      debug('invalid MessageKind (%s)', type)
-    }
   }
 
   self.conversationIdentifier = header['conv_id']
@@ -58,6 +57,6 @@ function Message (params) {
   self.type = message['type']
 
   if (self.type !== 'chat_message') {
-    debug('unknown chat message type (%s)', self.type)
+    debug('unknown chat message type (%s %j)', self.type, params)
   }
 }

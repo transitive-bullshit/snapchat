@@ -128,3 +128,19 @@ test('SKBlob.initWithStoryData => image (2)', function (t) {
     })
   })
 })
+
+test('SKBlob.initWithStoryData => image (2)', function (t) {
+  request(imageStory2.mediaURL, { encoding: null }, function (err, response, body) {
+    t.notOk(err)
+    t.ok(body)
+    t.notOk(BufferUtils.isCompressed(body))
+    t.notOk(BufferUtils.isMedia(body))
+    SKBlob.initWithStoryData(body, imageStory2, function (err, blob) {
+      t.notOk(err)
+      t.ok(blob)
+      t.ok(blob.isMedia)
+      t.ok(blob.isImage)
+      t.end()
+    })
+  })
+})

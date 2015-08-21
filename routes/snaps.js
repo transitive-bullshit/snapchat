@@ -28,7 +28,7 @@ function Snaps (client, opts) {
  * Sends a snap to everyone in recipients with text text for duration seconds.
  *
  * @param {SKBlob} blob The SKBlob object containing the image or video data to send. Can be created with any NSData object.
- * @param {Array<string>} recipients An array of username strings.
+ * @param {Array<string>|string} recipients An array of username strings.
  * @param {string} text The text to label the snap with. This text is not superimposed upon the image; you must do that yourself.
  * @param {number} duration The length of the snap. It must be greater than 0 or an exception will be raised.
  * @param {function} cb
@@ -210,9 +210,13 @@ Snaps.prototype._uploadSnap = function (blob, cb) {
   var self = this
   var uuid = StringUtils.mediaIdentifier(self.client.username)
 
+  if (!(blob instanceof SKBlob)) {
+    throw new Error('Snap._uploadSnap invalid argument "blob" must be SKBlob instance')
+  }
+
   var params = {
     'media_id': uuid,
-    'type': blob.isImage ? constants.MediaKind.Image : constants.MediaKind.Video,
+    'type': blob.isImage ? constants.MediaKind.Image.value : constants.MediaKind.Video.value,
     'data': blob.data,
     'zipped': 0,
     'features_map': '{}',

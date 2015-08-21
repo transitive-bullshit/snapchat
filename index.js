@@ -87,6 +87,17 @@ Object.defineProperty(Snapchat.prototype, 'friends', {
 })
 
 /**
+ * Snap routes.
+ *
+ * @name Snapchat#snaps
+ * @property {Snaps}
+ * @readonly
+ */
+Object.defineProperty(Snapchat.prototype, 'snaps', {
+  get: function () { return this._snaps }
+})
+
+/**
  * Story routes.
  *
  * @name Snapchat#stories
@@ -841,7 +852,7 @@ Snapchat.prototype._getAttestation = function (username, password, ts, cb) {
   var params = {
     'nonce': nonce,
     'authentication': constants.attestation.auth,
-    'apk_digest': constants.attestation['digest9_12_2'],
+    'apk_digest': constants.attestation.digest(),
     'timestamp': ts
   }
 
