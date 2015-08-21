@@ -205,6 +205,8 @@ Snaps.prototype._loadSnapWithIdentifier = function (identifier, cb) {
 
 /**
  * @private
+ * @param {SKBlob} blob
+ * @param {function} cb
  */
 Snaps.prototype._uploadSnap = function (blob, cb) {
   var self = this
@@ -231,7 +233,6 @@ Snaps.prototype._uploadSnap = function (blob, cb) {
     if (err) {
       return cb(err)
     } else {
-      // TODO: return Snap object
       return cb(null, uuid)
     }
   })
