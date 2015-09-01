@@ -315,6 +315,10 @@ Snapchat.prototype.signIn = function (username, password, gmailEmail, gmailPassw
             return cb(err)
           }
 
+          // NOTE: this is a temporary requirement which unfortunately sends
+          // the username and password via plaintext and relies on casper's
+          // servers until we figure out a workaround for generating
+          // X-Snapchat-Client-Auth
           if (true) {
             self._getClientAuthToken(username, password, timestamp, function (err, clientAuthToken) {
               if (err) {
