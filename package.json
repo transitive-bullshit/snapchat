@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "async": "^1.4.2",
+    "bluebird": "^2.9.34",
     "debug": "^2.1.0",
     "enum": "^2.1.0",
     "inherits": "^2.0.1",

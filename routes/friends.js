@@ -1,6 +1,7 @@
 module.exports = Friends
 
 var debug = require('debug')('snapchat:friends')
+var Promise = require('bluebird')
 
 var constants = require('../lib/constants')
 
@@ -36,7 +37,7 @@ Friends.prototype.addFriends = function (toAdd, toUnfriend, cb) {
   if (!toAdd) toAdd = []
   if (!toUnfriend) toUnfriend = []
 
-  self.client.post(constants.endpoints.friends.friend, {
+  return self.client.post(constants.endpoints.friends.friend, {
     'username': self.client.username,
     'action': 'multiadddelete',
     'friend': {
@@ -57,7 +58,7 @@ Friends.prototype.addFriend = function (username, cb) {
   var self = this
   debug('Friends.addFriend (%s)', username)
 
-  self.client.post(constants.endpoints.friends.friend, {
+  return self.client.post(constants.endpoints.friends.friend, {
     'action': 'add',
     'friend': username,
     'username': self.client.username,
@@ -76,7 +77,7 @@ Friends.prototype.addFriendBack = function (username, cb) {
   var self = this
   debug('Friends.addFriendBack (%s)', username)
 
-  self.client.post(constants.endpoints.friends.friend, {
+  return self.client.post(constants.endpoints.friends.friend, {
     'action': 'add',
     'friend': username,
     'username': self.client.username,
@@ -92,20 +93,24 @@ Friends.prototype.addFriendBack = function (username, cb) {
  */
 Friends.prototype.unfriend = function (username, cb) {
   var self = this
-  debug('Friends.unfriend (%s)', username)
+  return new Promise(function (resolve, reject) {
 
-  self.client.post(constants.endpoints.friends.friend, {
-    'action': 'delete',
-    'friend': username,
-    'username': self.client.username
-  }, function (err) {
-    if (err) {
-      return cb(err)
-    }
+    debug('Friends.unfriend (%s)', username)
 
-    self._removeFriendsFromSession([ { username: username } ])
-    return cb(null)
-  })
+    self.client.post(constants.endpoints.friends.friend, {
+      'action': 'delete',
+      'friend': username,
+      'username': self.client.username
+    }, function (err) {
+      if (err) {
+        return reject(err)
+      }
+
+      self._removeFriendsFromSession([ { username: username } ])
+      return resolve()
+    })
+
+  }).nodeify(cb)
 }
 
 /**
@@ -119,28 +124,33 @@ Friends.prototype.unfriend = function (username, cb) {
  */
 Friends.prototype.findFriends = function (friends, cb) {
   var self = this
-  debug('Friends.findFriends (%j)', friends)
+  return new Promise(function (resolve, reject) {
 
-  if (self.client.session.shouldTextToVerifyNumber ||
-      self.client.session.shouldCallToVerifyNumber) {
-    return cb('Friends.findFriends error client needs to verify phone first')
-  }
+    debug('Friends.findFriends (%j)', friends)
 
-  self.client.post(constants.endpoints.friends.find, {
-    'username': self.client.username,
-    'countryCode': self.client.session.countryCode,
-    'numbers': JSON.stringify(friends)
-  }, function (err, result) {
-    if (err) {
-      return cb(err)
-    } else if (result && result.results) {
-      return cb(null, result.results.map(function (friend) {
-        return new FoundFriend(friend)
-      }))
+    if (self.client.session.shouldTextToVerifyNumber ||
+        self.client.session.shouldCallToVerifyNumber) {
+      return reject(new Error('Friends.findFriends error client needs to verify phone first'))
     }
 
-    return cb('Friends.findFriends parse error')
-  })
+    self.client.post(constants.endpoints.friends.find, {
+      'username': self.client.username,
+      'countryCode': self.client.session.countryCode,
+      'numbers': JSON.stringify(friends)
+    }, function (err, result) {
+      if (err) {
+        return reject(err)
+      } else if (result && result.results) {
+        var results = result.results.map(function (friend) {
+          return new FoundFriend(friend)
+        })
+        return resolve(results)
+      }
+
+      return reject(new Error('Friends.findFriends parse error'))
+    })
+
+  }).nodeify(cb)
 }
 
 /**
@@ -153,28 +163,33 @@ Friends.prototype.findFriends = function (friends, cb) {
  */
 Friends.prototype.findFriendsNear = function (location, accuracy, milliseconds, cb) {
   var self = this
-  debug('Friends.findFriendsNear (%j)', location)
+  return new Promise(function (resolve, reject) {
 
-  if (accuracy <= 0) accuracy = 10
+    debug('Friends.findFriendsNear (%j)', location)
 
-  self.client.post(constants.endpoints.friends.findNearby, {
-    'username': self.client.username,
-    'accuracyMeters': accuracy,
-    'action': 'update',
-    'lat': location.lat,
-    'lng': location.lng,
-    'totalPollingDurationMillis': milliseconds
-  }, function (err, result) {
-    if (err) {
-      return cb(err)
-    } else if (result && result['nearby_snapchatters']) {
-      return cb(null, result['nearby_snapchatters'].map(function (user) {
-        return new NearbyUser(user['username'], user['user_id'])
-      }))
-    }
+    if (accuracy <= 0) accuracy = 10
 
-    return cb('Friends.findFriendNear parse error')
-  })
+    self.client.post(constants.endpoints.friends.findNearby, {
+      'username': self.client.username,
+      'accuracyMeters': accuracy,
+      'action': 'update',
+      'lat': location.lat,
+      'lng': location.lng,
+      'totalPollingDurationMillis': milliseconds
+    }, function (err, result) {
+      if (err) {
+        return reject(err)
+      } else if (result && result['nearby_snapchatters']) {
+        var results = result['nearby_snapchatters'].map(function (user) {
+          return new NearbyUser(user['username'], user['user_id'])
+        })
+        return resolve(results)
+      }
+
+      return reject(new Error('Friends.findFriendNear parse error'))
+    })
+
+  }).nodeify(cb)
 }
 
 /**
@@ -184,7 +199,7 @@ Friends.prototype.searchFriend = function (query, cb) {
   var self = this
   debug('Friends.searchFriend (%s)', query)
 
-  self.client.post(constants.endpoints.friends.search, {
+  return self.client.post(constants.endpoints.friends.search, {
     'query': query,
     'username': self.client.username
   }, cb)
@@ -198,20 +213,24 @@ Friends.prototype.searchFriend = function (query, cb) {
  */
 Friends.prototype.userExists = function (username, cb) {
   var self = this
-  debug('Friends.userExists (%s)', username)
+  return new Promise(function (resolve, reject) {
 
-  self.client.post(constants.endpoints.friends.exists, {
-    'request_username': username,
-    'username': self.client.username
-  }, function (err, result) {
-    if (err) {
-      return cb(err)
-    } else if (result) {
-      return cb(null, !!result.exists)
-    }
+    debug('Friends.userExists (%s)', username)
 
-    return cb('Friends.userExists parse error')
-  })
+    self.client.post(constants.endpoints.friends.exists, {
+      'request_username': username,
+      'username': self.client.username
+    }, function (err, result) {
+      if (err) {
+        return reject(err)
+      } else if (result) {
+        return resolve(!!result.exists)
+      }
+
+      return reject(new Error('Friends.userExists parse error'))
+    })
+
+  }).nodeify(cb)
 }
 
 /**
@@ -223,29 +242,33 @@ Friends.prototype.userExists = function (username, cb) {
  */
 Friends.prototype.updateDisplayNameForUser = function (friend, displayName, cb) {
   var self = this
-  debug('Friends.updateDisplayNameForUser (%s, "%s")', friend, displayName)
+  return new Promise(function (resolve, reject){
 
-  self.client.post(constants.endpoints.friends.friend, {
-    'action': 'display',
-    'display': displayName,
-    'friend': friend,
-    'friend_id': '',
-    'username': self.client.username
-  }, function (err, result) {
-    if (err) {
-      return cb(err)
-    } else if (result && result.object) {
-      var updated = new User(result.object)
+    debug('Friends.updateDisplayNameForUser (%s, "%s")', friend, displayName)
 
-      self._removeFriendsFromSession([ updated ])
-      self._addFriendsToSession([ updated ])
-      return cb(null, updated)
-    } else {
-      debug('Friends.updateDisplayNameForUser parse error %j', result)
-    }
+    self.client.post(constants.endpoints.friends.friend, {
+      'action': 'display',
+      'display': displayName,
+      'friend': friend,
+      'friend_id': '',
+      'username': self.client.username
+    }, function (err, result) {
+      if (err) {
+        return rejectr(err)
+      } else if (result && result.object) {
+        var updated = new User(result.object)
 
-    return cb('Friends.updateDisplayNameForUser parse error')
-  })
+        self._removeFriendsFromSession([ updated ])
+        self._addFriendsToSession([ updated ])
+        return resolve(updated)
+      } else {
+        debug('Friends.updateDisplayNameForUser parse error %j', result)
+      }
+
+      return reject(new Error('Friends.updateDisplayNameForUser parse error'))
+    })
+
+  }).nodeify(cb)
 }
 
 /**
@@ -258,7 +281,7 @@ Friends.prototype.blockUser = function (username, cb) {
   var self = this
   debug('Friends.blockUser (%s)', username)
 
-  self._setUserBlocked(username, true, cb)
+  return self._setUserBlocked(username, true, cb)
 }
 
 /**
@@ -271,7 +294,7 @@ Friends.prototype.unblockUser = function (username, cb) {
   var self = this
   debug('Friends.unblockUser (%s)', username)
 
-  self._setUserBlocked(username, false, cb)
+  return self._setUserBlocked(username, false, cb)
 }
 
 /**
@@ -283,24 +306,28 @@ Friends.prototype.unblockUser = function (username, cb) {
  */
 Friends.prototype.seenSuggestedFriends = function (usernames, seen, cb) {
   var self = this
-  debug('Friends.seenSuggestedFriends (%j, %d)', usernames, seen)
+  return new Promise(function (resolve, reject) {
 
-  if (!usernames || !usernames.length) usernames = [ ]
+    debug('Friends.seenSuggestedFriends (%j, %d)', usernames, seen)
 
-  self.client.post(constants.endpoints.misc.suggestFriend, {
-    'action': 'update',
-    'seen': !!seen,
-    'seen_suggested_friend_list': JSON.stringify(usernames),
-    'username': self.client.username
-  }, function (err, result) {
-    if (err) {
-      return cb(err)
-    } else if (result) {
-      return cb(null, !!result.logged)
-    }
+    if (!usernames || !usernames.length) usernames = [ ]
 
-    return cb('Friends.seenSuggestedFriends parse error')
-  })
+    self.client.post(constants.endpoints.misc.suggestFriend, {
+      'action': 'update',
+      'seen': !!seen,
+      'seen_suggested_friend_list': JSON.stringify(usernames),
+      'username': self.client.username
+    }, function (err, result) {
+      if (err) {
+        return reject(err)
+      } else if (result) {
+        return resolve(!!result.logged)
+      }
+
+      return reject(new Error('Friends.seenSuggestedFriends parse error'))
+    })
+
+  }).nodeify(cb)
 }
 
 /**
@@ -341,7 +368,7 @@ Friends.prototype._addFriendsToSession = function (friends) {
 Friends.prototype._setUserBlocked = function (username, blocked, cb) {
   var self = this
 
-  self.client.post(constants.endpoints.friends.friend, {
+  return self.client.post(constants.endpoints.friends.friend, {
     'action': blocked ? 'block' : 'unblock',
     'friend': username,
     'username': self.client.username

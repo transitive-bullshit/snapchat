@@ -1,6 +1,7 @@
 module.exports = Snaps
 
 var debug = require('debug')('snapchat:snaps')
+var Promise = require('bluebird')
 
 var constants = require('../lib/constants')
 var StringUtils = require('../lib/string-utils')
@@ -37,7 +38,7 @@ Snaps.prototype.sendSnap = function (blob, recipients, text, duration, cb) {
   var self = this
   debug('Snaps.sendSnap')
 
-  self.sendSnapCustom(blob, new SnapOptions(recipients, text, duration), cb)
+  return self.sendSnapCustom(blob, new SnapOptions(recipients, text, duration), cb)
 }
 
 /**
@@ -49,25 +50,34 @@ Snaps.prototype.sendSnap = function (blob, recipients, text, duration, cb) {
  */
 Snaps.prototype.sendSnapCustom = function (blob, opts, cb) {
   var self = this
-  debug('Snaps.sendSnapCustom')
+  return new Promise(function (resolve, reject) {
 
-  self._uploadSnap(blob, function (err, mediaID) {
-    if (err) {
-      return cb(err)
-    }
+    debug('Snaps.sendSnapCustom')
 
-    self.client.post(constants.endpoints.snaps.send, {
-      'camera_front_facing': !!opts.cameraFrontFacing,
-      'country_code': self.client.session.countryCode,
-      'media_id': mediaID,
-      'recipients': JSON.stringify(opts.recipients),
-      'recipient_ids': JSON.stringify(opts.recipients),
-      'reply': !!opts.isReply,
-      'time': +opts.timer,
-      'zipped': 0,
-      'username': self.client.username
-    }, cb)
-  })
+    self._uploadSnap(blob, function (err, mediaID) {
+      if (err) {
+        return reject(err)
+      }
+
+      self.client.post(constants.endpoints.snaps.send, {
+        'camera_front_facing': !!opts.cameraFrontFacing,
+        'country_code': self.client.session.countryCode,
+        'media_id': mediaID,
+        'recipients': JSON.stringify(opts.recipients),
+        'recipient_ids': JSON.stringify(opts.recipients),
+        'reply': !!opts.isReply,
+        'time': +opts.timer,
+        'zipped': 0,
+        'username': self.client.username
+      }, function (err, result) {
+        if (err) {
+          return reject(err)
+        }
+        return resolve(result)
+      })
+    })
+
+  }).nodeify(cb)
 }
 
 /**
@@ -80,7 +90,7 @@ Snaps.prototype.markSnapViewed = function (snap, secondsViewed, cb) {
   var self = this
   debug('Snaps.markSnapViewed')
 
-  self.markSnapsViewed([ snap ], [ new Date() ], [ secondsViewed ], cb)
+  return self.markSnapsViewed([ snap ], [ new Date() ], [ secondsViewed ], cb)
 }
 
 /**
@@ -108,7 +118,7 @@ Snaps.prototype.markSnapsViewed = function (snaps, times, secondsViewed, cb) {
     }
   })
 
-  self.client.post(constants.endpoints.update.snaps, {
+  return self.client.post(constants.endpoints.update.snaps, {
     'added_friends_timestamp': StringUtils.timestampFrom(self.session.addedFriendsTimestamp),
     'username': self.client.username,
     'json': JSON.stringify(json)
@@ -142,7 +152,7 @@ Snaps.prototype.markSnapScreenshot = function (snap, secondsViewed, cb) {
     'ts': StringUtils.timestamp() | 0
   }
 
-  self.client.sendEvents([ screenshot ], snapInfo, cb)
+  return self.client.sendEvents([ screenshot ], snapInfo, cb)
 }
 
 /**
@@ -155,7 +165,7 @@ Snaps.prototype.loadSnap = function (snap, cb) {
   var self = this
   debug('Snaps.loadSnap')
 
-  self._loadSnapWithIdentifier(snap.identifier, cb)
+  return self._loadSnapWithIdentifier(snap.identifier, cb)
 }
 
 /**
@@ -166,23 +176,27 @@ Snaps.prototype.loadSnap = function (snap, cb) {
  */
 Snaps.prototype.loadFiltersForLocation = function (location, cb) {
   var self = this
-  debug('Snaps.loadFiltersForLocation')
+  return new Promise(function (resolve, reject) {
 
-  self.client.post(constants.endpoints.misc.locationData, {
-    'lat': location.lat,
-    'lng': location.lng,
-    'screen_width': self.client.screenSize.width,
-    'screen_height': self.client.screenSize.height,
-    'username': self.client.username
-  }, function (err, result) {
-    if (err) {
-      return cb(err)
-    } else if (result) {
-      return cb(null, new SKLocation(result))
-    }
+    debug('Snaps.loadFiltersForLocation')
 
-    return cb('Snaps.loadFiltersForLocation parse error')
-  })
+    self.client.post(constants.endpoints.misc.locationData, {
+      'lat': location.lat,
+      'lng': location.lng,
+      'screen_width': self.client.screenSize.width,
+      'screen_height': self.client.screenSize.height,
+      'username': self.client.username
+    }, function (err, result) {
+      if (err) {
+        return reject(err)
+      } else if (result) {
+        return resolve(new SKLocation(result))
+      }
+
+      return reject(new Error('Snaps.loadFiltersForLocation parse error'))
+    })
+
+  }).nodeify(cb)
 }
 
 /**
@@ -190,17 +204,25 @@ Snaps.prototype.loadFiltersForLocation = function (location, cb) {
  */
 Snaps.prototype._loadSnapWithIdentifier = function (identifier, cb) {
   var self = this
+  return new Promise(function (resolve, reject) {
 
-  self.client.post(constants.endpoints.snaps.loadBlob, {
-    'id': identifier,
-    'username': self.client.username
-  }, function (err, body) {
-    if (err) {
-      return cb(err)
-    }
+    self.client.post(constants.endpoints.snaps.loadBlob, {
+      'id': identifier,
+      'username': self.client.username
+    }, function (err, body) {
+      if (err) {
+        return reject(err)
+      }
 
-    SKBlob.initWithData(body, cb)
-  })
+      SKBlob.initWithData(body, function (err, blob) {
+        if (err) {
+          return reject(err)
+        }
+        return resolve(blob)
+      })
+    })
+
+  }).nodeify(cb)
 }
 
 /**

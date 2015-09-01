@@ -1,6 +1,7 @@
 module.exports = Account
 
 var debug = require('debug')('snapchat:account')
+var Promise = require('bluebird')
 
 var constants = require('../lib/constants')
 
@@ -28,24 +29,28 @@ function Account (client, opts) {
  */
 Account.prototype.updateBestFriendsCount = function (number, cb) {
   var self = this
-  debug('Account.updateBestFriendsCount (%d)', number)
+  return new Promise(function (resolve, reject) {
 
-  if (number < 3) number = 3
-  if (number > 7) number = 7
+    debug('Account.updateBestFriendsCount (%d)', number)
 
-  self.client.post(constants.endpoints.account.setBestsCount, {
-    'num_best_friends': number | 0,
-    'username': self.client.username
-  }, function (err, result) {
-    if (err) {
-      return cb(err)
-    } else if (result) {
-      self.client.session.bestFriendUsernames = result['best_friends']
-      return cb(null)
-    }
+    if (number < 3) number = 3
+    if (number > 7) number = 7
 
-    return cb('Snapchat.Account.updateBestFriendsCount parse error')
-  })
+    self.client.post(constants.endpoints.account.setBestsCount, {
+      'num_best_friends': number | 0,
+      'username': self.client.username
+    }, function (err, result) {
+      if (err) {
+        return reject(err)
+      } else if (result) {
+        self.client.session.bestFriendUsernames = result['best_friends']
+        return resolve()
+      }
+
+      return reject(new Error('Snapchat.Account.updateBestFriendsCount parse error'))
+    })
+
+  }).nodeify(cb)
 }
 
 /**
@@ -60,7 +65,7 @@ Account.prototype.updateSnapPrivacy = function (privacy, cb) {
 
   privacy = Math.min(privacy, 1) | 0
 
-  self.client.post(constants.endpoints.account.settings, {
+  return self.client.post(constants.endpoints.account.settings, {
     'action': 'updatePrivacy',
     'privacySetting': privacy,
     'username': self.client.username
@@ -93,7 +98,7 @@ Account.prototype.updateStoryPrivacy = function (privacy, friends, cb) {
     params.storyFriendsToBlock = friends
   }
 
-  self.client.post(constants.endpoints.account.settings, params, cb)
+  return self.client.post(constants.endpoints.account.settings, params, cb)
 }
 
 /**
@@ -106,7 +111,7 @@ Account.prototype.updateEmail = function (address, cb) {
   var self = this
   debug('Account.updateEmail (%s)', address)
 
-  self.client.post(constants.endpoints.account.settings, {
+  return self.client.post(constants.endpoints.account.settings, {
     'action': 'updateEmail',
     'email': address,
     'username': self.client.username
@@ -123,7 +128,7 @@ Account.prototype.updateSearchableByNumber = function (searchable, cb) {
   var self = this
   debug('Account.updateSearchableByNumber (%d)', searchable)
 
-  self.client.post(constants.endpoints.account.settings, {
+  return self.client.post(constants.endpoints.account.settings, {
     'action': 'updateSearchableByPhoneNumber',
     'searchable': !!searchable,
     'username': self.client.username
@@ -140,7 +145,7 @@ Account.prototype.updateNotificationSoundSetting = function (enableSound, cb) {
   var self = this
   debug('Account.updateNotificationSoundSetting (%d)', enableSound)
 
-  self.client.post(constants.endpoints.account.settings, {
+  return self.client.post(constants.endpoints.account.settings, {
     'action': 'updateNotificationSoundSetting',
     'notificationSoundSetting': enableSound ? 'ON' : 'OFF',
     'username': self.client.username
@@ -158,7 +163,7 @@ Account.prototype.updateDisplayName = function (displayName, cb) {
   var self = this
   debug('Account.updateDisplayName (%s)', displayName)
 
-  self.client.friends.updateDisplayNameForUser(self.client.username, displayName, cb)
+  return self.client.friends.updateDisplayNameForUser(self.client.username, displayName, cb)
 }
 
 /**
@@ -184,7 +189,7 @@ Account.prototype.updateFeatureSettings = function (settings, cb) {
   features[constants.featureSettings.swipeCashMode] = settings[constants.featureSettings.swipeCashMode] || self.client.session.enableSwipeCashMode
   features[constants.featureSettings.travelMode] = settings[constants.featureSettings.travelMode] || self.client.session.enableTravelMode
 
-  self.client.post(constants.endpoints.update.featureSettings, {
+  return self.client.post(constants.endpoints.update.featureSettings, {
     'settings': JSON.stringify(features),
     'username': self.client.username
   }, cb)
@@ -197,22 +202,26 @@ Account.prototype.updateFeatureSettings = function (settings, cb) {
  */
 Account.prototype.downloadSnaptag = function (cb) {
   var self = this
-  debug('Account.downloadSnaptag')
+  return new Promise(function (resolve, reject) {
 
-  self.client.post(constants.endpoints.account.snaptag, {
-    'image': self.client.session.QRPath,
-    'type': 'SVG',
-    'username': self.client.username
-  }, function (err, body) {
-    if (err) {
-      return cb(err)
-    } else {
+    debug('Account.downloadSnaptag')
+
+    self.client.post(constants.endpoints.account.snaptag, {
+      'image': self.client.session.QRPath,
+      'type': 'SVG',
+      'username': self.client.username
+    }, function (err, body) {
+      if (err) {
+        return reject(err)
+      }
+
       // TODO: this returns application/json but it's actually an XML doc:
       // '<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n<svg height="320" version="1.1" viewBox="0 0 320 320" width="320" xmlns="http://www.w3.org/2000/svg">\n  <path d="M162.31,52.4......74" fill="#FFFC00"/>\n</svg>\n'
-      throw new Error('downloadSnaptag TODO')
+      return reject(new Error('downloadSnaptag TODO'))
       // SKBlob.initWithData(body, cb)
-    }
-  })
+    })
+
+  }).nodeify(cb)
 }
 
 /**
@@ -222,11 +231,16 @@ Account.prototype.downloadSnaptag = function (cb) {
  * @param {function} cb
  */
 Account.prototype.uploadAvatar = function (images, cb) {
-  debug('Account.uploadAvatar')
+  var self = this
+  return new Promise(function (resolve, reject) {
 
-  throw new Error('Account.uploadAvatar TODO', images, cb)
-  // SKEPAccount.avatar.set
-  // multipart/form-data; takes a single 'data' parameter in addition to the usual 'username' param
+    debug('Account.uploadAvatar')
+
+    return reject(new Error('Account.uploadAvatar TODO'))
+    // SKEPAccount.avatar.set
+    // multipart/form-data; takes a single 'data' parameter in addition to the usual 'username' param
+
+  }).nodeify(cb)
 }
 
 /**
@@ -237,19 +251,28 @@ Account.prototype.uploadAvatar = function (images, cb) {
  */
 Account.prototype.downloadAvatar = function (username, cb) {
   var self = this
-  debug('Account.downloadAvatar')
+  return new Promise(function (resolve, reject) {
 
-  self.client.post(constants.endpoints.account.avatar.get, {
-    'username_image': username,
-    'username': self.client.username,
-    'size': 'MEDIUM'
-  }, function (err, body) {
-    if (err) {
-      return cb(err)
-    } else {
-      SKBlob.initWithData(body, cb)
-    }
-  })
+    debug('Account.downloadAvatar')
+
+    self.client.post(constants.endpoints.account.avatar.get, {
+      'username_image': username,
+      'username': self.client.username,
+      'size': 'MEDIUM'
+    }, function (err, body) {
+      if (err) {
+        return reject(err)
+      } else {
+        SKBlob.initWithData(body, function (err, blob) {
+          if (err) {
+            return reject(err)
+          }
+          return resolve(blob)
+        })
+      }
+    })
+
+  }).nodeify(cb)
 }
 
 /**
@@ -270,7 +293,7 @@ Account.prototype.updateTOSAgreementStatus = function (snapcash, snapcashV2, squ
     'square_tos_accepted': square ? 'true' : 'false'
   }
 
-  self.client.post(constants.endpoints.update.user, {
+  return self.client.post(constants.endpoints.update.user, {
     'username': self.client.username,
     'agreements': JSON.stringify(agreements)
   }, cb)
