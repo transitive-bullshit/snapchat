@@ -87,7 +87,9 @@ Stories.prototype.loadStoryBlob = function (story, cb) {
   }
 
   if (story.needsAuth) {
-    Request.post(constants.endpoints.stories.authBlob, {
+    var url = constants.endpoints.stories.authBlob + story.mediaIdentifier
+
+    Request.post(url, {
       'story_id': story.mediaIdentifier,
       'username': self.client.username
     }, self.client.googleAuthToken, self.client.authToken, blobHandler)

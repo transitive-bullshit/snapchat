@@ -289,7 +289,7 @@ Snapchat.prototype.signIn = function (username, password, gmailEmail, gmailPassw
 
   debug('Snapchat.signIn (username %s)', username)
 
-  self._getGoogleAuthToken(gmailEmail, gmailPassword, function (err, gauth) {
+  self._getGoogleAuthToken(gmailEmail, gmailPassword, function (err, googleAuthToken) {
     if (err) {
       debug('error getting google auth token')
       return cb(err)
@@ -315,57 +315,93 @@ Snapchat.prototype.signIn = function (username, password, gmailEmail, gmailPassw
             return cb(err)
           }
 
-          self._googleAuthToken = gauth
-          self._googleAttestation = attestation
-          self._deviceToken1i = deviceTokens[constants.core.deviceToken1i]
-          self._deviceToken1v = deviceTokens[constants.core.deviceToken1v]
-
-          var reqToken = StringUtils.hashSCString(constants.core.staticToken, timestamp)
-          var preHash = StringUtils.getSCPreHashString(username, password, timestamp, reqToken)
-          var deviceHash = StringUtils.hashHMacToBase64(preHash, self._deviceToken1v).substr(0, 20)
-
-          var params = {
-            'username': username,
-            'password': password,
-            'width': constants.screen.width,
-            'height': constants.screen.height,
-            'max_video_width': constants.screen.maxVideoWidth,
-            'max_video_height': constants.screen.maxVideoHeight,
-            'application_id': 'com.snapchat.android',
-            'is_two_fa': 'false',
-            'ptoken': ptoken,
-            'pre_auth': '',
-            'sflag': 1,
-            'dsig': deviceHash,
-            'dtoken1i': self._deviceToken1i,
-            'attestation': self._googleAttestation,
-            'timestamp': timestamp
+          if (true) {
+            self._getClientAuthToken(username, password, timestamp, function (err, clientAuthToken) {
+              if (err) {
+                debug('error generating client auth token')
+                return cb(err)
+              } else {
+                self.signInWithData(self._makeSignInData(googleAuthToken, attestation, ptoken, clientAuthToken, deviceTokens, timestamp), username, password, cb)
+              }
+            })
+          } else {
+            self.signInWithData(self._makeSignInData(googleAuthToken, attestation, ptoken, '', deviceTokens, timestamp), username, password, cb)
           }
-
-          var headers = { }
-          headers[constants.headers.clientAuthToken] = 'Bearer ' + self._googleAuthToken
-          headers[constants.headers.clientAuth] = ''
-
-          var opts = {
-            'timestamp': timestamp
-          }
-
-          Request.postCustom(constants.endpoints.account.login, params, headers, null, opts, function (err, result) {
-            if (err) {
-              debug('Snapchat.signIn error %s', err)
-              return cb(err)
-            } else if (result) {
-              self.session = new Session(self, result)
-              return cb(null, self.session)
-            }
-
-            return cb('Snapchat.signIn parse error', result)
-          })
         })
       })
     })
   })
 }
+
+Snapchat.prototype._makeSignInData = function (googleAuthToken, attestation, ptoken, clientAuthToken, deviceTokens, timestamp) {
+  return {
+    googleAuthToken: googleAuthToken,
+    attestation: attestation,
+    pushToken: ptoken,
+    clientAuthToken: clientAuthToken,
+    deviceTokens: deviceTokens,
+    timestamp: timestamp,
+  }
+}
+
+Snapchat.prototype.signInWithData = function (data, username, password, cb) {
+  var self = this
+
+  var googleAuthToken = data.googleAuthToken
+  var attestation = data.attestation
+  var ptoken = data.pushToken
+  var clientAuthToken = data.clientAuthToken
+  var deviceTokens = data.deviceTokens
+  var timestamp = data.timestamp
+
+  self._googleAuthToken = googleAuthToken
+  self._googleAttestation = attestation
+  self._deviceToken1i = deviceTokens[constants.core.deviceToken1i]
+  self._deviceToken1v = deviceTokens[constants.core.deviceToken1v]
+
+  var reqToken = StringUtils.hashSCString(constants.core.staticToken, timestamp)
+  var preHash = StringUtils.getSCPreHashString(username, password, timestamp, reqToken)
+  var deviceHash = StringUtils.hashHMacToBase64(preHash, self._deviceToken1v).substr(0, 20)
+
+  var params = {
+    'username': username,
+    'password': password,
+    'width': constants.screen.width,
+    'height': constants.screen.height,
+    'max_video_width': constants.screen.maxVideoWidth,
+    'max_video_height': constants.screen.maxVideoHeight,
+    'application_id': 'com.snapchat.android',
+    'is_two_fa': 'false',
+    'ptoken': ptoken,
+    'pre_auth': '',
+    'sflag': 1,
+    'dsig': deviceHash,
+    'dtoken1i': self._deviceToken1i,
+    'attestation': self._googleAttestation,
+    'timestamp': timestamp
+  }
+
+  var headers = { }
+  headers[constants.headers.clientAuthToken] = 'Bearer ' + self._googleAuthToken
+  headers[constants.headers.clientAuth] = clientAuthToken
+
+  var opts = {
+    'timestamp': timestamp
+  }
+
+  Request.postCustom(constants.endpoints.account.login, params, headers, null, opts, function (err, result) {
+    if (err) {
+      debug('Snapchat.signIn error %s', err)
+      return cb(err)
+    } else if (result) {
+      self.session = new Session(self, result)
+      return cb(null, self.session)
+    }
+
+    return cb('Snapchat.signIn parse error', result)
+  })
+}
+
 
 /**
  * Use this to restore a session that ended within the last hour. The google auth token must be re-generated every hour.
@@ -502,7 +538,7 @@ Snapchat.prototype.registerUsername = function (username, registeredEmail, gmail
   var self = this
   debug('Snapchat.registerUsername (username %s, email %s)', username, registeredEmail)
 
-  self._getGoogleAuthToken(gmailEmail, gmailPassword, function (err, gauth) {
+  self._getGoogleAuthToken(gmailEmail, gmailPassword, function (err, googleAuthToken) {
     if (err) {
       debug('could not retrieve google auth token')
       return cb(err)
@@ -517,7 +553,7 @@ Snapchat.prototype.registerUsername = function (username, registeredEmail, gmail
         return cb(err)
       } else if (result) {
         self.session = new Session(self, result)
-        self._googleAuthToken = gauth
+        self._googleAuthToken = googleAuthToken
         return cb(null)
       }
 
@@ -693,7 +729,7 @@ Snapchat.prototype.sendEvents = function (events, snapInfo, cb) {
 }
 
 /**
- * internal
+ * @private
  */
 Snapchat.prototype._getGoogleAuthToken = function (gmailEmail, gmailPassword, cb) {
   Request.postRaw({
@@ -743,7 +779,7 @@ var sDeviceToken1i = null
 var sDeviceToken1v = null
 
 /**
- * internal
+ * @private
  */
 Snapchat.prototype._getDeviceTokens = function (cb) {
   // cache device tokens
@@ -785,7 +821,7 @@ Snapchat.prototype._getDeviceTokens = function (cb) {
 
 /**
  * ptoken value
- * internal
+ * @private
  */
 Snapchat.prototype._getGoogleCloudMessagingIdentifier = function (cb) {
   var DEFAULT_TOKEN = 'ie'
@@ -843,7 +879,7 @@ Snapchat.prototype._getGoogleCloudMessagingIdentifier = function (cb) {
 
 /**
  * Attestation, courtesy of casper.io
- * internal
+ * @private
  */
 Snapchat.prototype._getAttestation = function (username, password, ts, cb) {
   var preHash = StringUtils.getSCPreHashString(username, password, ts, constants.endpoints.account.login)
@@ -867,5 +903,30 @@ Snapchat.prototype._getAttestation = function (username, password, ts, cb) {
     }
 
     return cb('Snapchat._getAttestation unknown error')
+  })
+}
+
+/**
+ * Client Auth Token, courtesy of casper.io
+ *
+ * Note that casper.io uses libscplugin.so which has been extracted from the
+ * Android Snapchat client.
+ *
+ * @private
+ */
+Snapchat.prototype._getClientAuthToken = function (username, password, ts, cb) {
+  var url = constants.attestation.URLCasperAuth + '/?username=' + username + '&password=' + password + '&timestamp=' + ts
+
+  Request.postRaw({
+    url: url,
+    form: { }
+  }, function (err, response, result) {
+    if (err) {
+      return cb(err)
+    } else if (result && +result.status === 200 && result.signature) {
+      return cb(null, result.signature)
+    }
+
+    return cb('Snapchat._getClientAuthToken unknown error')
   })
 }
