@@ -921,15 +921,17 @@ Snapchat.prototype._getAttestation = function (username, password, ts, cb) {
  * @private
  */
 Snapchat.prototype._getClientAuthToken = function (username, password, ts, cb) {
-  var url = constants.attestation.URLCasperAuth + '/?username=' + username + '&password=' + password + '&timestamp=' + ts
-
   Request.postRaw({
-    url: url,
-    form: { }
+    url: constants.attestation.URLCasperAuth,
+    form: {
+      username: username,
+      password: password,
+      timestamp: ts
+    }
   }, function (err, response, result) {
     if (err) {
       return cb(err)
-    } else if (result && +result.status === 200 && result.signature) {
+    } else if (result && +result.code === 200 && result.signature) {
       return cb(null, result.signature)
     }
 
