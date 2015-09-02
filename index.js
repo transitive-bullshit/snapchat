@@ -757,6 +757,30 @@ Snapchat.prototype.post = function (endpoint, params, cb) {
 }
 
 /**
+ * [get description]
+ *
+ * @param  {string}   endpoint
+ * @param  {function} cb
+ */
+Snapchat.prototype.get = function (endpoint, cb) {
+  var self = this
+  return new Promise(function (resolve, reject) {
+
+    debug('Snapchat.get (%s)', endpoint)
+
+    Request.get(endpoint, function (err, result) {
+      if (err) {
+        return reject(err)
+      }
+      return resolve(result)
+    })
+
+  }).nodeify(cb)
+}
+
+
+
+/**
  * internal
  */
 Snapchat.prototype.sendEvents = function (events, snapInfo, cb) {
