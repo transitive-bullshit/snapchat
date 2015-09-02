@@ -13,6 +13,6 @@ function SnapOptions (recipients, text, timer) {
   if (!(self instanceof SnapOptions)) return new SnapOptions(recipients, text, timer)
 
   self.recipients = Array.isArray(recipients) ? recipients : [ recipients ]
-  self.text = text || ""
+  self.text = text || ''
   self.timer = timer || 3
 }

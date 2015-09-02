@@ -81,8 +81,8 @@ Object.defineProperty(Story.prototype, 'suggestedFilename', {
  */
 Story.prototype.load = function (cb) {
   var self = this
-  return new Promise(function (resolve, reject) {
 
+  return new Promise(function (resolve, reject) {
     self.client.stories.loadStoryBlob(self, function (err, blob) {
       if (err) {
         return reject(err)
@@ -99,7 +99,6 @@ Story.prototype.load = function (cb) {
       self.blob = blob
       return resolve(blob)
     })
-
   }).nodeify(cb)
 }
 
@@ -108,10 +107,9 @@ Story.prototype.load = function (cb) {
  */
 Story.prototype.loadThumbnail = function (cb) {
   var self = this
+
   return new Promise(function (resolve, reject) {
-    console.log('loadThumnail: 1');
     self.client.stories.loadStoryThumbnailBlob(self, function (err, blob) {
-      console.log('loadThumnail: 5');
       if (err) {
         return reject(err)
       }
@@ -119,6 +117,5 @@ Story.prototype.loadThumbnail = function (cb) {
       self.thumbnailBlob = blob
       return resolve(self)
     })
-
   }).nodeify(cb)
 }

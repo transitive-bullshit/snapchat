@@ -2,7 +2,6 @@ module.exports = SKBlob
 
 var BufferUtils = require('../lib/buffer-utils')
 var Story = require('./story')
-var zlib = require('zlib')
 var fileType = require('file-type')
 var JSZip = require('jszip')
 

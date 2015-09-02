@@ -351,7 +351,7 @@ Snapchat.prototype._makeSignInData = function (googleAuthToken, attestation, pto
     pushToken: ptoken,
     clientAuthToken: clientAuthToken,
     deviceTokens: deviceTokens,
-    timestamp: timestamp,
+    timestamp: timestamp
   }
 }
 
@@ -810,7 +810,7 @@ Snapchat.prototype._getGoogleAuthToken = function (gmailEmail, gmailPassword, cb
       'accountType': 'HOSTED_OR_GOOGLE',
       'Email': gmailEmail,
       'EncryptedPasswd': encryptedGmailPassword,
-      //'Passwd': gmailPassword, // unencrypted version
+      // 'Passwd': gmailPassword, // unencrypted version
       'service': 'audience:server:client_id:694893979329-l59f3phl42et9clpoo296d8raqoljl6p.apps.googleusercontent.com',
       'source': 'android',
       'androidId': '378c184c6070c26c',

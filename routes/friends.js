@@ -239,7 +239,7 @@ Friends.prototype.userExists = function (username, cb) {
 Friends.prototype.updateDisplayNameForUser = function (friend, displayName, cb) {
   var self = this
 
-  return new Promise(function (resolve, reject){
+  return new Promise(function (resolve, reject) {
     debug('Friends.updateDisplayNameForUser (%s, "%s")', friend, displayName)
 
     self.client.post(constants.endpoints.friends.friend, {

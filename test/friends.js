@@ -46,7 +46,7 @@ client.signIn(function (err) {
       t.ok(results)
       t.ok(results.length >= 1)
       t.equal(results.filter(function (result) {
-        return result.username ===  'lovealways_cma'
+        return result.username === 'lovealways_cma'
       }).length, 1)
       t.end()
     })

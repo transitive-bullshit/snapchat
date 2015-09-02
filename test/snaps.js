@@ -10,15 +10,11 @@ var Snapchat = require('../')
 var SKBlob = require('../models/blob')
 
 var client = new Snapchat()
-var opts
-
-var imageBlob0 = new SKBlob(fs.readFileSync(__dirname + '/data/out1.jpg', opts))
-var imageBlob1 = new SKBlob(fs.readFileSync(__dirname + '/data/out2.jpg', opts))
-var videoBlob = new SKBlob(fs.readFileSync(__dirname + '/data/out.mp4', opts))
 
 client.signIn(function (err) {
   if (err) throw new Error('signIn error', err)
 
+  var imageBlob0 = new SKBlob(fs.readFileSync(__dirname + '/data/out1.jpg'))
   test('Snapchat.snaps.sendSnap => image (0)', function (t) {
     t.ok(imageBlob0.isImage)
     t.ok(!imageBlob0.isVideo)
@@ -27,7 +23,9 @@ client.signIn(function (err) {
     })
   })
 
-  /*test('Snapchat.snaps.sendSnap => image (1)', function (t) {
+  /*
+  var imageBlob1 = new SKBlob(fs.readFileSync(__dirname + '/data/out2.jpg'))
+  test('Snapchat.snaps.sendSnap => image (1)', function (t) {
     t.ok(imageBlob1.isImage)
     t.ok(!imageBlob1.isVideo)
     client.snaps.sendSnap(imageBlob1, TEST_USERNAME, 'hola', 5, function (err) {
@@ -35,6 +33,7 @@ client.signIn(function (err) {
     })
   })
 
+  var videoBlob = new SKBlob(fs.readFileSync(__dirname + '/data/out.mp4'))
   test('Snapchat.snaps.sendSnap => video', function (t) {
     t.ok(!videoBlob.isImage)
     t.ok(videoBlob.isVideo)
@@ -44,5 +43,4 @@ client.signIn(function (err) {
   })*/
 
   // TODO:
-  //
 })
