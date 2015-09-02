@@ -904,8 +904,8 @@ Snapchat.prototype._getAttestation = function (username, password, ts, cb) {
   }, function (err, response, result) {
     if (err) {
       return cb(err)
-    } else if (result && +result.code === 200) {
-      return cb(null, result.signedAttestation)
+    } else if (result && +result.code === 200 && result.attestation) {
+      return cb(null, result.attestation)
     }
 
     return cb('Snapchat._getAttestation unknown error')
