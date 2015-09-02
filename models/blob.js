@@ -3,6 +3,8 @@ module.exports = SKBlob
 var BufferUtils = require('../lib/buffer-utils')
 var Story = require('./story')
 var zlib = require('zlib')
+var fileType = require('file-type')
+var JSZip = require('jszip')
 
 /**
  * Snapchat Blob wrapper
@@ -19,6 +21,8 @@ function SKBlob (data) {
   }
 
   self._data = data
+  self._type = fileType(data)
+
   self._isImage = BufferUtils.isImage(data)
   self._isMPEG4 = BufferUtils.isMPEG4(data)
   self._isVideo = self._isMPEG4
@@ -37,6 +41,17 @@ function SKBlob (data) {
  */
 Object.defineProperty(SKBlob.prototype, 'data', {
   get: function () { return this._data }
+})
+
+/**
+ * Information about the media type.
+ *
+ * @name SKBlob#type
+ * @property {Buffer}
+ * @readonly
+ */
+Object.defineProperty(SKBlob.prototype, 'type', {
+  get: function () { return this._type }
 })
 
 /**
@@ -107,16 +122,17 @@ SKBlob.initWithData = function (data, cb) {
     return cb('error empty blob')
   }
 
-  if (data instanceof String) {
+  if (typeof data === 'string') {
     data = new Buffer(data)
   }
 
   if (BufferUtils.isCompressed(data)) {
-    SKBlob.decompress(data, cb)
-  } else {
-    var blob = new SKBlob(data)
-    return cb(blob.isMedia ? null : 'unknown blob format', blob)
+    var files = SKBlob.decompress(data)
+    return cb(null, files)
   }
+
+  var blob = new SKBlob(data)
+  return cb(blob.isMedia ? null : 'unknown blob format', blob)
 }
 
 /**
@@ -132,15 +148,16 @@ SKBlob.initWithStoryData = function (data, story, cb) {
     throw new Error('SKBlob.initWithStoryData invalid story')
   }
 
-  if (data instanceof String) {
+  if (typeof data === 'string') {
     data = new Buffer(data)
   }
 
   if (BufferUtils.isCompressed(data)) {
-    SKBlob.decompress(data, cb)
-  } else {
-    SKBlob.decrypt(data, story, cb)
+    var files = SKBlob.decompress(data)
+    return cb(null, files)
   }
+
+  return SKBlob.decrypt(data, story, cb)
 }
 
 /**
@@ -151,15 +168,15 @@ SKBlob.initWithStoryData = function (data, story, cb) {
  * @param {function} cb
  */
 SKBlob.decompress = function (data, cb) {
-  zlib.gunzip(data, function (err, decompressed) {
-    if (err) {
-      return cb(err)
-    } else {
-      var blob = new SKBlob(decompressed)
-
-      return cb(blob.isMedia ? null : 'unknown blob format', blob)
+  var zip = new JSZip(data)
+  var files = Object.keys(zip.files).map(function (filename) {
+    var decompressed = zip.file(filename).asNodeBuffer()
+    return {
+      name: filename,
+      blob: new SKBlob(decompressed)
     }
   })
+  return files
 }
 
 /**
@@ -178,10 +195,10 @@ SKBlob.decrypt = function (data, story, cb) {
   }
 
   if (BufferUtils.isCompressed(data)) {
-    SKBlob.decompress(data, cb)
-  } else {
-    var blob = new SKBlob(data)
-
-    return cb(blob.isMedia ? null : 'unknown blob format', blob)
+    var files = SKBlob.decompress(data)
+    return cb(null, files)
   }
+
+  var blob = new SKBlob(data)
+  return cb(blob.isMedia ? null : 'unknown blob format', blob)
 }

@@ -15,10 +15,12 @@
     "bluebird": "^2.9.34",
     "debug": "^2.1.0",
     "enum": "^2.1.0",
+    "file-type": "^2.10.2",
     "inherits": "^2.0.1",
+    "jszip": "^2.5.0",
     "node-uuid": "^1.4.3",
     "phone": "^1.0.4",
-    "request": "^2.60.0",
+    "request": "^2.61.0",
     "url-join": "0.0.1",
     "xtend": "^4.0.0"
   },
