@@ -61,11 +61,13 @@
 			class="sunlight-highlight-javascript ">module.exports = Request
 
 var debug = require('debug')('snapchat:request')
+var https = require('https')
 var request = require('request')
 var urljoin = require('url-join')
 var extend = require('xtend')
 var zlib = require('zlib')
 
+var BufferUtils = require('./buffer-utils')
 var StringUtils = require('./string-utils')
 var constants = require('./constants')
 
@@ -82,6 +84,7 @@ function Request (opts) {
 
   self.HTTPMethod = opts.method
   self.HTTPHeaders = {}
+  self.opts = opts
 
   if (opts.method === 'POST') {
     if (opts.endpoint) {
@@ -147,24 +150,27 @@ Request.prototype._initPOST = function (opts) {
 
   // special-case for uploading snaps
   if (opts.endpoint === constants.endpoints.snaps.upload) {
-    // TODO: this is tricky
-    throw new Error('not yet implemented')
+    var body = [ ]
 
-    /*
-    NSMutableData *body = [NSMutableData data];
-
-    for (NSString *key in json.allKeys) {
-      if ([key isEqualToString:@'data']) {
-        [body appendData:[NSData boundaryWithKey:key forDataValue:json[key]]];
+    for (var key in opts.params) {
+      if (key === 'data') {
+        body.push(BufferUtils.boundaryForBuffer(key, opts.params[key]))
       } else {
-        [body appendData:[NSData boundaryWithKey:key forStringValue:(NSString *)json[key]]];
+        body.push(BufferUtils.boundaryForString(key, opts.params[key]))
       }
     }
 
-    [body appendData:[[NSString stringWithFormat:@'\r\n--%@--\r\n', SKConsts.boundary] dataUsingEncoding:NSUTF8StringEncoding]];
+    // final boundary
+    body.push(new Buffer('\r\n--' + constants.core.boundary + '--\r\n'))
 
-    self.HTTPBody = body;
-    */
+    // concat all buffers together to form the body
+    self.HTTPBody = Buffer.concat(body)
+    self.multipart = true
+
+    // debugging...
+    // var fs = require('fs')
+    // fs.writeFileSync('out.txt', self.HTTPBody.toString('utf-8'))
+    // console.log(self.HTTPBody.toString('utf-8'))
   } else {
     self.HTTPBody = opts.params
   }
@@ -206,14 +212,20 @@ Request.prototype.start = function (cb) {
   var self = this
 
   function wrapcb (err, response, body) {
+    var contentType = response &amp;&amp; response.headers &amp;&amp; response.headers['content-type']
+    if (contentType &amp;&amp; contentType !== 'application/octet-stream') {
+      response.body = response.body.toString('utf8')
+    }
     if (err) {
       return cb(err, body)
     } else if (!err &amp;&amp; response &amp;&amp; (response.statusCode &lt; 200 || response.statusCode >= 300)) {
       // catch snapchat API error codes
-      debug('Snapchat Request Error: %d (%s) \nrequest: %s',
+      debug('Snapchat Request Error: %d (%s) \nendpoint: %s \nheaders: %j \nrequest: %s',
             response.statusCode,
             response.statusMessage,
-            response.request.body.toString('utf-8'))
+            self.opts.endpoint,
+            response.request.headers,
+            self.multipart ? '' : response.request.body.toString('utf-8').substr(0, 80))
 
       // console.log(response)
       // console.log(response.request.body.toString('base64'))
@@ -221,11 +233,10 @@ Request.prototype.start = function (cb) {
 
       return cb('Snapchat API error ' + response.statusCode + ' (' + response.statusMessage + ')', body)
     } else {
-      var contentType = response.headers['content-type']
       var result = body
 
       // attempt to parse the body as JSON if appropriate
-      if (contentType.indexOf('application/json') >= 0) {
+      if (contentType &amp;&amp; contentType.indexOf('application/json') >= 0) {
         result = StringUtils.tryParseJSON(body)
 
         if (!result) {
@@ -239,18 +250,77 @@ Request.prototype.start = function (cb) {
   }
 
   if (self.HTTPMethod === 'POST') {
-    self.httpRequest = request.post({
-      url: self.URL,
-      headers: self.HTTPHeaders,
-      form: self.HTTPBody
-    }, wrapcb)
+    if (self.multipart) {
+      self.HTTPHeaders['content-length'] = Buffer.byteLength(self.HTTPBody)
 
-    // debug('%s Request %s (headers %j) (body \'%s\')', self.HTTPMethod, self.URL, self.HTTPHeaders,
-    //       self.httpRequest.body.toString('utf-8'))
+      // self.HTTPHeaders['X-Timestamp'] = 0
+
+      // TODO:
+      // neither objc or php versions send Content-Length header
+      // don't think we can use request because its multipart/form-data uses random boundary
+
+      var req = https.request({
+        host: 'feelinsonice-hrd.appspot.com', // constants.core.baseURL,
+        path: self.endpoint,
+        method: 'POST',
+        headers: self.HTTPHeaders,
+        agent: false,
+        rejectUnauthorized: false
+        //, secureOptions: require('constants').SSL_OP_NO_TLSv1
+      }, function (response) {
+        response.request = req
+        response.request.headers = req._headers
+
+        console.log('status', response.statusCode)
+        console.log('headers', JSON.stringify(response.headers))
+
+        response.setEncoding('utf8')
+
+        var result = ''
+        response.on('data', function (chunk) {
+          console.log('RESPONSE DATA', chunk)
+          result += chunk
+        })
+
+        response.on('end', function () {
+          console.log('RESPONSE END')
+          wrapcb(null, response, result)
+        })
+      })
+
+      // req.removeHeader('content-length')
+      // req.removeHeader('transfer-encoding')
+      // req.removeHeader('connection')
+
+      req.on('error', function (err) {
+        console.error('ERROR', err)
+        wrapcb(err, null, null)
+      })
+
+      req.on('abort', function () {
+        console.error('ABORT')
+        wrapcb('abort', null, null)
+      })
+
+      req.write(self.HTTPBody)
+      req.end()
+      console.log('REQUEST END', req._headers)
+    } else {
+      self.httpRequest = request.post({
+        url: self.URL,
+        headers: self.HTTPHeaders,
+        form: self.HTTPBody
+      }, wrapcb)
+
+      // debug('%s Request %s (headers %j) (body \'%s\')', self.HTTPMethod, self.URL, self.HTTPHeaders,
+      //       self.httpRequest.body.toString('utf-8'))
+    }
   } else {
+
     self.httpRequest = request({
       url: self.URL,
-      headers: self.HTTPHeaders
+      headers: self.HTTPHeaders,
+      encoding: null
     }, wrapcb)
 
     debug('%s Request %s (headers %j)', self.HTTPMethod, self.URL, self.HTTPHeaders)
@@ -471,7 +541,7 @@ var endpointOverrides = { }
 
 <span class="jsdoc-message">
 	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.2</a>
-	on Wed Aug 19th 2015 using the <a
+	on Wed Sep 2nd 2015 using the <a
 	href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
 </span>
 </footer>

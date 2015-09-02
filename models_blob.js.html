@@ -61,7 +61,9 @@
 			class="sunlight-highlight-javascript ">module.exports = SKBlob
 
 var BufferUtils = require('../lib/buffer-utils')
-var zlib = require('zlib')
+var Story = require('./story')
+var fileType = require('file-type')
+var JSZip = require('jszip')
 
 /**
  * Snapchat Blob wrapper
@@ -78,8 +80,11 @@ function SKBlob (data) {
   }
 
   self._data = data
+  self._type = fileType(data)
+
   self._isImage = BufferUtils.isImage(data)
-  self._isVideo = BufferUtils.isMPEG4(data)
+  self._isMPEG4 = BufferUtils.isMPEG4(data)
+  self._isVideo = self._isMPEG4
   self._isMedia = BufferUtils.isMedia(data)
 
   // TODO
@@ -91,9 +96,21 @@ function SKBlob (data) {
  *
  * @name SKBlob#data
  * @property {Buffer}
+ * @readonly
  */
 Object.defineProperty(SKBlob.prototype, 'data', {
   get: function () { return this._data }
+})
+
+/**
+ * Information about the media type.
+ *
+ * @name SKBlob#type
+ * @property {Buffer}
+ * @readonly
+ */
+Object.defineProperty(SKBlob.prototype, 'type', {
+  get: function () { return this._type }
 })
 
 /**
@@ -101,6 +118,7 @@ Object.defineProperty(SKBlob.prototype, 'data', {
  *
  * @name SKBlob#overlay
  * @property {Buffer}
+ * @readonly
  */
 Object.defineProperty(SKBlob.prototype, 'overlay', {
   get: function () { return this._overlay }
@@ -111,6 +129,7 @@ Object.defineProperty(SKBlob.prototype, 'overlay', {
  *
  * @name SKBlob#isImage
  * @property {boolean}
+ * @readonly
  */
 Object.defineProperty(SKBlob.prototype, 'isImage', {
   get: function () { return this._isImage }
@@ -121,9 +140,21 @@ Object.defineProperty(SKBlob.prototype, 'isImage', {
  *
  * @name SKBlob#isVideo
  * @property {boolean}
+ * @readonly
  */
 Object.defineProperty(SKBlob.prototype, 'isVideo', {
   get: function () { return this._isVideo }
+})
+
+/**
+ * Whether or not this blob represents an MPEG4 video.
+ *
+ * @name SKBlob#isMPEG4
+ * @property {boolean}
+ * @readonly
+ */
+Object.defineProperty(SKBlob.prototype, 'isMPEG4', {
+  get: function () { return this._isMPEG4 }
 })
 
 /**
@@ -131,6 +162,7 @@ Object.defineProperty(SKBlob.prototype, 'isVideo', {
  *
  * @name SKBlob#isMedia
  * @property {boolean}
+ * @readonly
  */
 Object.defineProperty(SKBlob.prototype, 'isMedia', {
   get: function () { return this._isMedia }
@@ -149,16 +181,17 @@ SKBlob.initWithData = function (data, cb) {
     return cb('error empty blob')
   }
 
-  if (data instanceof String) {
+  if (typeof data === 'string') {
     data = new Buffer(data)
   }
 
   if (BufferUtils.isCompressed(data)) {
-    SKBlob.decompress(data, cb)
-  } else {
-    var blob = new SKBlob(data)
-    return cb(blob.isMedia ? null : 'unknown blob format', blob)
+    var files = SKBlob.decompress(data)
+    return cb(null, files)
   }
+
+  var blob = new SKBlob(data)
+  return cb(blob.isMedia ? null : 'unknown blob format', blob)
 }
 
 /**
@@ -170,15 +203,20 @@ SKBlob.initWithData = function (data, cb) {
  * @param {function} cb
  */
 SKBlob.initWithStoryData = function (data, story, cb) {
-  if (data instanceof String) {
+  if (!(story instanceof Story)) {
+    throw new Error('SKBlob.initWithStoryData invalid story')
+  }
+
+  if (typeof data === 'string') {
     data = new Buffer(data)
   }
 
   if (BufferUtils.isCompressed(data)) {
-    SKBlob.decompress(data, cb)
-  } else {
-    SKBlob.decrypt(data, story, cb)
+    var files = SKBlob.decompress(data)
+    return cb(null, files)
   }
+
+  return SKBlob.decrypt(data, story, cb)
 }
 
 /**
@@ -189,15 +227,15 @@ SKBlob.initWithStoryData = function (data, story, cb) {
  * @param {function} cb
  */
 SKBlob.decompress = function (data, cb) {
-  zlib.gunzip(data, function (err, decompressed) {
-    if (err) {
-      return cb(err)
-    } else {
-      var blob = new SKBlob(decompressed)
-
-      return cb(blob.isMedia ? null : 'unknown blob format', blob)
+  var zip = new JSZip(data)
+  var files = Object.keys(zip.files).map(function (filename) {
+    var decompressed = zip.file(filename).asNodeBuffer()
+    return {
+      name: filename,
+      blob: new SKBlob(decompressed)
     }
   })
+  return files
 }
 
 /**
@@ -207,17 +245,21 @@ SKBlob.decompress = function (data, cb) {
  * @param {function} cb
  */
 SKBlob.decrypt = function (data, story, cb) {
+  if (!(story instanceof Story)) {
+    throw new Error('SKBlob.decrypt invalid story')
+  }
+
   if (!BufferUtils.isCompressed(data) &amp;&amp; !BufferUtils.isMedia(data) &amp;&amp; story) {
     data = BufferUtils.decryptStory(data, story.mediaKey, story.mediaIV)
   }
 
   if (BufferUtils.isCompressed(data)) {
-    SKBlob.decompress(data, cb)
-  } else {
-    var blob = new SKBlob(data)
-
-    return cb(blob.isMedia ? null : 'unknown blob format', blob)
+    var files = SKBlob.decompress(data)
+    return cb(null, files)
   }
+
+  var blob = new SKBlob(data)
+  return cb(blob.isMedia ? null : 'unknown blob format', blob)
 }
 </pre>
 	</article>
@@ -248,7 +290,7 @@ SKBlob.decrypt = function (data, story, cb) {
 
 <span class="jsdoc-message">
 	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.2</a>
-	on Wed Aug 19th 2015 using the <a
+	on Wed Sep 2nd 2015 using the <a
 	href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
 </span>
 </footer>

@@ -61,6 +61,7 @@
 			class="sunlight-highlight-javascript ">module.exports = Snaps
 
 var debug = require('debug')('snapchat:snaps')
+var Promise = require('bluebird')
 
 var constants = require('../lib/constants')
 var StringUtils = require('../lib/string-utils')
@@ -88,16 +89,16 @@ function Snaps (client, opts) {
  * Sends a snap to everyone in recipients with text text for duration seconds.
  *
  * @param {SKBlob} blob The SKBlob object containing the image or video data to send. Can be created with any NSData object.
- * @param {Array&lt;string>} recipients An array of username strings.
+ * @param {Array&lt;string>|string} recipients An array of username strings.
  * @param {string} text The text to label the snap with. This text is not superimposed upon the image; you must do that yourself.
  * @param {number} duration The length of the snap. It must be greater than 0 or an exception will be raised.
  * @param {function} cb
  */
 Snaps.prototype.sendSnap = function (blob, recipients, text, duration, cb) {
   var self = this
-  debug('Snaps.sendSnapSimple')
+  debug('Snaps.sendSnap')
 
-  self.sendSnapCustom(blob, new SnapOptions(recipients, text, duration), cb)
+  return self.sendSnapCustom(blob, new SnapOptions(recipients, text, duration), cb)
 }
 
 /**
@@ -109,25 +110,33 @@ Snaps.prototype.sendSnap = function (blob, recipients, text, duration, cb) {
  */
 Snaps.prototype.sendSnapCustom = function (blob, opts, cb) {
   var self = this
-  debug('Snaps.sendSnap')
 
-  self._uploadSnap(blob, function (err, mediaID) {
-    if (err) {
-      return cb(err)
-    }
+  return new Promise(function (resolve, reject) {
+    debug('Snaps.sendSnapCustom')
 
-    self.client.post(constants.endpoints.snaps.send, {
-      'camera_front_facing': !!opts.cameraFrontFacing,
-      'country_code': self.client.session.countryCode,
-      'media_id': mediaID,
-      'recipients': JSON.stringify(opts.recipients),
-      'recipient_ids': JSON.stringify(opts.recipients),
-      'reply': !!opts.isReply,
-      'time': +opts.timer,
-      'zipped': 0,
-      'username': self.client.username
-    }, cb)
-  })
+    self._uploadSnap(blob, function (err, mediaID) {
+      if (err) {
+        return reject(err)
+      }
+
+      self.client.post(constants.endpoints.snaps.send, {
+        'camera_front_facing': !!opts.cameraFrontFacing,
+        'country_code': self.client.session.countryCode,
+        'media_id': mediaID,
+        'recipients': JSON.stringify(opts.recipients),
+        'recipient_ids': JSON.stringify(opts.recipients),
+        'reply': !!opts.isReply,
+        'time': +opts.timer,
+        'zipped': 0,
+        'username': self.client.username
+      }, function (err, result) {
+        if (err) {
+          return reject(err)
+        }
+        return resolve(result)
+      })
+    })
+  }).nodeify(cb)
 }
 
 /**
@@ -140,7 +149,7 @@ Snaps.prototype.markSnapViewed = function (snap, secondsViewed, cb) {
   var self = this
   debug('Snaps.markSnapViewed')
 
-  self.markSnapsViewed([ snap ], [ new Date() ], [ secondsViewed ], cb)
+  return self.markSnapsViewed([ snap ], [ new Date() ], [ secondsViewed ], cb)
 }
 
 /**
@@ -168,7 +177,7 @@ Snaps.prototype.markSnapsViewed = function (snaps, times, secondsViewed, cb) {
     }
   })
 
-  self.client.post(constants.endpoints.update.snaps, {
+  return self.client.post(constants.endpoints.update.snaps, {
     'added_friends_timestamp': StringUtils.timestampFrom(self.session.addedFriendsTimestamp),
     'username': self.client.username,
     'json': JSON.stringify(json)
@@ -202,7 +211,7 @@ Snaps.prototype.markSnapScreenshot = function (snap, secondsViewed, cb) {
     'ts': StringUtils.timestamp() | 0
   }
 
-  self.client.sendEvents([ screenshot ], snapInfo, cb)
+  return self.client.sendEvents([ screenshot ], snapInfo, cb)
 }
 
 /**
@@ -215,7 +224,7 @@ Snaps.prototype.loadSnap = function (snap, cb) {
   var self = this
   debug('Snaps.loadSnap')
 
-  self._loadSnapWithIdentifier(snap.identifier, cb)
+  return self._loadSnapWithIdentifier(snap.identifier, cb)
 }
 
 /**
@@ -226,23 +235,26 @@ Snaps.prototype.loadSnap = function (snap, cb) {
  */
 Snaps.prototype.loadFiltersForLocation = function (location, cb) {
   var self = this
-  debug('Snaps.loadFiltersForLocation')
 
-  self.client.post(constants.endpoints.misc.locationData, {
-    'lat': location.lat,
-    'lng': location.lng,
-    'screen_width': self.client.screenSize.width,
-    'screen_height': self.client.screenSize.height,
-    'username': self.client.username
-  }, function (err, result) {
-    if (err) {
-      return cb(err)
-    } else if (result) {
-      return cb(null, new SKLocation(result))
-    }
+  return new Promise(function (resolve, reject) {
+    debug('Snaps.loadFiltersForLocation')
 
-    return cb('Snaps.loadFiltersForLocation parse error')
-  })
+    self.client.post(constants.endpoints.misc.locationData, {
+      'lat': location.lat,
+      'lng': location.lng,
+      'screen_width': self.client.screenSize.width,
+      'screen_height': self.client.screenSize.height,
+      'username': self.client.username
+    }, function (err, result) {
+      if (err) {
+        return reject(err)
+      } else if (result) {
+        return resolve(new SKLocation(result))
+      }
+
+      return reject(new Error('Snaps.loadFiltersForLocation parse error'))
+    })
+  }).nodeify(cb)
 }
 
 /**
@@ -251,28 +263,41 @@ Snaps.prototype.loadFiltersForLocation = function (location, cb) {
 Snaps.prototype._loadSnapWithIdentifier = function (identifier, cb) {
   var self = this
 
-  self.client.post(constants.endpoints.snaps.loadBlob, {
-    'id': identifier,
-    'username': self.client.username
-  }, function (err, body) {
-    if (err) {
-      return cb(err)
-    }
+  return new Promise(function (resolve, reject) {
+    self.client.post(constants.endpoints.snaps.loadBlob, {
+      'id': identifier,
+      'username': self.client.username
+    }, function (err, body) {
+      if (err) {
+        return reject(err)
+      }
 
-    SKBlob.initWithData(body, cb)
-  })
+      SKBlob.initWithData(body, function (err, blob) {
+        if (err) {
+          return reject(err)
+        }
+        return resolve(blob)
+      })
+    })
+  }).nodeify(cb)
 }
 
 /**
  * @private
+ * @param {SKBlob} blob
+ * @param {function} cb
  */
 Snaps.prototype._uploadSnap = function (blob, cb) {
   var self = this
   var uuid = StringUtils.mediaIdentifier(self.client.username)
 
+  if (!(blob instanceof SKBlob)) {
+    throw new Error('Snap._uploadSnap invalid argument "blob" must be SKBlob instance')
+  }
+
   var params = {
     'media_id': uuid,
-    'type': blob.isImage ? constants.MediaKind.Image : constants.MediaKind.Video,
+    'type': blob.isImage ? constants.MediaKind.Image.value : constants.MediaKind.Video.value,
     'data': blob.data,
     'zipped': 0,
     'features_map': '{}',
@@ -287,7 +312,6 @@ Snaps.prototype._uploadSnap = function (blob, cb) {
     if (err) {
       return cb(err)
     } else {
-      // TODO: return Snap object
       return cb(null, uuid)
     }
   })
@@ -321,7 +345,7 @@ Snaps.prototype._uploadSnap = function (blob, cb) {
 
 <span class="jsdoc-message">
 	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.2</a>
-	on Wed Aug 19th 2015 using the <a
+	on Wed Sep 2nd 2015 using the <a
 	href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
 </span>
 </footer>
