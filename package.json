@@ -1,7 +1,7 @@
 {
   "name": "snapchat",
   "description": "Nodejs client for the unofficial Snapchat API",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "author": {
     "name": "Travis Fischer",
     "email": "travis@makesnaps.com",
