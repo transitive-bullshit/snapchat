@@ -23,7 +23,6 @@ test('Snapchat._getDeviceTokens', function (t) {
   var client = new Snapchat()
 
   client._getDeviceTokens(function (err, result) {
-    console.log(result)
     t.notOk(err)
     t.ok(result)
     t.ok(result.dtoken1i)
