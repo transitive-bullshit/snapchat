@@ -160,6 +160,7 @@ function Session (client, params) {
 Session.prototype.getFriend = function (username) {
   var self = this
 
+  // TODO: use cached map of username->friend
   for (var i = 0; i < self.friends.length; ++i) {
     var friend = self.friends[i]
 
@@ -178,7 +179,8 @@ Session.prototype.getFriend = function (username) {
 Session.prototype.getStory = function (username) {
   var self = this
 
-  for (var i = 0; i < self.stories.length; i++) {
+  // TODO: use cached map of username->story
+  for (var i = 0; i < self.stories.length; ++i) {
     var story = self.stories[i]
 
     if (story.username === username) {
