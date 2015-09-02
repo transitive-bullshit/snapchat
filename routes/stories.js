@@ -108,7 +108,8 @@ Stories.prototype.loadStoryBlob = function (story, cb) {
         'username': self.client.username
       }, self.client.googleAuthToken, self.client.authToken, blobHandler)
     } else {
-      self.client.get(story.mediaURL.replace(constants.endpoints.baseURL), blobHandler)
+      var baseIgnorePattern = new RegExp(constants.core.baseList.join('|'))
+      self.client.get(story.mediaURL.replace(baseIgnorePattern, ''), blobHandler)
     }
 
   }).nodeify(cb)
