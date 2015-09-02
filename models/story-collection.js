@@ -1,5 +1,7 @@
 module.exports = StoryCollection
 
+var xtend = require('xtend')
+
 var Snapchat = require('../')
 var Story = require('./story')
 
@@ -24,13 +26,15 @@ function StoryCollection (client, params) {
   // Whether this story contains explicit content.
   self.matureContent = !!params['mature_content']
 
+  // shared stories only
+
   // Only applies to shared stories.
   self.adPlacementData = params['ad_placement_metadata']
-  // The display name of the shared story. (shared only)
+  // The display name of the shared story.
   self.displayName = params['display_name']
-  // The identifier of the shared story. (shared only)
+  // The identifier of the shared story.
   self.sharedIdentifier = params['shared_id']
-  // Whether the shared story is local or not. (shared only)
+  // Whether the shared story is local or not.
   self.isLocal = !!params['is_local']
 
   // Only applies to shared stories.
@@ -46,7 +50,10 @@ function StoryCollection (client, params) {
 
   // An array of Story objects.
   self.stories = (params['stories'] || []).map(function (story) {
-    return new Story(self.client, story)
+    xtend(story.story, {
+      'viewed': story.viewed
+    })
+    return new Story(self.client, story.story)
   })
 }
 

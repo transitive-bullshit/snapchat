@@ -1,7 +1,10 @@
 module.exports = Stories
 
+var qs = require('querystring')
+
 var debug = require('debug')('snapchat:stories')
 var async = require('async')
+var Promise = require('bluebird')
 
 var constants = require('../lib/constants')
 var Request = require('../lib/request')
@@ -34,37 +37,40 @@ function Stories (client, opts) {
  */
 Stories.prototype.postStory = function (blob, opts, cb) {
   var self = this
-  debug('Stories.postStory')
 
-  self._uploadStory(blob, function (err, mediaID) {
-    if (err) {
-      debug('Snapchat.Stories.postStory error %s', err)
-      return cb(err)
-    }
+  return new Promise(function (resolve, reject) {
+    debug('Stories.postStory')
 
-    self.client.post(constants.endpoints.stories.post, {
-      'caption_text_display': opts.text,
-      'story_timestamp': StringUtils.timestamp(),
-      'type': blob.isImage ? constants.MediaKind.Image : constants.MediaKind.Video,
-      'media_id': mediaID,
-      'client_id': mediaID,
-      'time': opts.timer | 0,
-      'username': self.client.username,
-      'camera_front_facing': opts.cameraFrontFacing,
-      'my_story': 'true',
-      'zipped': 0,
-      'shared_ids': '{}'
-    }, function (err, result) {
+    self._uploadStory(blob, function (err, mediaID) {
       if (err) {
         debug('Snapchat.Stories.postStory error %s', err)
-        return cb(err)
-      } else if (result) {
-        return cb(null, result)
+        return reject(err)
       }
 
-      return cb('Snapchat.Stories.postStory parse error')
+      self.client.post(constants.endpoints.stories.post, {
+        'caption_text_display': opts.text,
+        'story_timestamp': StringUtils.timestamp(),
+        'type': blob.isImage ? constants.MediaKind.Image : constants.MediaKind.Video,
+        'media_id': mediaID,
+        'client_id': mediaID,
+        'time': opts.timer | 0,
+        'username': self.client.username,
+        'camera_front_facing': opts.cameraFrontFacing,
+        'my_story': 'true',
+        'zipped': 0,
+        'shared_ids': '{}'
+      }, function (err, result) {
+        if (err) {
+          debug('Snapchat.Stories.postStory error %s', err)
+          return reject(err)
+        } else if (result) {
+          return resolve(result)
+        }
+
+        return reject(new Error('Snapchat.Stories.postStory parse error'))
+      })
     })
-  })
+  }).nodeify(cb)
 }
 
 /**
@@ -75,27 +81,36 @@ Stories.prototype.postStory = function (blob, opts, cb) {
  */
 Stories.prototype.loadStoryBlob = function (story, cb) {
   var self = this
-  debug('Stories.loadStoryBlob (%s)', story.identifier)
 
-  function blobHandler (err, body) {
-    if (err) {
-      debug('Snapchat.Stories.loadStoryBlob error %s', err)
-      return cb(err)
-    } else {
-      SKBlob.initWithStoryData(body, story, cb)
+  return new Promise(function (resolve, reject) {
+    debug('Stories.loadStoryBlob (%s)', story.identifier)
+
+    function blobHandler (err, body) {
+      if (err) {
+        debug('Snapchat.Stories.loadStoryBlob error %s', err)
+        return reject(err)
+      }
+
+      SKBlob.initWithStoryData(body, story, function (err, blob) {
+        if (err) {
+          return reject(err)
+        }
+        return resolve(blob)
+      })
     }
-  }
 
-  if (story.needsAuth) {
-    var url = constants.endpoints.stories.authBlob + story.mediaIdentifier
+    if (story.needsAuth) {
+      var url = constants.endpoints.stories.authBlob + story.mediaIdentifier
 
-    Request.post(url, {
-      'story_id': story.mediaIdentifier,
-      'username': self.client.username
-    }, self.client.googleAuthToken, self.client.authToken, blobHandler)
-  } else {
-    self.client.get(story.mediaURL.replace(constants.endpoints.baseURL), blobHandler)
-  }
+      Request.post(url, {
+        'story_id': story.mediaIdentifier,
+        'username': self.client.username
+      }, self.client.googleAuthToken, self.client.authToken, blobHandler)
+    } else {
+      var baseIgnorePattern = new RegExp(constants.core.baseList.join('|'))
+      self.client.get(story.mediaURL.replace(baseIgnorePattern, ''), blobHandler)
+    }
+  }).nodeify(cb)
 }
 
 /**
@@ -106,16 +121,24 @@ Stories.prototype.loadStoryBlob = function (story, cb) {
  */
 Stories.prototype.loadStoryThumbnailBlob = function (story, cb) {
   var self = this
-  debug('Stories.loadStoryThumbnailBlob (%s)', story.identifier)
 
-  self.client.get(constants.endpoints.stories.thumb + story.mediaIdentifier, function (err, body) {
-    if (err) {
-      debug('Snapchat.Stories.loadStoryThumbnailBlob error %s', err)
-      return cb(err)
-    }
+  return new Promise(function (resolve, reject) {
+    debug('Stories.loadStoryThumbnailBlob (%s)', story.identifier)
 
-    SKBlob.initWithStoryData(body, story, cb)
-  })
+    self.client.get(constants.endpoints.stories.thumb + story.mediaIdentifier, function (err, body) {
+      if (err) {
+        debug('Snapchat.Stories.loadStoryThumbnailBlob error %s', err)
+        return reject(err)
+      }
+
+      SKBlob.initWithStoryData(body, story, function (err, blob) {
+        if (err) {
+          return reject(err)
+        }
+        return resolve(blob)
+      })
+    })
+  }).nodeify(cb)
 }
 
 /**
@@ -127,26 +150,31 @@ Stories.prototype.loadStoryThumbnailBlob = function (story, cb) {
 Stories.prototype.loadStories = function (stories, cb) {
   debug('Stories.loadStories (%d)', stories.length)
 
-  var results = {
-    loaded: [ ],
-    failed: [ ],
-    errors: [ ]
-  }
+  return new Promise(function (resolve, reject) {
+    var results = {
+      loaded: [ ],
+      failed: [ ],
+      errors: [ ]
+    }
 
-  async.eachLimit(stories, 4, function (story, cb) {
-    story.load(function (err) {
+    async.eachLimit(stories, 4, function (story, cb) {
+      story.load(function (err) {
+        if (err) {
+          results.failed.push(story)
+          results.errors.push(err)
+        } else {
+          results.loaded.push(story)
+        }
+
+        return cb(err)
+      })
+    }, function (err) {
       if (err) {
-        results.failed.push(story)
-        results.errors.push(err)
-      } else {
-        results.loaded.push(story)
+        return reject(err)
       }
-
-      return cb(err)
+      return resolve(results)
     })
-  }, function (err) {
-    return cb(err, results)
-  })
+  }).nodeify(cb)
 }
 
 /**
@@ -157,21 +185,24 @@ Stories.prototype.loadStories = function (stories, cb) {
  */
 Stories.prototype.deleteStory = function (story, cb) {
   var self = this
-  debug('Stories.deleteStory (%s)', story.identifier)
 
-  self.client.post(constants.endpoints.stories.remove, {
-    'story_id': story.identifier,
-    'username': self.client.username
-  }, function (err) {
-    if (!err) {
+  return new Promise(function (resolve, reject) {
+    debug('Stories.deleteStory (%s)', story.identifier)
+
+    self.client.post(constants.endpoints.stories.remove, {
+      'story_id': story.identifier,
+      'username': self.client.username
+    }, function (err) {
+      if (err) {
+        return reject(err)
+      }
       var index = self.client.session.userStories.indexOf(story)
       if (index >= 0) {
         self.client.session.userStories.splice(index, 1)
       }
-    }
-
-    return cb(err)
-  })
+      return resolve()
+    })
+  }).nodeify(cb)
 }
 
 /**
@@ -192,7 +223,7 @@ Stories.prototype.markStoriesViewed = function (stories, cb) {
     }
   })
 
-  self.client.post(constants.endpoints.update.stories, {
+  return self.client.post(constants.endpoints.update.stories, {
     'username': self.client.username,
     'friend_stories': JSON.stringify(friendStories)
   }, cb)
@@ -210,7 +241,7 @@ Stories.prototype.markStoryViewed = function (story, sscount, cb) {
   var self = this
   debug('Stories.markStoryViewed (%s)', story.identifier)
 
-  self.markStoriesViewed([
+  return self.markStoriesViewed([
     new StoryUpdater(story.identifier, StringUtils.timestamp(), sscount)
   ], cb)
 }
@@ -224,7 +255,7 @@ Stories.prototype.hideSharedStory = function (story, cb) {
   var self = this
   debug('Stories.hideSharedStory (%s)', story.identifier)
 
-  self.client.post(constants.endpoints.friends.hide, {
+  return self.client.post(constants.endpoints.friends.hide, {
     'friend': story.username,
     'hide': 'true',
     'username': self.client.username
@@ -240,9 +271,11 @@ Stories.prototype.hideSharedStory = function (story, cb) {
 Stories.prototype.provideSharedDescription = function (sharedStory, cb) {
   var self = this
   debug('Stories.provideSharedDescription (%s)', sharedStory.identifier)
-  if (!sharedStory.shared) return
+  if (!sharedStory.shared) {
+    return Promise.reject(new Error('Snapchat.Stories.provideSharedDescription error')).nodeify(cb)
+  }
 
-  self.client.post(constants.endpoints.sharedDescription, {
+  return self.client.post(constants.endpoints.sharedDescription, {
     'shared_id': sharedStory.identifier,
     'username': self.client.username
   }, cb)
@@ -256,23 +289,29 @@ Stories.prototype.provideSharedDescription = function (sharedStory, cb) {
  */
 Stories.prototype.getSharedDescriptionForStory = function (sharedStory, cb) {
   var self = this
-  debug('Stories.getSharedDescriptionForStory (%s)', sharedStory.identifier)
 
-  if (!sharedStory.sharedStoryIdentifier) {
-    throw new Error('Snapchat.Stories.getSharedDescriptionForStory error invalid story')
-  }
+  return new Promise(function (resolve, reject) {
+    debug('Stories.getSharedDescriptionForStory (%s)', sharedStory.identifier)
 
-  var endpoint = constants.endpoints.sharedDescription + '?ln=en&shared_id=' + sharedStory.sharedStoryIdentifier
-
-  self.client.get(endpoint, function (err, result) {
-    if (err) {
-      return cb(err)
-    } else if (result) {
-      return cb(null, new SharedStoryDescription(result))
+    if (!sharedStory.sharedStoryIdentifier) {
+      return reject(new Error('Snapchat.Stories.getSharedDescriptionForStory error invalid story'))
     }
 
-    return cb('Snapchat.Stories.getSharedDescriptionForStory parse error')
-  })
+    var endpoint = constants.endpoints.sharedDescription + '?' + qs.stringify({
+      'ln': 'en',
+      'shared_id': sharedStory.sharedStoryIdentifier
+    })
+
+    self.client.get(endpoint, function (err, result) {
+      if (err) {
+        return reject(err)
+      } else if (result) {
+        return resolve(new SharedStoryDescription(result))
+      }
+
+      return reject(new Error('Snapchat.Stories.getSharedDescriptionForStory parse error'))
+    })
+  }).nodeify(cb)
 }
 
 /**

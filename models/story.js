@@ -1,5 +1,7 @@
 module.exports = Story
 
+var Promise = require('bluebird')
+
 var BufferUtils = require('../lib/buffer-utils')
 var Snapchat = require('../')
 
@@ -18,10 +20,10 @@ function Story (client, params) {
   self.client = client
 
   // null until you call load
-  self.blob = null
+  // self.blob = null
 
   // null until you call loadThumbnail
-  self.thumbnailBlob = null
+  // self.thumbnailBlob = null
 
   self.author = params['username']
   self.viewed = !!params['viewed']
@@ -30,26 +32,28 @@ function Story (client, params) {
   self.matureContent = !!params['mature_content']
   self.needsAuth = !!params['needs_auth']
 
-  self.duration = params['time'] | 0
+  self.duration = params['time'] || 0
 
   self.identifier = params['id']
   self.text = params['caption_text_display']
   self.clientIdentifier = params['client_id']
 
-  self.storyFilterIdentifier = params['story_filter_id']
+  if (params['story_filter_id'].length) {
+    self.storyFilterIdentifier = params['story_filter_id']
+  }
   self.adCanFollow = !!params['ad_can_follow']
 
   self.mediaIdentifier = params['media_id']
   self.mediaIV = params['media_iv']
   self.mediaKey = params['media_key']
-  self.mediaKind = params['media_type'] | 0
+  self.mediaKind = params['media_type'] || 0
   self.mediaURL = params['media_url']
 
   self.thumbIV = params['thumbnail_iv']
   self.thumbURL = params['thumbnail_url']
 
-  self.timeLeft = params['time_left'] | 0
-  self.created = new Date(+params['timestamp'])
+  self.timeLeft = params['time_left'] || 0
+  self.created = new Date(+params['timestamp']).toISOString()
 }
 
 /**
@@ -77,13 +81,26 @@ Object.defineProperty(Story.prototype, 'suggestedFilename', {
  */
 Story.prototype.load = function (cb) {
   var self = this
-  self.client.stories.loadStoryBlob(self, function (err, blob) {
-    if (!err) {
-      self.blob = blob
-    }
+  return new Promise(function (resolve, reject) {
 
-    return cb(err)
-  })
+    self.client.stories.loadStoryBlob(self, function (err, blob) {
+      if (err) {
+        return reject(err)
+      }
+
+      // seperate media & overlay data
+      if (Array.isArray(blob)) {
+        if (blob.length > 2) {
+        }
+        self.overlay = blob[1].blob
+        blob = blob[0].blob
+      }
+
+      self.blob = blob
+      return resolve(blob)
+    })
+
+  }).nodeify(cb)
 }
 
 /**
@@ -91,11 +108,17 @@ Story.prototype.load = function (cb) {
  */
 Story.prototype.loadThumbnail = function (cb) {
   var self = this
-  self.client.stories.loadStoryThumbnailBlob(self, function (err, blob) {
-    if (!err) {
-      self.thumbnailBlob = blob
-    }
+  return new Promise(function (resolve, reject) {
+    console.log('loadThumnail: 1');
+    self.client.stories.loadStoryThumbnailBlob(self, function (err, blob) {
+      console.log('loadThumnail: 5');
+      if (err) {
+        return reject(err)
+      }
 
-    return cb(err)
-  })
+      self.thumbnailBlob = blob
+      return resolve(self)
+    })
+
+  }).nodeify(cb)
 }
