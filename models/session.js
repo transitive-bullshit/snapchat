@@ -168,3 +168,21 @@ Session.prototype.getFriend = function (username) {
 
   return null
 }
+
+/**
+ * @param  {string} username
+ * @return {Story|null}
+ */
+Session.prototype.getStory = function (username) {
+  var self = this
+
+  for (var i = 0; i < self.stories.length; i++) {
+    var story = self.stories[i]
+
+    if (story.username === username) {
+      return story
+    }
+  }
+
+  return null
+}
