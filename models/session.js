@@ -59,7 +59,9 @@ function Session (client, params) {
   self.discoverVideoCatalog = discover['video_catalog']
 
   // Friends
-  self.friends = friends.map(function (friend) {
+  self.friends = friends.filter(function (friend) {
+    return friend.name !== updatesResponse['username'] && friend.expiration === 0
+  }).map(function (friend) {
     return new User(friend)
   })
 
