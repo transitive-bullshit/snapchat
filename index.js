@@ -736,6 +736,8 @@ Snapchat.prototype.sendEvents = function (events, snapInfo, cb) {
  * @private
  */
 Snapchat.prototype._getGoogleAuthToken = function (gmailEmail, gmailPassword, cb) {
+  var encryptedGmailPassword = StringUtils.encryptGmailPassword(gmailEmail, gmailPassword)
+
   Request.postRaw({
     url: 'https://android.clients.google.com/auth',
     form: {
@@ -746,8 +748,8 @@ Snapchat.prototype._getGoogleAuthToken = function (gmailEmail, gmailPassword, cb
       'sdk_version': '19',
       'accountType': 'HOSTED_OR_GOOGLE',
       'Email': gmailEmail,
-      'Passwd': gmailPassword,
-      // 'EncryptedPasswd': encryptedGmailPassword, // TODO
+      'EncryptedPasswd': encryptedGmailPassword,
+      //'Passwd': gmailPassword, // unencrypted version
       'service': 'audience:server:client_id:694893979329-l59f3phl42et9clpoo296d8raqoljl6p.apps.googleusercontent.com',
       'source': 'android',
       'androidId': '378c184c6070c26c',

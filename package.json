@@ -12,13 +12,16 @@
   },
   "dependencies": {
     "async": "^1.4.2",
+    "bignum": "^0.11.0",
     "debug": "^2.1.0",
     "enum": "^2.1.0",
     "inherits": "^2.0.1",
+    "node-rsa": "^0.2.25",
     "node-uuid": "^1.4.3",
     "phone": "^1.0.4",
     "request": "^2.60.0",
     "url-join": "0.0.1",
+    "ursa": "^0.8.5",
     "xtend": "^4.0.0"
   },
   "devDependencies": {
