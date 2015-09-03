@@ -67,10 +67,6 @@ See [CONTRIBUTING](https://github.com/fisch0920/snapchat/blob/master/CONTRIBUTIN
 You can enable [debug](https://www.npmjs.com/package/debug) logs by setting the `DEBUG` environment variable:
 
 ```bash
-DEBUG=snapchat; # debug core snapchat
-```
-OR
-```bash
 DEBUG=snapchat,snapchat:*; # debug all snapchat submodules
 ```
 

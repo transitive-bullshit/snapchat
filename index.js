@@ -115,26 +115,20 @@ Object.defineProperty(Snapchat.prototype, 'stories', {
  *
  * @name Snapchat#username
  * @property {string}
+ * @readonly
  */
 Object.defineProperty(Snapchat.prototype, 'username', {
-  get: function () {
-    var self = this
-    return self._username
-  }
+  get: function () { return this._username }
 })
 
 /**
- * The username of the currently signed in (or not yet singed in) user.
- * @note Always lowercase.
+ * The current session.
  *
  * @name Snapchat#session
  * @property {Session}
  */
 Object.defineProperty(Snapchat.prototype, 'session', {
-  get: function () {
-    var self = this
-    return self._session
-  },
+  get: function () { return this._session },
 
   set: function (session) {
     var self = this
@@ -157,10 +151,7 @@ Object.defineProperty(Snapchat.prototype, 'session', {
  * @property {Object}
  */
 Object.defineProperty(Snapchat.prototype, 'screenSize', {
-  get: function () {
-    var self = this
-    return self._screenSize
-  }
+  get: function () { return this._screenSize }
 })
 
 /**
@@ -170,10 +161,7 @@ Object.defineProperty(Snapchat.prototype, 'screenSize', {
  * @property {Object}
  */
 Object.defineProperty(Snapchat.prototype, 'maxVideoSize', {
-  get: function () {
-    var self = this
-    return self._maxVideoSize
-  }
+  get: function () { return this._maxVideoSize }
 })
 
 /**
@@ -196,10 +184,7 @@ Object.defineProperty(Snapchat.prototype, 'isSignedIn', {
  * @property {string}
  */
 Object.defineProperty(Snapchat.prototype, 'authToken', {
-  get: function () {
-    var self = this
-    return self._authToken
-  }
+  get: function () { return this._authToken }
 })
 
 /**
@@ -209,10 +194,7 @@ Object.defineProperty(Snapchat.prototype, 'authToken', {
  * @property {string}
  */
 Object.defineProperty(Snapchat.prototype, 'googleAuthToken', {
-  get: function () {
-    var self = this
-    return self._googleAuthToken
-  }
+  get: function () { return this._googleAuthToken }
 })
 
 /**
@@ -222,10 +204,7 @@ Object.defineProperty(Snapchat.prototype, 'googleAuthToken', {
  * @property {string}
  */
 Object.defineProperty(Snapchat.prototype, 'deviceToken1i', {
-  get: function () {
-    var self = this
-    return self._deviceToken1i
-  }
+  get: function () { return this._deviceToken1i }
 })
 
 /**
@@ -235,10 +214,7 @@ Object.defineProperty(Snapchat.prototype, 'deviceToken1i', {
  * @property {string}
  */
 Object.defineProperty(Snapchat.prototype, 'deviceToken1v', {
-  get: function () {
-    var self = this
-    return self._deviceToken1v
-  }
+  get: function () { return this._deviceToken1v }
 })
 
 /**
@@ -248,10 +224,7 @@ Object.defineProperty(Snapchat.prototype, 'deviceToken1v', {
  * @property {string}
  */
 Object.defineProperty(Snapchat.prototype, 'googleAttestation', {
-  get: function () {
-    var self = this
-    return self._googleAttestation
-  }
+  get: function () { return this._googleAttestation }
 })
 
 /**
@@ -684,7 +657,7 @@ Snapchat.prototype.getCaptcha = function (cb) {
         return reject(err)
       }
 
-      zlib.gunzip(new Buffer(body), function (err, data) {
+      zlib.gunzip(new Buffer(body), function (err) {
         if (err) {
           debug('getCaptcha gunzip error %s', err)
           return reject(err)
