@@ -1012,3 +1012,25 @@ Snapchat.prototype._getClientAuthToken = function (username, password, ts, cb) {
 
   }).nodeify(cb)
 }
+
+/**
+ * Removes previously cached values
+ *
+ * @param {string} Optional username The Snapchat username to sign in with.
+ * @param {string} Optional password The password to the Snapchat account to sign in with.
+ * @param {string} Optional gmailEmail A valid GMail address.
+ * @param {string} Optional gmailPassword The password associated with gmailEmail.
+ *
+ * @private
+ */
+Snapchat.prototype._clearCache = function (username, password, gmailEmail, gmailPassword) {
+  if (!(username && password && gmailEmail && gmailPassword)) {
+    return configs.clear()
+  }
+  if (username && password) {
+    configs.del(StringUtils.hashHMacToBase64(username, password))
+  }
+  if (gmailEmail && gmailPassword) {
+    configs.del(StringUtils.hashHMacToBase64(gmailEmail, gmailPassword))
+  }
+}
