@@ -375,6 +375,9 @@ Snapchat.prototype.signInWithData = function (data, username, password, cb) {
     }
 
     Request.postCustom(constants.endpoints.account.login, params, headers, null, opts, function (err, result) {
+      if (!result.logged) {
+        err = new Error(result.message)
+      }
       if (err) {
         debug('Snapchat.signIn error %s', err)
         return reject(err)
