@@ -5,6 +5,7 @@ var debug = require('debug')('snapchat')
 var phone = require('phone')
 var zlib = require('zlib')
 var Promise = require('bluebird')
+var Configstore = require('configstore')
 
 // utilities
 var constants = require('./lib/constants')
@@ -21,6 +22,8 @@ var Stories = require('./routes/stories')
 
 // models
 var Session = require('./models/session')
+
+var configs = new Configstore('snapchat')
 
 /**
  * Snapchat Client
@@ -383,6 +386,13 @@ Snapchat.prototype.signInWithData = function (data, username, password, cb) {
         return reject(err)
       } else if (result) {
         self.session = new Session(self, result)
+        var userHash = StringUtils.hashHMacToBase64(username, password)
+        if (!configs.get(userHash)) {
+          configs.set(userHash, {
+            attestation: attestation,
+            clientAuthToken: clientAuthToken
+          })
+        }
         return resolve(self.session)
       }
 
@@ -773,48 +783,57 @@ Snapchat.prototype.sendEvents = function (events, snapInfo, cb) {
  * @private
  */
 Snapchat.prototype._getGoogleAuthToken = function (gmailEmail, gmailPassword, cb) {
-  var encryptedGmailPassword = StringUtils.encryptGmailPassword(gmailEmail, gmailPassword)
+  return new Promise(function (resolve, reject) {
 
-  Request.postRaw({
-    url: 'https://android.clients.google.com/auth',
-    form: {
-      'google_play_services_version': '7097038',
-      'device_country': 'us',
-      'operatorCountry': 'us',
-      'lang': 'en_US',
-      'sdk_version': '19',
-      'accountType': 'HOSTED_OR_GOOGLE',
-      'Email': gmailEmail,
-      'EncryptedPasswd': encryptedGmailPassword,
-      // 'Passwd': gmailPassword, // unencrypted version
-      'service': 'audience:server:client_id:694893979329-l59f3phl42et9clpoo296d8raqoljl6p.apps.googleusercontent.com',
-      'source': 'android',
-      'androidId': '378c184c6070c26c',
-      'app': 'com.snapchat.android',
-      'client_sig': '49f6badb81d89a9e38d65de76f09355071bd67e7',
-      'callerPkg': 'com.snapchat.android',
-      'callerSig': '49f6badb81d89a9e38d65de76f09355071bd67e7'
-    },
-    headers: {
-      'device': '378c184c6070c26c',
-      'app': 'com.snapchat.android',
-      'Accept-Encoding': 'gzip',
-      'User-Agent': 'GoogleAuth/1.4 (mako JDQ39)'
+    var googleCache = configs.get(StringUtils.hashHMacToBase64(gmailEmail, gmailPassword))
+    if (googleCache) {
+      return resolve(googleCache)
     }
-  }, function (err, response, body) {
-    if (err) {
-      debug('_getGoogleAuthToken error %s', err)
-      return cb(err)
-    } else if (body) {
-      var auth = StringUtils.matchGroup(body, /Auth=([\w\.-]+)/i, 1)
 
-      if (auth) {
-        return cb(null, auth)
+    var encryptedGmailPassword = StringUtils.encryptGmailPassword(gmailEmail, gmailPassword)
+
+    Request.postRaw({
+      url: 'https://android.clients.google.com/auth',
+      form: {
+        'google_play_services_version': '7097038',
+        'device_country': 'us',
+        'operatorCountry': 'us',
+        'lang': 'en_US',
+        'sdk_version': '19',
+        'accountType': 'HOSTED_OR_GOOGLE',
+        'Email': gmailEmail,
+        'EncryptedPasswd': encryptedGmailPassword,
+        // 'Passwd': gmailPassword, // unencrypted version
+        'service': 'audience:server:client_id:694893979329-l59f3phl42et9clpoo296d8raqoljl6p.apps.googleusercontent.com',
+        'source': 'android',
+        'androidId': '378c184c6070c26c',
+        'app': 'com.snapchat.android',
+        'client_sig': '49f6badb81d89a9e38d65de76f09355071bd67e7',
+        'callerPkg': 'com.snapchat.android',
+        'callerSig': '49f6badb81d89a9e38d65de76f09355071bd67e7'
+      },
+      headers: {
+        'device': '378c184c6070c26c',
+        'app': 'com.snapchat.android',
+        'Accept-Encoding': 'gzip',
+        'User-Agent': 'GoogleAuth/1.4 (mako JDQ39)'
       }
-    }
+    }, function (err, response, body) {
+      if (err) {
+        debug('_getGoogleAuthToken error %s', err)
+        return reject(err)
+      } else if (body) {
+        var auth = StringUtils.matchGroup(body, /Auth=([\w\.-]+)/i, 1)
+        if (auth) {
+          configs.set(StringUtils.hashHMacToBase64(gmailEmail, gmailPassword), auth)
+          return resolve(auth)
+        }
+      }
 
-    return cb('Snapchat._getGoogleAuthToken unknown error')
-  })
+      return reject(new Error('Snapchat._getGoogleAuthToken unknown error'))
+    })
+
+  }).nodeify(cb)
 }
 
 // static cache of device tokens
@@ -925,28 +944,37 @@ Snapchat.prototype._getGoogleCloudMessagingIdentifier = function (cb) {
  * @private
  */
 Snapchat.prototype._getAttestation = function (username, password, ts, cb) {
-  var preHash = StringUtils.getSCPreHashString(username, password, ts, constants.endpoints.account.login)
-  var nonce = StringUtils.sha256HashToBase64(preHash)
+  return new Promise(function (resolve, reject) {
 
-  var params = {
-    'nonce': nonce,
-    'authentication': constants.attestation.auth,
-    'apk_digest': constants.attestation.digest(),
-    'timestamp': ts
-  }
-
-  Request.postRaw({
-    url: constants.attestation.URLCasper,
-    form: params
-  }, function (err, response, result) {
-    if (err) {
-      return cb(err)
-    } else if (result && +result.code === 200 && result.attestation) {
-      return cb(null, result.attestation)
+    var userCache = configs.get(StringUtils.hashHMacToBase64(username, password))
+    if (userCache) {
+      return resolve(userCache.attestation)
     }
 
-    return cb('Snapchat._getAttestation unknown error')
-  })
+    var preHash = StringUtils.getSCPreHashString(username, password, ts, constants.endpoints.account.login)
+    var nonce = StringUtils.sha256HashToBase64(preHash)
+
+    var params = {
+      'nonce': nonce,
+      'authentication': constants.attestation.auth,
+      'apk_digest': constants.attestation.digest(),
+      'timestamp': ts
+    }
+
+    Request.postRaw({
+      url: constants.attestation.URLCasper,
+      form: params
+    }, function (err, response, result) {
+      if (err) {
+        return reject(err)
+      } else if (result && +result.code === 200 && result.attestation) {
+        return resolve(result.attestation)
+      }
+
+      return reject(new Error('Snapchat._getAttestation unknown error'))
+    })
+
+  }).nodeify(cb)
 }
 
 /**
@@ -958,20 +986,29 @@ Snapchat.prototype._getAttestation = function (username, password, ts, cb) {
  * @private
  */
 Snapchat.prototype._getClientAuthToken = function (username, password, ts, cb) {
-  Request.postRaw({
-    url: constants.attestation.URLCasperAuth,
-    form: {
-      username: username,
-      password: password,
-      timestamp: ts
-    }
-  }, function (err, response, result) {
-    if (err) {
-      return cb(err)
-    } else if (result && +result.code === 200 && result.signature) {
-      return cb(null, result.signature)
+  return new Promise(function (resolve, reject) {
+
+    var userCache = configs.get(StringUtils.hashHMacToBase64(username, password))
+    if (userCache) {
+      return resolve(userCache.clientAuthToken)
     }
 
-    return cb('Snapchat._getClientAuthToken unknown error')
-  })
+    Request.postRaw({
+      url: constants.attestation.URLCasperAuth,
+      form: {
+        username: username,
+        password: password,
+        timestamp: ts
+      }
+    }, function (err, response, result) {
+      if (err) {
+        return reject(err)
+      } else if (result && +result.code === 200 && result.signature) {
+        return resolve(result.signature)
+      }
+
+      return reject(new Error('Snapchat._getClientAuthToken unknown error'))
+    })
+
+  }).nodeify(cb)
 }
