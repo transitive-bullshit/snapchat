@@ -100,7 +100,7 @@ DEBUG=snapchat,snapchat:*; # debug all snapchat submodules
 
 ### License
 
-MIT. Copyright (c) [Travis Fischer](https://makesnaps.com).
+MIT. Copyright (c) [Travis Fischer](http://github.com/fisch0920).
 
 ### Legal
 
