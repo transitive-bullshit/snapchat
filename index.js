@@ -387,13 +387,6 @@ Snapchat.prototype.signInWithData = function (data, username, password, cb) {
         return reject(err)
       } else if (result) {
         self.session = new Session(self, result)
-        var userHash = StringUtils.hashHMacToBase64(username, password)
-        if (!configs.get(userHash)) {
-          configs.set(userHash, {
-            attestation: attestation,
-            clientAuthToken: clientAuthToken
-          })
-        }
         return resolve(self.session)
       }
 
@@ -947,11 +940,6 @@ Snapchat.prototype._getGoogleCloudMessagingIdentifier = function (cb) {
 Snapchat.prototype._getAttestation = function (username, password, ts, cb) {
   return new Promise(function (resolve, reject) {
 
-    var userCache = configs.get(StringUtils.hashHMacToBase64(username, password))
-    if (userCache) {
-      return resolve(userCache.attestation)
-    }
-
     Request.get(constants.attestation.URLCasperDroidGuardBinary, function (err, result) {
       if (err) {
         debug('Attstation droidguarbinary error %s', err)
@@ -1029,11 +1017,6 @@ Snapchat.prototype._getAttestation = function (username, password, ts, cb) {
 Snapchat.prototype._getClientAuthToken = function (username, password, ts, cb) {
   return new Promise(function (resolve, reject) {
 
-    var userCache = configs.get(StringUtils.hashHMacToBase64(username, password))
-    if (userCache) {
-      return resolve(userCache.clientAuthToken)
-    }
-
     Request.postRaw({
       'url': constants.attestation.URLCasperAuth,
       'form': {
@@ -1060,19 +1043,14 @@ Snapchat.prototype._getClientAuthToken = function (username, password, ts, cb) {
 /**
  * Removes previously cached values
  *
- * @param {string} Optional username The Snapchat username to sign in with.
- * @param {string} Optional password The password to the Snapchat account to sign in with.
  * @param {string} Optional gmailEmail A valid GMail address.
  * @param {string} Optional gmailPassword The password associated with gmailEmail.
  *
  * @private
  */
-Snapchat.prototype._clearCache = function (username, password, gmailEmail, gmailPassword) {
-  if (!(username && password && gmailEmail && gmailPassword)) {
+Snapchat.prototype._clearCache = function (gmailEmail, gmailPassword) {
+  if (!(gmailEmail && gmailPassword)) {
     return configs.clear()
-  }
-  if (username && password) {
-    configs.del(StringUtils.hashHMacToBase64(username, password))
   }
   if (gmailEmail && gmailPassword) {
     configs.del(StringUtils.hashHMacToBase64(gmailEmail, gmailPassword))
