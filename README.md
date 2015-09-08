@@ -83,6 +83,7 @@ DEBUG=snapchat,snapchat:*; # debug all snapchat submodules
 - Tanner Bennett ([ThePantsThief](https://github.com/ThePantsThief)), the auther of the Objective-C library SnapchatKit, which this version is **heavily** based on.
 - Everyone who built and maintains the PHP implementation.
 - See [nykac](https://github.com/nykac)'s old node [version](https://github.com/nykac/node-snapchat).
+- Liam Cottle for his tenacious work on [Casper](https://casper.io/) and the API service he provides.
 
 ### Author
 
