@@ -276,6 +276,7 @@ Snapchat.prototype.signIn = function (username, password, gmailEmail, gmailPassw
       var timestamp = StringUtils.timestamp()
 
       self._getAttestation(username, password, timestamp, function (err, attestation) {
+
         if (err) {
           debug('error getting attestation')
           return reject(err)
@@ -378,7 +379,7 @@ Snapchat.prototype.signInWithData = function (data, username, password, cb) {
     }
 
     Request.postCustom(constants.endpoints.account.login, params, headers, null, opts, function (err, result) {
-      if (!result.logged) {
+      if (result.status < 0) {
         err = new Error(result.message)
       }
       if (err) {
@@ -793,8 +794,8 @@ Snapchat.prototype._getGoogleAuthToken = function (gmailEmail, gmailPassword, cb
     var encryptedGmailPassword = StringUtils.encryptGmailPassword(gmailEmail, gmailPassword)
 
     Request.postRaw({
-      url: 'https://android.clients.google.com/auth',
-      form: {
+      'url': 'https://android.clients.google.com/auth',
+      'form': {
         'google_play_services_version': '7097038',
         'device_country': 'us',
         'operatorCountry': 'us',
@@ -812,7 +813,7 @@ Snapchat.prototype._getGoogleAuthToken = function (gmailEmail, gmailPassword, cb
         'callerPkg': 'com.snapchat.android',
         'callerSig': '49f6badb81d89a9e38d65de76f09355071bd67e7'
       },
-      headers: {
+      'headers': {
         'device': '378c184c6070c26c',
         'app': 'com.snapchat.android',
         'Accept-Encoding': 'gzip',
@@ -951,29 +952,69 @@ Snapchat.prototype._getAttestation = function (username, password, ts, cb) {
       return resolve(userCache.attestation)
     }
 
-    var preHash = StringUtils.getSCPreHashString(username, password, ts, constants.endpoints.account.login)
-    var nonce = StringUtils.sha256HashToBase64(preHash)
-
-    var params = {
-      'nonce': nonce,
-      'authentication': constants.attestation.auth,
-      'apk_digest': constants.attestation.digest(),
-      'timestamp': ts
-    }
-
-    Request.postRaw({
-      url: constants.attestation.URLCasper,
-      form: params
-    }, function (err, response, result) {
+    Request.get(constants.attestation.URLCasperDroidGuardBinary, function (err, result) {
       if (err) {
-        return reject(err)
-      } else if (result && +result.code === 200 && result.attestation) {
-        return resolve(result.attestation)
+        debug('Attstation droidguarbinary error %s', err)
+        result = {
+          'binary': constants.attestation.droidGuard
+        }
       }
 
-      return reject(new Error('Snapchat._getAttestation unknown error'))
-    })
+      Request.postRaw({
+        'uri': 'https://www.googleapis.com/androidantiabuse/v1/x/create',
+        'qs': {
+          'alt': 'PROTO',
+          'key': 'AIzaSyBofcZsgLSS7BOnBjZPEkk4rYwzOIz-lTI'
+        },
+        'body': new Buffer(result.binary, 'base64'),
+        'headers': {
+          'User-Agent': 'DroidGuard/7329000 (A116 _Quad KOT49H); gzip',
+          'Content-Type': 'application/x-protobuf'
+        }
+      }, function(err, response, result){
+        if (err) {
+          debug('Attstation googleantiabuse error %s', err)
+          return reject(err)
+        }
+        var preHash = StringUtils.getSCPreHashString(username, password, ts, constants.endpoints.account.login)
+        var nonce = StringUtils.sha256HashToBase64(preHash)
 
+        Request.postRaw({
+          'uri': constants.attestation.URLCasperAttestationBinary,
+          'form': {
+            'bytecode_proto': result.toString('base64'),
+            'nonce': nonce,
+            'apk_digest': constants.attestation.digest()
+          }
+        }, function(err, response, result){
+          if (err) {
+            debug('Attstation casper error %s', err)
+            return reject(err)
+          }
+          var postData = new Buffer(result.binary, 'base64')
+
+          Request.postRaw({
+            'uri': 'https://www.googleapis.com/androidcheck/v1/attestations/attest',
+            'qs': {
+              'alt': 'JSON',
+              'key': 'AIzaSyDqVnJBjE5ymo--oBJt3On7HQx9xNm1RHA'
+            },
+            'body': postData,
+            'headers': {
+              'User-Agent': 'SafetyNet/7899000 (WIKO JZO54K); gzip',
+              'Content-Type': 'application/x-protobuf',
+              'Content-Length': postData.length
+            }
+          }, function(err, response, result){
+            if (err) {
+              debug('Attstation androidcheck error %s', err)
+              return reject(err)
+            }
+            return resolve(result.signedAttestation)
+          })
+        })
+      })
+    })
   }).nodeify(cb)
 }
 
@@ -994,16 +1035,19 @@ Snapchat.prototype._getClientAuthToken = function (username, password, ts, cb) {
     }
 
     Request.postRaw({
-      url: constants.attestation.URLCasperAuth,
-      form: {
-        username: username,
-        password: password,
-        timestamp: ts
+      'url': constants.attestation.URLCasperAuth,
+      'form': {
+        'username': username,
+        'password': password,
+        'timestamp': ts
       }
     }, function (err, response, result) {
       if (err) {
         return reject(err)
-      } else if (result && +result.code === 200 && result.signature) {
+      // NOTE:
+      // - currently still using the old version see (https://github.com/fisch0920/snapchat/issues/7),
+      //   new version uses: +result.code === 200
+      } else if (result && +result.status === 200 && result.signature) {
         return resolve(result.signature)
       }
 
