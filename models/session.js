@@ -190,3 +190,31 @@ Session.prototype.getStory = function (username) {
 
   return null
 }
+
+/**
+ * @param  {string|array} usernames
+ * @return {Conversation|null}
+ */
+Session.prototype.getConversation = function (usernames) {
+  var self = this
+
+  // TODO: use cached map of username->story
+  if (!Array.isArray(usernames)) {
+    usernames = [usernames]
+  }
+  var participants = [self.username].concat(usernames)
+
+  for (var i = 0; i < self.conversations.length; ++i) {
+    var conversation = self.conversations[i]
+
+    var match = !conversation.participants.some(function (participant) {
+      return participants.indexOf(participant) === -1
+    })
+
+    if (match) {
+      return conversation
+    }
+  }
+
+  return null
+}
