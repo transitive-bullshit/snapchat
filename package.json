@@ -26,7 +26,7 @@
     "phone": "^1.0.4",
     "request": "^2.61.0",
     "url-join": "0.0.1",
-    "ursa": "^0.8.5",
+    "ursa": "^0.9.1",
     "xtend": "^4.0.0"
   },
   "devDependencies": {
