@@ -22,11 +22,11 @@
     "inherits": "^2.0.1",
     "jszip": "^2.5.0",
     "node-rsa": "^0.2.25",
-    "node-uuid": "^1.4.3",
     "phone": "^1.0.4",
     "request": "^2.61.0",
     "url-join": "0.0.1",
     "ursa": "^0.9.1",
+    "uuid": "^3.0.0",
     "xtend": "^4.0.0"
   },
   "devDependencies": {
