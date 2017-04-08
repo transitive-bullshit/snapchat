@@ -10,10 +10,6 @@ This project is a node.js port of the excellent Objective-C [SnapchatKit](https:
 
 It provides an easy-to-use client interface to Snapchat's unofficial API, allowing Javascript developers to script Snapchat!
 
-### Status
-
-Most API methods are working and up-to-date with the current version of Snapchat, though there are some non-core methods which are untested. For example usage, please refer to the tests.
-
 ### Install
 
 ```bash
