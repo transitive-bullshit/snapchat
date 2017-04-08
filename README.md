@@ -1,5 +1,9 @@
 # Snapchat
 
+## *STATUS*
+
+This library is not being actively maintained and AFAIK there is no easy way to get it working due to Snapchat updates and the Casper service no longer being public. If anyone is interested in adopting this project or knows a workaround to get this library working again, please feel free to reach out.
+
 ### Nodejs client for the unofficial Snapchat API
 
 This project is a node.js port of the excellent Objective-C [SnapchatKit](https://github.com/ThePantsThief/SnapchatKit) library by Tanner Bennett ([ThePantsThief](https://github.com/ThePantsThief)).
