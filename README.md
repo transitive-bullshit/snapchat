@@ -18,7 +18,7 @@ npm install snapchat
 
 ### Usage
 
-The main entrypoint is the [Snapchat](http://fisch0920.github.io/snapchat/Snapchat.html) class. See the auto-generated [documentation](http://fisch0920.github.io/snapchat) for a detailed API reference.
+The main entrypoint is the [Snapchat](http://transitive-bullshit.github.io/snapchat/Snapchat.html) class. See the auto-generated [documentation](http://transitive-bullshit.github.io/snapchat) for a detailed API reference.
 
 Snapchat defaults to using required signin credentials stored in environment variables:
 
